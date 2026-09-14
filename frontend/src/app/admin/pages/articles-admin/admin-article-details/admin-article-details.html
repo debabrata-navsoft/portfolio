@@ -1,0 +1,384 @@
+@if (isErrorMsg()) {
+  <app-error />
+} @else if (article(); as art) {
+  <div class="space-y-6 pb-12">
+    <!-- TOP NAVIGATION & ACTION BAR -->
+    <div
+      class="flex flex-col gap-4 rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div class="space-y-1.5 min-w-0">
+        <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
+          <a
+            routerLink="/admin/articles"
+            class="hover:text-emerald-600 transition-colors flex items-center gap-1 font-semibold"
+          >
+            <lucide-icon name="arrow-left" [size]="13" />
+            <span>Articles</span>
+          </a>
+          <span class="text-slate-300">/</span>
+          <span class="text-slate-700 font-semibold truncate max-w-xs">{{ art.title }}</span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+          <h1 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900 truncate">
+            {{ art.title }}
+          </h1>
+
+          @if (art.published) {
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200/60 px-3 py-0.5 text-xs font-bold text-emerald-700 shadow-2xs"
+            >
+              <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              Published
+            </span>
+          } @else {
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200/60 px-3 py-0.5 text-xs font-bold text-amber-700 shadow-2xs"
+            >
+              <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+              Draft
+            </span>
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2 shrink-0">
+        <a
+          routerLink="/admin/articles"
+          class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:text-slate-900 transition active:scale-95"
+        >
+          <lucide-icon name="arrow-left" [size]="14" />
+          <span>Back</span>
+        </a>
+
+        @if (art.published) {
+          <a
+            [routerLink]="['/articles', art.slug]"
+            target="_blank"
+            class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 transition active:scale-95"
+            title="View live public article"
+          >
+            <lucide-icon name="external-link" [size]="14" />
+            <span>Live Article</span>
+          </a>
+        }
+
+        <a
+          [routerLink]="['/admin/articles/edit', art.slug]"
+          class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-emerald-500 transition active:scale-95"
+        >
+          <lucide-icon name="square-pen" [size]="14" />
+          <span>Edit Article</span>
+        </a>
+
+        <button
+          type="button"
+          (click)="deleteArticle()"
+          class="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50/80 px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-100 transition active:scale-95 cursor-pointer"
+          title="Delete this article"
+        >
+          <lucide-icon name="trash-2" [size]="14" />
+          <span>Delete</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN TWO-COLUMN GRID -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      <!-- LEFT COLUMN: ARTICLE CONTENT & COVER (8 cols) -->
+      <div class="space-y-6 lg:col-span-8">
+        <!-- Cover Image Showcase -->
+        <div class="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-xs">
+          <div class="border-b border-slate-100 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-2 text-slate-900 font-bold text-sm">
+              <span
+                class="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600"
+              >
+                <lucide-icon name="image" [size]="15" />
+              </span>
+              <span>Article Cover Banner</span>
+            </div>
+            @if (art.image) {
+              <span class="text-xs font-medium text-slate-400">Click image to enlarge</span>
+            }
+          </div>
+
+          <div class="p-6">
+            @if (art.image) {
+              <div
+                (click)="openImage(art.image)"
+                class="group relative aspect-21/9 w-full cursor-zoom-in overflow-hidden rounded-xl border border-slate-200/90 bg-slate-900 shadow-xs transition hover:shadow-md"
+              >
+                <img
+                  [src]="art.image"
+                  [alt]="art.title"
+                  class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-103"
+                  loading="lazy"
+                />
+                <div
+                  class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-200 group-hover:opacity-100 backdrop-blur-[2px]"
+                >
+                  <span
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-black/80 px-3.5 py-1.5 text-xs font-semibold text-white shadow-md ring-1 ring-white/20"
+                  >
+                    <lucide-icon name="maximize-2" [size]="14" />
+                    View Fullscreen
+                  </span>
+                </div>
+              </div>
+            } @else {
+              <div
+                class="flex flex-col items-center justify-center py-12 text-center text-slate-400 bg-slate-50/50 rounded-xl border border-dashed border-slate-200"
+              >
+                <lucide-icon name="image" [size]="36" class="mb-2 text-slate-300" />
+                <p class="text-sm font-semibold text-slate-600">No cover image uploaded</p>
+                <p class="text-xs text-slate-400 mt-0.5">
+                  Add an article banner from the edit screen
+                </p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Excerpt Callout -->
+        @if (art.excerpt) {
+          <div
+            class="rounded-2xl border-l-4 border-l-emerald-500 border-y border-r border-slate-200/90 bg-emerald-50/30 p-6 shadow-xs"
+          >
+            <div class="mb-2.5 flex items-center gap-2">
+              <span
+                class="flex h-6 w-6 items-center justify-center rounded-md bg-emerald-100/80 text-emerald-700"
+              >
+                <lucide-icon name="sparkles" [size]="13" />
+              </span>
+              <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-800">
+                Article Excerpt & Hook
+              </h2>
+            </div>
+            <p class="text-base sm:text-lg italic font-normal text-slate-800 leading-relaxed">
+              "{{ art.excerpt }}"
+            </p>
+          </div>
+        }
+
+        <!-- Article Body Card -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs">
+          <div class="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2">
+              <span
+                class="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600"
+              >
+                <lucide-icon name="file-text" [size]="15" />
+              </span>
+              <h2 class="text-base font-bold text-slate-900">Article Content</h2>
+            </div>
+            <span
+              class="text-xs font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full"
+            >
+              {{ wordCount() }} words
+            </span>
+          </div>
+
+          <div class="whitespace-pre-line text-sm sm:text-base leading-relaxed text-slate-700">
+            {{ art.content }}
+          </div>
+        </div>
+
+        <!-- Assigned Tags Card -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs">
+          <div class="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2">
+              <span
+                class="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600"
+              >
+                <lucide-icon name="layers" [size]="15" />
+              </span>
+              <h2 class="text-base font-bold text-slate-900">Assigned Tags</h2>
+            </div>
+            @if (art.tags && art.tags.length > 0) {
+              <span class="text-xs font-semibold text-slate-400">{{ art.tags.length }} tags</span>
+            }
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            @if (art.tags && art.tags.length > 0) {
+              @for (tag of art.tags; track tag) {
+                <span
+                  class="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/70 bg-emerald-50/70 px-3.5 py-1.5 text-xs font-bold text-emerald-700 shadow-2xs transition hover:bg-emerald-100/80"
+                >
+                  <span class="text-emerald-500 font-extrabold">#</span>
+                  {{ tag }}
+                </span>
+              }
+            } @else {
+              <p class="text-xs font-medium text-slate-400 italic">No tags assigned.</p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: METADATA & QUICK NAVIGATION (4 cols) -->
+      <div class="space-y-6 lg:col-span-4">
+        <!-- Publication Details Card -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs space-y-4">
+          <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+            <span
+              class="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600"
+            >
+              <lucide-icon name="file-text" [size]="15" />
+            </span>
+            <h3 class="text-base font-bold text-slate-900">Publication Details</h3>
+          </div>
+
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400"
+              >Visibility Status</span
+            >
+            <div class="mt-1">
+              @if (art.published) {
+                <span
+                  class="inline-flex items-center gap-1.5 rounded-md bg-emerald-50 border border-emerald-200/70 px-2.5 py-1 text-xs font-bold text-emerald-700"
+                >
+                  <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                  Published & Live
+                </span>
+              } @else {
+                <span
+                  class="inline-flex items-center gap-1.5 rounded-md bg-slate-100 border border-slate-200 px-2.5 py-1 text-xs font-bold text-slate-700"
+                >
+                  <span class="h-2 w-2 rounded-full bg-slate-400"></span>
+                  Draft (Private)
+                </span>
+              }
+            </div>
+          </div>
+
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400"
+              >Estimated Reading Time</span
+            >
+            <p class="mt-1 flex items-center gap-1.5 text-sm font-bold text-slate-800">
+              <lucide-icon name="clock" [size]="14" class="text-emerald-600" />
+              <span>{{ art.estimatedReadingTime || 1 }} min read</span>
+            </p>
+          </div>
+
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400"
+              >Total Word Count</span
+            >
+            <p class="mt-1 text-sm font-bold text-slate-800">{{ wordCount() }} words</p>
+          </div>
+
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400"
+              >Created Date</span
+            >
+            <p class="mt-1 text-sm font-semibold text-slate-700">
+              {{ (art.createdAt | date: 'dd MMM yyyy, hh:mm a') || 'N/A' }}
+            </p>
+          </div>
+
+          @if (art.updatedAt) {
+            <div>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400"
+                >Last Modified</span
+              >
+              <p class="mt-1 text-sm font-semibold text-slate-700">
+                {{ (art.updatedAt | date: 'dd MMM yyyy, hh:mm a') || 'N/A' }}
+              </p>
+            </div>
+          }
+
+          <div class="border-t border-slate-100 pt-3">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400"
+              >URL Slug</span
+            >
+            <div
+              class="mt-1 flex items-center justify-between rounded-xl bg-slate-50 p-2.5 border border-slate-200"
+            >
+              <code class="text-xs text-slate-800 truncate font-mono font-semibold">{{
+                art.slug
+              }}</code>
+              <button
+                type="button"
+                (click)="copySlug(art.slug)"
+                class="ml-2 inline-flex items-center gap-1 rounded-lg bg-white px-2 py-1 text-[11px] font-bold text-emerald-600 border border-slate-200 shadow-2xs hover:bg-emerald-50 hover:border-emerald-200 transition cursor-pointer"
+                title="Copy slug"
+              >
+                <lucide-icon [name]="copiedSlug() ? 'check' : 'copy'" [size]="12" />
+                <span>{{ copiedSlug() ? 'Copied' : 'Copy' }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Navigation Card -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs space-y-3">
+          <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+            <span
+              class="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600"
+            >
+              <lucide-icon name="sparkles" [size]="15" />
+            </span>
+            <h3 class="text-base font-bold text-slate-900">Quick Navigation</h3>
+          </div>
+
+          <a
+            [routerLink]="['/admin/articles/edit', art.slug]"
+            class="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-500 active:scale-98 shadow-xs"
+          >
+            <lucide-icon name="square-pen" [size]="14" />
+            <span>Edit Article Content</span>
+          </a>
+
+          @if (art.published) {
+            <a
+              [routerLink]="['/articles', art.slug]"
+              target="_blank"
+              class="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50/60 py-2.5 text-xs font-bold text-slate-700 transition hover:bg-slate-100/80 active:scale-98 shadow-2xs"
+            >
+              <lucide-icon name="eye" [size]="14" />
+              <span>View Public Article</span>
+            </a>
+          }
+
+          <a
+            routerLink="/admin/articles"
+            class="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-2.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-50 active:scale-98 shadow-2xs"
+          >
+            <lucide-icon name="arrow-left" [size]="14" />
+            <span>All Articles</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- FULLSCREEN LIGHTBOX MODAL -->
+@if (activeImage()) {
+  <div
+    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4 backdrop-blur-md transition-all"
+    (click)="closeImage()"
+  >
+    <button
+      type="button"
+      (click)="closeImage()"
+      class="absolute right-5 top-5 z-[10000] flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition active:scale-95"
+      title="Close preview"
+    >
+      <lucide-icon name="x" [size]="22" />
+    </button>
+    <div
+      (click)="$event.stopPropagation()"
+      class="relative flex items-center justify-center max-h-[88vh] max-w-[92vw]"
+    >
+      <img
+        [src]="activeImage()!"
+        alt="Fullscreen Preview"
+        class="max-h-[88vh] max-w-[92vw] rounded-2xl object-contain shadow-2xl ring-1 ring-white/10"
+      />
+    </div>
+  </div>
+}

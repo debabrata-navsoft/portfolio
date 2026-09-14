@@ -1,0 +1,200 @@
+<section class="md:pt-10 xl:pt-15 my-20">
+  <div class="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-start">
+    <div appReveal revealAnimation="left" [revealDelay]="100" class="flex flex-col items-start">
+      <h2 class="text-4xl font-bold md:text-6xl">Get in touch</h2>
+
+      <p class="mb-10 mt-8 text-lg text-gray-500">
+        I'm currently avaliable to take on new projects, so feel free to send me a message about
+        anything that you want me to work on. You can contact anytime.
+        <!-- Have a project in mind? Let's talk and build something great. -->
+      </p>
+
+      <a
+        href="mailto:test@gmail.com"
+        class="inline-flex items-center gap-2 text-lg font-medium text-gray-500 hover:text-gray-700 transition-colors"
+      >
+        <span> <lucide-icon size="20" name="mail"></lucide-icon></span>
+        <p>debabratadas711@gmail.com</p>
+      </a>
+
+      <a
+        href="tel:+911234567890"
+        class="mt-4 inline-flex items-center gap-2 text-lg font-medium text-gray-500 transition-colors hover:text-gray-700"
+      >
+        <span><lucide-icon size="20" name="phone"></lucide-icon></span>
+        <p>+91 9734990919</p>
+      </a>
+
+      <a
+        href="https://www.google.com/maps?q=Kolkata,West+Bengal,India"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="mt-4 inline-flex items-center gap-2 text-lg font-medium text-gray-500 hover:text-blue-600 transition-colors"
+      >
+        <span><lucide-icon size="20" name="map-pin"></lucide-icon></span>
+        <p>Kolkata, West Bengal, India</p>
+      </a>
+
+      <div
+        appReveal
+        revealAnimation="up"
+        [revealDelay]="200"
+        class="mt-8 h-75 w-full overflow-hidden"
+      >
+        <iframe
+          class="h-full w-full border-0"
+          src="https://www.google.com/maps?q=Kolkata,West+Bengal,India&output=embed"
+          loading="lazy"
+          allowfullscreen
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+      </div>
+    </div>
+
+    <form (ngSubmit)="submit($event)" class="space-y-6">
+      <div
+        appReveal
+        revealAnimation="up"
+        [revealDelay]="100"
+        class="grid grid-cols-1 md:grid-cols-2 gap-5"
+      >
+        <div>
+          <label for="firstName" class="text-lg font-bold"
+            >First Name <span class="text-red-500">*</span></label
+          >
+          <input
+            id="firstName"
+            name="firstName"
+            placeholder="First Name"
+            [value]="contactForm().firstName"
+            (input)="update($event)"
+            (blur)="markTouched('firstName')"
+            class="mt-2 w-full border bg-[#f2f6f7] p-4.5 outline-none transition-all duration-300 dark:bg-gray-950 placeholder-gray-400 dark:placeholder-gray-600"
+            [ngClass]="{
+              'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-red-950':
+                hasError('firstName'),
+              'border-gray-300 dark:border-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-950':
+                !hasError('firstName'),
+            }"
+          />
+          @if (hasError('firstName')) {
+            <p class="mt-1 text-xs font-medium text-red-500">First name is required</p>
+          }
+        </div>
+
+        <div>
+          <label for="lastName" class="text-lg font-bold"
+            >Last Name <span class="text-red-500">*</span></label
+          >
+          <input
+            id="lastName"
+            name="lastName"
+            placeholder="Last Name"
+            [value]="contactForm().lastName"
+            (input)="update($event)"
+            (blur)="markTouched('lastName')"
+            class="mt-2 w-full border bg-[#f2f6f7] p-4.5 outline-none transition-all duration-300 dark:bg-gray-950 placeholder-gray-400 dark:placeholder-gray-600"
+            [ngClass]="{
+              'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-red-950':
+                hasError('lastName'),
+              'border-gray-300 dark:border-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-950':
+                !hasError('lastName'),
+            }"
+          />
+          @if (hasError('lastName')) {
+            <p class="mt-1 text-xs font-medium text-red-500">Last name is required</p>
+          }
+        </div>
+      </div>
+
+      <div appReveal revealAnimation="up" [revealDelay]="200">
+        <label for="email" class="text-lg font-bold"
+          >Email <span class="text-red-500">*</span></label
+        >
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          placeholder="Email"
+          [value]="contactForm().email"
+          (input)="update($event)"
+          (blur)="markTouched('email')"
+          class="mt-2 w-full border bg-[#f2f6f7] p-4.5 outline-none transition-all duration-300 dark:bg-gray-950 placeholder-gray-400 dark:placeholder-gray-600"
+          [ngClass]="{
+            'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-red-950':
+              hasError('email'),
+            'border-gray-300 dark:border-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-950':
+              !hasError('email'),
+          }"
+        />
+        @if (hasError('email')) {
+          <p class="mt-1 text-xs font-medium text-red-500">Email is required</p>
+        }
+      </div>
+
+      <div appReveal revealAnimation="up" [revealDelay]="300">
+        <label for="subject" class="text-lg font-bold"
+          >Subject <span class="text-red-500">*</span></label
+        >
+        <input
+          id="subject"
+          name="subject"
+          placeholder="Subject"
+          [value]="contactForm().subject"
+          (input)="update($event)"
+          (blur)="markTouched('subject')"
+          class="mt-2 w-full border bg-[#f2f6f7] p-4.5 outline-none transition-all duration-300 dark:bg-gray-950 placeholder-gray-400 dark:placeholder-gray-600"
+          [ngClass]="{
+            'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-red-950':
+              hasError('subject'),
+            'border-gray-300 dark:border-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-950':
+              !hasError('subject'),
+          }"
+        />
+        @if (hasError('subject')) {
+          <p class="mt-1 text-xs font-medium text-red-500">Subject is required</p>
+        }
+      </div>
+
+      <div appReveal revealAnimation="up" [revealDelay]="400">
+        <label for="message" class="text-lg font-bold"
+          >Tell me a bit more what you're looking for? <span class="text-red-500">*</span></label
+        >
+        <textarea
+          id="message"
+          name="message"
+          rows="8"
+          placeholder="Message"
+          [value]="contactForm().message"
+          (input)="update($event)"
+          (blur)="markTouched('message')"
+          class="mt-2 w-full border bg-[#f2f6f7] p-4.5 outline-none transition-all duration-300 dark:bg-gray-950 placeholder-gray-400 dark:placeholder-gray-600"
+          [ngClass]="{
+            'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:focus:ring-red-950':
+              hasError('message'),
+            'border-gray-300 dark:border-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-950':
+              !hasError('message'),
+          }"
+        ></textarea>
+        @if (hasError('message')) {
+          <p class="mt-1 text-xs font-medium text-red-500">Message is required</p>
+        }
+      </div>
+
+      <div
+        appReveal
+        revealAnimation="up"
+        [revealDelay]="400"
+        class="flex justify-center xl:justify-start"
+      >
+        <app-custom-button
+          [text]="isSending() ? 'Submitting...' : 'Submit Now!'"
+          type="submit"
+          [disabled]="isSending()"
+          width="w-[200px]"
+        />
+      </div>
+    </form>
+  </div>
+</section>

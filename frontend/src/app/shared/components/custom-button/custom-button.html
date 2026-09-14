@@ -1,0 +1,31 @@
+@if (link()) {
+  <a [routerLink]="link()">
+    <div
+      class="relative bg-gradient-to-r from-orange-400 via-red-500 to-purple-600"
+      [ngClass]="[width(), height()]"
+    >
+      <button
+        type="button"
+        class="absolute right-2 bottom-2 dark:border dark:border-gray-900 bg-black font-medium text-white transition-all duration-300 hover:right-0 hover:bottom-0 cursor-pointer"
+        [ngClass]="[width(), height(), textSize()]"
+      >
+        {{ text() }}
+      </button>
+    </div>
+  </a>
+} @else {
+  <div
+    class="relative bg-gradient-to-r from-orange-400 via-red-500 to-purple-600"
+    [ngClass]="[width(), height()]"
+  >
+    <button
+      [type]="type()"
+      [disabled]="disabled()"
+      class="absolute right-2 bottom-2 dark:border dark:border-gray-900 bg-black font-medium text-white transition-all duration-300 hover:right-0 hover:bottom-0 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+      [ngClass]="[width(), height(), textSize()]"
+    >
+      {{ text() }}
+    </button>
+  </div>
+}
+

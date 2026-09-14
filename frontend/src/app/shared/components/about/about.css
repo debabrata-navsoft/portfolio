@@ -1,0 +1,18 @@
+::ng-deep .about-content {
+  line-height: 1.8;
+}
+
+::ng-deep .about-content p {
+  margin-bottom: 12px;
+}
+
+::ng-deep .about-content p:last-child {
+  margin-bottom: 0;
+}
+::ng-deep .about-content strong {
+  font-weight: 700;
+  color: #374151;
+}
+::ng-deep .dark-theme .about-content strong {
+  color: #9ca3af;
+}

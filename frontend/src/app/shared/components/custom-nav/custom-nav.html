@@ -1,0 +1,9 @@
+<p class="group flex cursor-pointer items-center gap-2 {{ class() }}" (click)="navigate()">
+  <span>{{ text() }}</span>
+
+  <lucide-icon
+    [img]="ArrowRight"
+    [size]="iconSize()"
+    class="transition-transform duration-500 group-hover:translate-x-3"
+  />
+</p>

@@ -1,0 +1,294 @@
+@if (isErrorMsg()) {
+  <app-error />
+} @else if (contact(); as cont) {
+  <div class="space-y-6 pb-12">
+    <!-- TOP NAVIGATION & ACTION BAR -->
+    <div
+      class="flex flex-col gap-4 rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div class="space-y-1.5 min-w-0">
+        <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
+          <a
+            routerLink="/admin/contacts"
+            class="hover:text-indigo-600 transition-colors flex items-center gap-1 font-semibold"
+          >
+            <lucide-icon name="arrow-left" [size]="13" />
+            <span>Inquiries</span>
+          </a>
+          <span class="text-slate-300">/</span>
+          <span class="text-slate-700 font-semibold truncate max-w-xs">
+            {{ cont.firstName }} {{ cont.lastName }}
+          </span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+          <h1 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900 truncate">
+            {{ cont.subject || 'No Subject' }}
+          </h1>
+
+          @if (cont.isRead) {
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200/60 px-3 py-0.5 text-xs font-bold text-emerald-700 shadow-2xs"
+            >
+              <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+              Read
+            </span>
+          } @else {
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-rose-50 border border-rose-200/60 px-3 py-0.5 text-xs font-bold text-rose-700 shadow-2xs"
+            >
+              <span class="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+              New Inquiry
+            </span>
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2 shrink-0">
+        <a
+          routerLink="/admin/contacts"
+          class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:text-slate-900 transition active:scale-95"
+        >
+          <lucide-icon name="arrow-left" [size]="14" />
+          <span>Back</span>
+        </a>
+
+        <a
+          [href]="'mailto:' + cont.email + '?subject=Re: ' + (cont.subject || 'Portfolio Inquiry')"
+          class="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-indigo-500 transition active:scale-95"
+        >
+          <lucide-icon name="mail" [size]="14" />
+          <span>Reply via Email</span>
+        </a>
+
+        <button
+          type="button"
+          (click)="deleteContact()"
+          class="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50/70 px-3.5 py-2 text-xs font-bold text-rose-600 shadow-2xs hover:bg-rose-100 hover:border-rose-300 transition active:scale-95 cursor-pointer"
+          title="Delete inquiry"
+        >
+          <lucide-icon name="trash-2" [size]="14" />
+          <span>Delete</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN TWO-COLUMN DASHBOARD GRID -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <!-- LEFT COLUMN: MESSAGE DETAILS -->
+      <div class="lg:col-span-2 space-y-6">
+        <div class="rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-8 shadow-xs space-y-6">
+          <!-- Subject Block -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold uppercase tracking-wider text-slate-400">Subject</span>
+              <span class="text-slate-400 font-medium">Inquiry Topic</span>
+            </div>
+            <div
+              class="flex items-center gap-3 rounded-2xl bg-slate-50/80 p-4 border border-slate-100"
+            >
+              <div
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100/80"
+              >
+                <lucide-icon name="message-square" [size]="18" />
+              </div>
+              <p class="text-base font-bold text-slate-800 leading-snug">
+                {{ cont.subject || 'No Subject Provided' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Message Body -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400"
+                >Message Content</span
+              >
+              <button
+                type="button"
+                (click)="copyMessage(cont.message)"
+                class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-indigo-600 transition cursor-pointer"
+                title="Copy message content"
+              >
+                <lucide-icon [name]="copiedMessage() ? 'check' : 'copy'" [size]="13" />
+                <span>{{ copiedMessage() ? 'Copied' : 'Copy Message' }}</span>
+              </button>
+            </div>
+            <div
+              class="rounded-2xl border border-slate-200/80 bg-slate-50/40 p-6 sm:p-7 leading-relaxed text-slate-800 whitespace-pre-line text-sm sm:text-base font-normal select-text selection:bg-indigo-100 shadow-2xs"
+            >
+              {{ cont.message }}
+            </div>
+          </div>
+
+          <!-- Quick Action Reply Banner -->
+          <div
+            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-indigo-50/80 to-violet-50/60 p-6 border border-indigo-100/90"
+          >
+            <div class="space-y-1">
+              <h4 class="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                <lucide-icon name="send" [size]="15" class="text-indigo-600" />
+                <span>Respond to this inquiry</span>
+              </h4>
+              <p class="text-xs text-slate-600">
+                Compose an email response directly to
+                <span class="font-semibold text-indigo-700">{{ cont.email }}</span>
+              </p>
+            </div>
+
+            <a
+              [href]="
+                'mailto:' + cont.email + '?subject=Re: ' + (cont.subject || 'Portfolio Inquiry')
+              "
+              class="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-indigo-500 transition active:scale-95 shrink-0"
+            >
+              <lucide-icon name="mail" [size]="14" />
+              <span>Compose Reply</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: SENDER PROFILE & META -->
+      <div class="space-y-6">
+        <!-- Sender Profile Card -->
+        <div class="rounded-3xl border border-slate-200/90 bg-white p-6 shadow-xs space-y-6">
+          <div class="flex items-center gap-2 pb-3 border-b border-slate-100">
+            <div
+              class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600"
+            >
+              <lucide-icon name="user" [size]="15" />
+            </div>
+            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">
+              Sender Details
+            </h3>
+          </div>
+
+          <!-- Avatar & Name -->
+          <div class="flex flex-col items-center text-center space-y-3 pt-2">
+            <div
+              class="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-2xl font-black text-white shadow-md ring-4 ring-indigo-50"
+            >
+              {{ getInitials(cont.firstName + ' ' + cont.lastName) }}
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-slate-900">
+                {{ cont.firstName }} {{ cont.lastName }}
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">Inquiry Author</p>
+            </div>
+          </div>
+
+          <!-- Email Address Box -->
+          <div class="space-y-1.5">
+            <span class="text-xs font-semibold text-slate-400">Email Address</span>
+            <div
+              class="flex items-center justify-between gap-2 rounded-xl bg-slate-50 border border-slate-100 p-3"
+            >
+              <a
+                [href]="'mailto:' + cont.email"
+                class="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline truncate"
+                title="Send email"
+              >
+                {{ cont.email }}
+              </a>
+              <button
+                type="button"
+                (click)="copyEmail(cont.email)"
+                class="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-slate-200/70 hover:text-slate-700 transition cursor-pointer"
+                title="Copy email to clipboard"
+              >
+                <lucide-icon [name]="copiedEmail() ? 'check' : 'copy'" [size]="14" />
+              </button>
+            </div>
+          </div>
+
+          <!-- Metadata -->
+          <div class="space-y-3 pt-2 border-t border-slate-100 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="font-medium text-slate-500 flex items-center gap-1.5">
+                <lucide-icon name="calendar" [size]="13" class="text-slate-400" />
+                <span>Received Date</span>
+              </span>
+              <span class="font-bold text-slate-700">
+                {{ cont.createdAt ? (cont.createdAt | date: 'dd MMM yyyy, hh:mm a') : 'N/A' }}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="font-medium text-slate-500 flex items-center gap-1.5">
+                <lucide-icon name="clock" [size]="13" class="text-slate-400" />
+                <span>Time Elapsed</span>
+              </span>
+              <span class="font-bold text-indigo-600">
+                {{ cont.createdAt ? (cont.createdAt | timeAgo) : 'Just now' }}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="font-medium text-slate-500 flex items-center gap-1.5">
+                <lucide-icon name="shield-check" [size]="13" class="text-slate-400" />
+                <span>Status</span>
+              </span>
+              <span
+                class="font-bold"
+                [ngClass]="cont.isRead ? 'text-emerald-600' : 'text-rose-600'"
+              >
+                {{ cont.isRead ? 'Read' : 'Unread' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions Card -->
+        <div class="rounded-3xl border border-slate-200/90 bg-white p-6 shadow-xs space-y-4">
+          <div class="flex items-center gap-2 pb-3 border-b border-slate-100">
+            <div
+              class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600"
+            >
+              <lucide-icon name="inbox" [size]="15" />
+            </div>
+            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Quick Actions</h3>
+          </div>
+
+          <div class="space-y-2">
+            <a
+              [href]="
+                'mailto:' + cont.email + '?subject=Re: ' + (cont.subject || 'Portfolio Inquiry')
+              "
+              class="w-full flex items-center justify-between rounded-xl bg-indigo-50/70 border border-indigo-100 px-4 py-2.5 text-xs font-bold text-indigo-700 hover:bg-indigo-100/70 transition"
+            >
+              <span class="flex items-center gap-2">
+                <lucide-icon name="mail" [size]="14" />
+                <span>Email {{ cont.firstName }}</span>
+              </span>
+              <lucide-icon name="external-link" [size]="13" class="text-indigo-400" />
+            </a>
+
+            <button
+              type="button"
+              (click)="copyMessage(cont.message)"
+              class="w-full flex items-center justify-between rounded-xl bg-slate-50 border border-slate-200/70 px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+            >
+              <span class="flex items-center gap-2">
+                <lucide-icon [name]="copiedMessage() ? 'check' : 'copy'" [size]="14" />
+                <span>{{ copiedMessage() ? 'Message Copied' : 'Copy Message Text' }}</span>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              (click)="deleteContact()"
+              class="w-full flex items-center justify-between rounded-xl bg-rose-50/60 border border-rose-200/60 px-4 py-2.5 text-xs font-bold text-rose-600 hover:bg-rose-100 hover:text-rose-700 transition cursor-pointer"
+            >
+              <span class="flex items-center gap-2">
+                <lucide-icon name="trash-2" [size]="14" />
+                <span>Delete This Inquiry</span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,102 @@
+<section class="my-20">
+  <div class="mb-16 flex flex-col items-start md:flex-row md:items-end justify-between">
+    <div
+      appReveal
+      revealAnimation="left"
+      [revealDelay]="0"
+      class="flex flex-col items-start justify-center md:justify-between"
+    >
+      <app-gradient-text
+        tagName="h6"
+        text="PROJECTS"
+        [showLine]="true"
+        class="text-2xl uppercase font-bold tracking-[4px]"
+      />
+      <h2 class="mt-4 text-3xl font-bold leading-[120%] lg:text-[54px]">
+        Innovative side projects
+      </h2>
+
+      <p class="mt-4 mb-10 md:mb-0 max-w-2xl text-base lg:text-lg leading-8 text-gray-500">
+        A showcase of thoughtfully crafted projects where modern technology meets creative ideas,
+        practical solutions, and meaningful user experiences.
+      </p>
+    </div>
+
+    <div appReveal revealAnimation="up" [revealDelay]="150" class="mx-auto md:mx-0">
+      <app-custom-button text="View all projects" link="/projects" width="w-[200px]" />
+    </div>
+
+  </div>
+
+  <!-- <div class="relative left-1/2 w-screen -translate-x-1/2"> -->
+  <div class="relative left-1/2 w-[calc(100vw-0px)] -translate-x-1/2 overflow-hidden">
+    <div class="px-5 md:px-8 lg:px-10">
+      <div class="embla" #emblaViewport>
+        <div class="embla__container">
+          @for (project of projects(); track project._id) {
+            <div class="embla__slide md:basis-[400px]">
+              <article
+                class="group cursor-pointer overflow-hidden border border-gray-200 dark:border-gray-900"
+                (click)="viewProject(project.slug)"
+              >
+                <!-- Image -->
+                <div
+                  class="relative aspect-video w-full overflow-hidden bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center"
+                >
+                  <img
+                    [src]="project.image"
+                    [alt]="project.title"
+                    class="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+
+                <!-- Content -->
+                <div class="p-8">
+                  <app-gradient-text
+                    tagName="h6"
+                    [text]="project.category | uppercase"
+                    class="text-sm font-bold tracking-[4px]"
+                  />
+
+                  <h3
+                    class="my-5 text-2xl font-bold leading-tight transition-all duration-300 group-hover:opacity-60"
+                  >
+                    {{ project.title }}
+                  </h3>
+
+                  <app-custom-nav text="View Project" [iconSize]="20" class="text-sm" />
+
+                </div>
+              </article>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (projects().length > 1) {
+    <div
+      appReveal
+      revealAnimation="up"
+      [revealDelay]="300"
+      class="mt-10 flex justify-center gap-4 md:justify-end"
+    >
+      <button
+        type="button"
+        (click)="prev()"
+        class="flex h-14 w-14 items-center justify-center dark:text-black border border-gray-300 bg-white transition-all duration-300 hover:bg-black hover:text-white cursor-pointer"
+      >
+        <lucide-icon name="chevron-left" [size]="20" />
+      </button>
+
+      <button
+        type="button"
+        (click)="next()"
+        class="flex h-14 w-14 items-center justify-center dark:text-black border border-gray-300 bg-white transition-all duration-300 hover:bg-black hover:text-white cursor-pointer"
+      >
+        <lucide-icon name="chevron-right" [size]="20" />
+      </button>
+    </div>
+  }
+</section>

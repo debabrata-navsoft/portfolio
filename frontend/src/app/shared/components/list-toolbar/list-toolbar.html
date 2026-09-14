@@ -1,0 +1,82 @@
+<div
+  class="flex flex-col-reverse gap-4 border-b border-gray-200 pb-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800"
+>
+  <div class="flex flex-wrap items-center gap-3">
+    <p class="text-sm text-gray-600 dark:text-gray-400">
+      Total
+      <span class="font-bold text-black dark:text-white">{{ total() }}</span>
+      {{ label() }} found
+    </p>
+
+    <!-- Applied filters -->
+    @for (chip of chips(); track chip.groupId + '|' + chip.value) {
+      <span
+        class="flex items-center gap-2 rounded-full bg-gray-100 py-1 pr-2 pl-3 text-xs dark:bg-gray-900"
+      >
+        <span class="font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+          {{ chip.groupLabel }}:
+        </span>
+
+        <span class="font-medium text-black dark:text-white">{{ chip.label }}</span>
+
+        <button
+          type="button"
+          (click)="removeChip.emit(chip)"
+          [attr.aria-label]="'Remove filter ' + chip.groupLabel + ' ' + chip.label"
+          class="flex h-4 w-4 cursor-pointer items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-300 hover:text-black dark:hover:bg-gray-700 dark:hover:text-white"
+        >
+          <lucide-icon name="x" [size]="12" />
+        </button>
+      </span>
+    }
+  </div>
+
+  <div class="flex items-center gap-3">
+    <!-- Search -->
+    <div class="relative flex-1 sm:w-72 sm:flex-none">
+      <!-- lucide-icon copies its class onto the inner <svg>, so the positioning
+           lives on a wrapper instead of the icon. -->
+      <span class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400">
+        <lucide-icon name="search" [size]="18" />
+      </span>
+
+      <input
+        type="text"
+        [value]="search()"
+        (input)="onSearch($event)"
+        [placeholder]="placeholder()"
+        aria-label="Search"
+        class="h-12 w-full border border-gray-300 bg-white pr-10 pl-10 text-sm text-black outline-none transition focus:border-black dark:border-gray-800 dark:bg-black dark:text-white dark:focus:border-gray-500"
+      />
+
+      @if (search()) {
+        <button
+          type="button"
+          (click)="clearSearch()"
+          aria-label="Clear search"
+          class="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-gray-400 transition hover:text-black dark:hover:text-white"
+        >
+          <lucide-icon name="x" [size]="16" />
+        </button>
+      }
+    </div>
+
+    <!-- Filter -->
+    <button
+      type="button"
+      (click)="openFilters.emit()"
+      aria-label="Open filters"
+      class="relative flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center border border-gray-300 bg-white text-black transition hover:bg-black hover:text-white dark:border-gray-800 dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black"
+    >
+      <lucide-icon name="list-filter" [size]="18" />
+
+      @if (activeFilterCount() > 0) {
+        <span
+          class="absolute -top-2 -right-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-black dark:bg-white px-1 text-[11px] font-bold text-white dark:text-black"
+        >
+          {{ activeFilterCount() }}
+        </span>
+      }
+    </button>
+  </div>
+</div>

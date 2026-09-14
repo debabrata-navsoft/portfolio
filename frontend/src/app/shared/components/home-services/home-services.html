@@ -1,0 +1,48 @@
+<section id="services" class="my-20 scroll-mt-32">
+  <!-- Heading -->
+  <div appReveal revealAnimation="up" [revealDelay]="0" class="mb-16 flex flex-col items-start">
+    <app-gradient-text
+      tagName="h6"
+      text="SERVICES"
+      [showLine]="true"
+      class="text-2xl uppercase font-bold tracking-[4px]"
+    />
+    <h2 class="max-w-2xl mt-4 text-3xl font-bold leading-[120%] lg:text-[54px]">
+      Code that solves problems, one product at a time
+    </h2>
+  </div>
+
+  <!-- Cards -->
+  <div class="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+    @for (service of services(); track service._id; let i = $index) {
+      <article
+        appReveal
+        revealAnimation="up"
+        [revealDelay]="i * 150"
+        class="group rounded-3xl border border-gray-200 bg-white p-8 dark:border-gray-900 dark:bg-black"
+      >
+        <div class="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+          <lucide-icon [name]="service.icon" [size]="30" class="text-primary" />
+        </div>
+
+        <h3 class="mb-5 text-2xl font-bold">
+          {{ service.title }}
+        </h3>
+
+        <p class="mb-8 leading-8 text-gray-500">
+          {{ service.description }}
+        </p>
+
+        <ul class="space-y-3">
+          @for (item of service.lists; track item) {
+            <li class="flex items-center gap-3">
+              <lucide-icon name="check" [size]="18" class="text-primary" />
+
+              <span>{{ item }}</span>
+            </li>
+          }
+        </ul>
+      </article>
+    }
+  </div>
+</section>

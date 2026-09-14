@@ -1,0 +1,104 @@
+@if (isErrorMsg()) {
+  <app-error />
+} @else {
+  <section class="overflow-hidden py-12 md:py-20">
+    <!-- [@listAnimation]="paginatedArticles().length" -->
+    <div class="mx-auto mb-16 max-w-7xl px-5">
+      <app-list-toolbar
+        label="articles"
+        placeholder="Search articles..."
+        [total]="total()"
+        [search]="search()"
+        [activeFilterCount]="activeFilterCount()"
+        [chips]="filterChips()"
+        (searchChange)="onSearch($event)"
+        (openFilters)="openFilters()"
+        (removeChip)="onRemoveChip($event)"
+      />
+    </div>
+
+    <div class="mx-auto grid max-w-7xl gap-20 px-5">
+      @for (article of articles(); track article._id; let i = $index) {
+        <article
+          appReveal
+          revealAnimation="up"
+          [revealDelay]="i * 150"
+          class="group mx-auto flex max-w-300 cursor-pointer flex-col overflow-hidden xl:max-h-95 xl:flex-row dark:border dark:border-gray-900"
+          (click)="viewArticle(article.slug)"
+        >
+          <!-- Image -->
+          <div class="h-60 w-full overflow-hidden md:h-80 md:w-175 xl:h-95 xl:w-175">
+            <img
+              [src]="article.image"
+              [alt]="article.title"
+              class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+            />
+          </div>
+
+          <!-- Content -->
+
+          <div
+            class="flex h-60 w-full flex-col justify-center bg-black p-8 md:p-12 md:h-80 md:w-175 xl:h-95 xl:min-h-95 xl:w-150 xl:p-20"
+          >
+            <app-gradient-text
+              tagName="h6"
+              [text]="article.createdAt | timeAgo"
+              className="text-[13px] font-bold tracking-[4px] uppercase md:text-sm"
+            />
+
+            <h2 class="my-4 text-[28px] font-bold leading-[120%] text-white md:my-8 md:text-[40px]">
+              {{ article.title }}
+            </h2>
+
+            <app-custom-nav
+              text="View Article"
+              [iconSize]="24"
+              class="text-sm md:text-lg text-white group-hover:text-cyan-400"
+            />
+          </div>
+        </article>
+      } @empty {
+        @if (!isLoading()) {
+          <p class="py-10 text-center text-lg text-gray-500">
+            No articles found. Try a different search or clear the filters.
+          </p>
+        }
+      }
+    </div>
+
+    @if (totalPages > 1) {
+      <div class="mt-16 flex items-center justify-center gap-4 md:justify-end">
+        <button
+          type="button"
+          (click)="previousPage()"
+          [disabled]="pageIndex() === 0"
+          class="flex h-14 w-14 items-center cursor-pointer justify-center dark:text-black border border-gray-300 bg-white transition hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <lucide-icon name="chevron-left" [size]="20" />
+        </button>
+
+        <span class="text-sm text-gray-500"> {{ currentPage }} / {{ totalPages }} </span>
+
+        <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="pageIndex() === totalPages - 1"
+          class="flex h-14 w-14 items-center cursor-pointer justify-center dark:text-black border border-gray-300 bg-white transition hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <lucide-icon name="chevron-right" [size]="20" />
+        </button>
+      </div>
+    }
+  </section>
+
+  <app-filter-drawer
+    [open]="isFilterOpen()"
+    [groups]="filterGroups()"
+    [selection]="appliedFilters()"
+    [totalResults]="previewCount()"
+    (closed)="closeFilters()"
+    (draftChange)="onDraftFiltersChange($event)"
+    (applied)="onApplyFilters($event)"
+    (cleared)="onClearFilters()"
+  />
+}

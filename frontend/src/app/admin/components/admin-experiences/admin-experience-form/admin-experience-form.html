@@ -1,0 +1,81 @@
+<form class="flex flex-col gap-4" (submit)="$event.preventDefault(); submitExperience()">
+  <div>
+    <h3 class="text-xl font-bold text-gray-900">
+      {{ editData() ? 'Edit Experience' : 'Add Work Experience' }}
+    </h3>
+    <p class="text-xs text-gray-500 mt-0.5">
+      Provide details regarding your role, company, and tenure.
+    </p>
+  </div>
+
+  <div class="space-y-4">
+    <div>
+      <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+        Company Name <span class="text-red-500">*</span>
+      </label>
+      <input
+        type="text"
+        placeholder="e.g. Google, TCS, Meta"
+        [value]="experienceForm().company"
+        (input)="updateField('company', $any($event.target).value)"
+        (blur)="markTouched('company')"
+        class="admin-input"
+        [class.has-error]="isFieldInvalid('company')"
+      />
+      @if (isFieldInvalid('company')) {
+        <p class="mt-1 text-xs font-medium text-red-500">Company Name is required</p>
+      }
+    </div>
+
+    <div>
+      <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+        Job Title / Role <span class="text-red-500">*</span>
+      </label>
+      <input
+        type="text"
+        placeholder="e.g. Senior Frontend Developer"
+        [value]="experienceForm().role"
+        (input)="updateField('role', $any($event.target).value)"
+        (blur)="markTouched('role')"
+        class="admin-input"
+        [class.has-error]="isFieldInvalid('role')"
+      />
+      @if (isFieldInvalid('role')) {
+        <p class="mt-1 text-xs font-medium text-red-500">Job Title / Role is required</p>
+      }
+    </div>
+
+    <div>
+      <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+        Duration / Years <span class="text-red-500">*</span>
+      </label>
+      <input
+        type="text"
+        placeholder="e.g. Aug 2023 - Present or 2021 - 2023"
+        [value]="experienceForm().years"
+        (input)="updateField('years', $any($event.target).value)"
+        (blur)="markTouched('years')"
+        class="admin-input"
+        [class.has-error]="isFieldInvalid('years')"
+      />
+      @if (isFieldInvalid('years')) {
+        <p class="mt-1 text-xs font-medium text-red-500">Duration / Years is required</p>
+      }
+    </div>
+  </div>
+
+  <div class="mt-2 flex justify-end gap-3 border-t border-gray-100 pt-4">
+    <button
+      type="submit"
+      [disabled]="loading()"
+      class="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 active:scale-95 transition disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+    >
+      @if (loading()) {
+        <div
+          class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+        ></div>
+      }
+      {{ loading() ? 'Saving...' : editData() ? 'Update Experience' : 'Save Experience' }}
+    </button>
+  </div>
+</form>

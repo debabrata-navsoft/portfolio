@@ -1,0 +1,124 @@
+<nav
+  class="fixed top-0 left-0 z-[999] w-full transition-[background-color,backdrop-filter,box-shadow,border-color] duration-300"
+  [class]="
+    isScrolled
+      ? 'bg-white/0 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.08)]'
+      : 'bg-[var(--navbar-bg)]'
+  "
+>
+  <div class="mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-10 xl:px-0">
+    <!-- <div class="relative flex items-center py-8"> -->
+    <div
+      class="relative flex items-center transition-all duration-300"
+      [class]="isScrolled ? 'py-4' : 'py-8'"
+    >
+      <!-- Logo -->
+      <a
+        (click)="goHome()"
+        class="mr-auto text-2xl font-extrabold italic whitespace-nowrap cursor-pointer no-underline max-[992px]:text-[1.4rem] max-[768px]:text-[1.25rem] max-[768px]:mr-0"
+      >
+        <span
+          class="bg-gradient-to-r from-black dark:from-white via-gray-500 dark:via-gray-300 to-purple-500 bg-clip-text text-transparent [-webkit-background-clip:text]"
+        >
+          &lt;Debabrata
+        </span>
+        <span
+          class="bg-gradient-to-r from-purple-500 via-red-500 to-orange-400 bg-clip-text text-transparent [-webkit-background-clip:text]"
+        >
+          Das /&gt;
+        </span>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <!-- <ul class="flex items-center justify-center list-none md:mx-10 p-0 max-[768px]:hidden"> -->
+      <ul class="hidden items-center justify-center list-none md:flex md:mx-10 p-0">
+        @for (item of navbarMenu; track item.id) {
+          <li
+            class="text-black dark:text-white transition-colors hover:text-gray-500"
+            [class]="getActiveLiClass(item.id)"
+          >
+            <button
+              (click)="handleNavigation(item)"
+              class="relative bg-transparent border-none text-inherit px-4 py-2.5 cursor-pointer text-lg font-medium max-[992px]:px-2.5 max-[992px]:text-[0.9rem] group flex flex-row items-center gap-2"
+            >
+              {{ item.title }}
+              @if (item.icon) {
+                <lucide-icon
+                  [name]="item.icon"
+                  [size]="20"
+                  class="transition-transform duration-300 group-hover:translate-x-1"
+                ></lucide-icon>
+              }
+            </button>
+            <!-- </button> -->
+          </li>
+        }
+      </ul>
+
+      <!-- Desktop Theme Toggle -->
+      <div>
+        <button
+          (click)="toggleTheme()"
+          class="hidden md:flex items-center justify-center ml-auto border border-gray-400 dark:border-gray-800 rounded-full p-2 w-[38px] h-[38px] cursor-pointer bg-transparent text-[var(--text-color)]"
+        >
+          <lucide-icon
+            [name]="isDark ? 'moon' : 'sun'"
+            [size]="20"
+            class="flex items-center justify-center"
+          ></lucide-icon>
+        </button>
+      </div>
+
+      <!-- Mobile Actions -->
+      <!-- <div class="hidden items-center gap-3.5 ml-auto max-[768px]:flex"> -->
+      <div class="flex items-center gap-3.5 ml-auto md:hidden">
+        <button
+          (click)="toggleTheme()"
+          class="flex items-center justify-center border border-gray-500 dark:border-gray-800 rounded-full p-1.5 cursor-pointer bg-transparent text-[var(--text-color)]"
+        >
+          <lucide-icon [name]="isDark ? 'moon' : 'sun'" [size]="14"></lucide-icon>
+        </button>
+
+        <button
+          (click)="toggleMenu()"
+          class="bg-transparent border-none text-[var(--text-color)] text-2xl cursor-pointer leading-none"
+        >
+          <lucide-icon [name]="isOpen ? 'x' : 'menu'" [size]="20"></lucide-icon>
+        </button>
+      </div>
+
+      <!-- Mobile Menu -->
+      @if (isOpen) {
+        <!-- Backdrop overlay: clicking anywhere closes the menu -->
+        <div
+          class="fixed inset-0 z-[998] bg-black/40 backdrop-blur-xs md:hidden"
+          (click)="isOpen = false"
+        ></div>
+
+        <div
+          class="fixed top-20 sm:top-24 left-1/2 -translate-x-1/2 z-[1000] w-[90%] max-w-sm rounded-2xl border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 shadow-2xl shadow-black/30"
+        >
+          <ul class="list-none px-5 py-5 m-0 flex flex-col items-center gap-3">
+            @for (item of navbarMenu; track item.id) {
+              <li [class.active]="activeSection === item.id" class="w-full text-center">
+                <button
+                  (click)="handleNavigation(item)"
+                  class="w-full relative bg-transparent border-none text-gray-900 dark:text-gray-100 hover:text-black dark:hover:text-white px-4 py-2.5 cursor-pointer text-[17px] font-semibold group flex flex-row items-center justify-center gap-2 transition-colors"
+                >
+                  {{ item.title }}
+                  @if (item.icon) {
+                    <lucide-icon
+                      [name]="item.icon"
+                      [size]="18"
+                      class="transition-transform duration-300 group-hover:translate-x-1"
+                    ></lucide-icon>
+                  }
+                </button>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+  </div>
+</nav>

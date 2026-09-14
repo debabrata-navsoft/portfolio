@@ -1,0 +1,455 @@
+@if (isErrorMsg()) {
+  <app-error />
+} @else if (project(); as proj) {
+  <div class="space-y-6 pb-12">
+    <!-- TOP NAVIGATION & ACTION BAR -->
+    <div
+      class="flex flex-col gap-4 rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div class="space-y-1.5 min-w-0">
+        <div class="flex items-center gap-2 text-xs font-medium text-slate-500">
+          <a
+            routerLink="/admin/projects"
+            class="hover:text-indigo-600 transition-colors flex items-center gap-1 font-semibold"
+          >
+            <lucide-icon name="arrow-left" [size]="13" />
+            <span>Projects</span>
+          </a>
+          <span class="text-slate-300">/</span>
+          <span class="text-slate-700 font-semibold truncate max-w-xs">{{ proj.title }}</span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+          <h1 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900 truncate">
+            {{ proj.title }}
+          </h1>
+          <span
+            class="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 border border-indigo-200/60 px-3 py-0.5 text-xs font-bold text-indigo-700 shadow-2xs"
+          >
+            <span class="h-1.5 w-1.5 rounded-full bg-indigo-600"></span>
+            {{ proj.category || 'General' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2 shrink-0">
+        <a
+          routerLink="/admin/projects"
+          class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:text-slate-900 transition active:scale-95"
+        >
+          <lucide-icon name="arrow-left" [size]="14" />
+          <span>Back</span>
+        </a>
+
+        @if (proj.liveUrl) {
+          <a
+            [href]="proj.liveUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-600 transition active:scale-95"
+            title="Open live website"
+          >
+            <lucide-icon name="external-link" [size]="14" />
+            <span>Live Site</span>
+          </a>
+        }
+
+        <a
+          [routerLink]="['/admin/projects/edit', proj.slug]"
+          class="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-indigo-500 transition active:scale-95"
+        >
+          <lucide-icon name="square-pen" [size]="14" />
+          <span>Edit Project</span>
+        </a>
+
+        <button
+          type="button"
+          (click)="deleteProject()"
+          class="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50/80 px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-100 transition active:scale-95 cursor-pointer"
+          title="Delete this project"
+        >
+          <lucide-icon name="trash-2" [size]="14" />
+          <span>Delete</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN TWO-COLUMN GRID -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      <!-- LEFT COLUMN: VISUALS & MAIN CONTENT (8 cols) -->
+      <div class="space-y-6 lg:col-span-8">
+        <!-- Visuals Showcase -->
+        <div class="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-xs">
+          <div class="border-b border-slate-100 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-2 text-slate-900 font-bold text-sm">
+              <span
+                class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600"
+              >
+                <lucide-icon name="image" [size]="15" />
+              </span>
+              <span>Project Visuals & Banner</span>
+            </div>
+            @if (proj.image || proj.projectCardImage) {
+              <span class="text-xs font-medium text-slate-400">Click image to enlarge</span>
+            }
+          </div>
+
+          <div class="p-6">
+            @if (proj.image || proj.projectCardImage) {
+              <div
+                class="grid grid-cols-1 gap-6"
+                [class.md:grid-cols-12]="
+                  proj.projectCardImage && proj.image && proj.projectCardImage !== proj.image
+                "
+              >
+                <!-- Main Banner -->
+                <div
+                  [class.md:col-span-8]="
+                    proj.projectCardImage && proj.image && proj.projectCardImage !== proj.image
+                  "
+                  class="flex flex-col gap-2.5"
+                >
+                  <div class="flex items-center justify-between text-[11px]">
+                    <span class="font-bold uppercase tracking-wider text-slate-500"
+                      >Full Details Banner</span
+                    >
+                    <span class="text-slate-400">16:9 Aspect</span>
+                  </div>
+
+                  <div
+                    (click)="openImage(proj.image || proj.projectCardImage)"
+                    class="group relative aspect-video w-full cursor-zoom-in overflow-hidden border border-slate-200/90 bg-slate-900 shadow-xs transition hover:shadow-md"
+                  >
+                    <img
+                      [src]="proj.image || proj.projectCardImage"
+                      [alt]="proj.title"
+                      class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-103"
+                      loading="lazy"
+                    />
+                    <div
+                      class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-200 group-hover:opacity-100 backdrop-blur-[2px]"
+                    >
+                      <span
+                        class="inline-flex items-center gap-1.5 rounded-lg bg-black/80 px-3.5 py-1.5 text-xs font-semibold text-white shadow-md ring-1 ring-white/20"
+                      >
+                        <lucide-icon name="maximize-2" [size]="14" />
+                        View Fullscreen
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Thumbnail -->
+                @if (proj.projectCardImage && proj.image && proj.projectCardImage !== proj.image) {
+                  <div class="md:col-span-4 flex flex-col gap-2.5">
+                    <div class="flex items-center justify-between text-[11px]">
+                      <span class="font-bold uppercase tracking-wider text-slate-500"
+                        >Card Thumbnail</span
+                      >
+                      <span class="text-slate-400">Card View</span>
+                    </div>
+
+                    <div
+                      (click)="openImage(proj.projectCardImage)"
+                      class="group relative aspect-video md:aspect-4/3 w-full cursor-zoom-in overflow-hidden border border-slate-200/90 bg-slate-900 shadow-xs transition hover:shadow-md"
+                    >
+                      <img
+                        [src]="proj.projectCardImage"
+                        [alt]="proj.title + ' Thumbnail'"
+                        class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div
+                        class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-200 group-hover:opacity-100 backdrop-blur-[2px]"
+                      >
+                        <span
+                          class="inline-flex items-center gap-1.5 rounded-lg bg-black/80 px-2.5 py-1 text-xs font-semibold text-white shadow-md ring-1 ring-white/20"
+                        >
+                          <lucide-icon name="maximize-2" [size]="12" />
+                          View
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div
+                class="flex flex-col items-center justify-center py-12 text-center text-slate-400 bg-slate-50/50 rounded-xl border border-dashed border-slate-200"
+              >
+                <lucide-icon name="image" [size]="36" class="mb-2 text-slate-300" />
+                <p class="text-sm font-semibold text-slate-600">No project visuals uploaded</p>
+                <p class="text-xs text-slate-400 mt-0.5">
+                  Upload a banner image from the edit page
+                </p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Overview -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs">
+          <div class="mb-4 flex items-center gap-2 border-b border-slate-100 pb-3">
+            <span
+              class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600"
+            >
+              <lucide-icon name="sparkles" [size]="15" />
+            </span>
+            <h2 class="text-base font-bold text-slate-900">Project Overview</h2>
+          </div>
+          <p
+            class="text-sm sm:text-base leading-relaxed text-slate-700 font-medium whitespace-pre-line"
+            [innerHTML]="proj.overview || 'No overview provided for this project.' | formatText"
+          ></p>
+        </div>
+
+        <!-- Description -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs">
+          <div class="mb-4 flex items-center gap-2 border-b border-slate-100 pb-3">
+            <span
+              class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600"
+            >
+              <lucide-icon name="file-text" [size]="15" />
+            </span>
+            <h2 class="text-base font-bold text-slate-900">Detailed Description</h2>
+          </div>
+          <div
+            class="whitespace-pre-line text-sm sm:text-base leading-relaxed text-slate-700"
+            [innerHTML]="proj.description || 'No detailed description provided.' | formatText"
+          ></div>
+        </div>
+
+        <!-- Tech Stack -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs">
+          <div class="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2">
+              <span
+                class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600"
+              >
+                <lucide-icon name="layers" [size]="15" />
+              </span>
+              <h2 class="text-base font-bold text-slate-900">Tech Stack & Technologies</h2>
+            </div>
+            @if (proj.technologies && proj.technologies.length > 0) {
+              <span class="text-xs font-semibold text-slate-400"
+                >{{ proj.technologies.length }} items</span
+              >
+            }
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            @if (proj.technologies && proj.technologies.length > 0) {
+              @for (tech of proj.technologies; track tech) {
+                <span
+                  class="inline-flex items-center gap-1.5 rounded-full border border-indigo-200/70 bg-indigo-50/70 px-3.5 py-1.5 text-xs font-bold text-indigo-700 shadow-2xs transition hover:bg-indigo-100/80"
+                >
+                  <span class="h-1.5 w-1.5 rounded-full bg-indigo-500"></span>
+                  {{ tech }}
+                </span>
+              }
+            } @else {
+              <p class="text-xs font-medium text-slate-400 italic">No technologies specified.</p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: METADATA & QUICK LINKS (4 cols) -->
+      <div class="space-y-6 lg:col-span-4">
+        <!-- Information Card -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs space-y-4">
+          <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+            <span
+              class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600"
+            >
+              <lucide-icon name="folder-kanban" [size]="15" />
+            </span>
+            <h3 class="text-base font-bold text-slate-900">Project Information</h3>
+          </div>
+
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400"
+              >Category</span
+            >
+            <div class="mt-1">
+              <span
+                class="inline-flex items-center gap-1.5 rounded-md bg-indigo-50 border border-indigo-200/70 px-2.5 py-1 text-xs font-bold text-indigo-700"
+              >
+                {{ proj.category || 'General' }}
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400"
+              >Project Date / Timeline</span
+            >
+            <p class="mt-1 text-sm font-bold text-slate-800">
+              {{ (proj.projectDate | date: 'dd MMM yyyy') || 'N/A' }}
+            </p>
+          </div>
+
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400"
+              >Date Added</span
+            >
+            <p class="mt-1 text-sm font-semibold text-slate-700">
+              {{ (proj.createdAt | date: 'dd MMM yyyy, hh:mm a') || 'N/A' }}
+            </p>
+          </div>
+
+          @if (proj.updatedAt) {
+            <div>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400"
+                >Last Modified</span
+              >
+              <p class="mt-1 text-sm font-semibold text-slate-700">
+                {{ (proj.updatedAt | date: 'dd MMM yyyy, hh:mm a') || 'N/A' }}
+              </p>
+            </div>
+          }
+
+          <div class="border-t border-slate-100 pt-3">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400"
+              >URL Slug</span
+            >
+            <div
+              class="mt-1 flex items-center justify-between rounded-xl bg-slate-50 p-2.5 border border-slate-200"
+            >
+              <code class="text-xs text-slate-800 truncate font-mono font-semibold">{{
+                proj.slug
+              }}</code>
+              <button
+                type="button"
+                (click)="copySlug(proj.slug)"
+                class="ml-2 inline-flex items-center gap-1 rounded-lg bg-white px-2 py-1 text-[11px] font-bold text-indigo-600 border border-slate-200 shadow-2xs hover:bg-indigo-50 hover:border-indigo-200 transition cursor-pointer"
+                title="Copy slug"
+              >
+                <lucide-icon [name]="copiedSlug() ? 'check' : 'copy'" [size]="12" />
+                <span>{{ copiedSlug() ? 'Copied' : 'Copy' }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Links Card -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs space-y-4">
+          <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+            <span
+              class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600"
+            >
+              <lucide-icon name="link-2" [size]="15" />
+            </span>
+            <h3 class="text-base font-bold text-slate-900">Project Links</h3>
+          </div>
+
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400"
+              >Live Website / Demo</span
+            >
+            @if (proj.liveUrl) {
+              <a
+                [href]="proj.liveUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="mt-1 group flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50/60 p-3 hover:border-indigo-300 hover:bg-indigo-50/40 transition shadow-2xs"
+              >
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <span
+                    class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600"
+                  >
+                    <lucide-icon name="globe" [size]="14" />
+                  </span>
+                  <span
+                    class="text-xs font-bold text-slate-800 truncate group-hover:text-indigo-600"
+                  >
+                    {{ proj.liveUrl }}
+                  </span>
+                </div>
+                <lucide-icon
+                  name="external-link"
+                  [size]="14"
+                  class="text-slate-400 group-hover:text-indigo-600 shrink-0"
+                />
+              </a>
+            } @else {
+              <p class="mt-1 text-xs text-slate-400 italic">No live demo URL configured.</p>
+            }
+          </div>
+
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400"
+              >Source Repository</span
+            >
+            @if (proj.githubUrl) {
+              <a
+                [href]="proj.githubUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="mt-1 group flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50/60 p-3 hover:border-slate-400 hover:bg-slate-100/60 transition shadow-2xs"
+              >
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <span
+                    class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-900 text-white"
+                  >
+                    <lucide-icon name="github" [size]="14" />
+                  </span>
+                  <span
+                    class="text-xs font-bold text-slate-800 truncate group-hover:text-slate-950"
+                  >
+                    {{ proj.githubUrl }}
+                  </span>
+                </div>
+                <lucide-icon
+                  name="external-link"
+                  [size]="14"
+                  class="text-slate-400 group-hover:text-slate-700 shrink-0"
+                />
+              </a>
+            } @else {
+              <p class="mt-1 text-xs text-slate-400 italic">No GitHub URL configured.</p>
+            }
+          </div>
+
+          <div class="border-t border-slate-100 pt-3">
+            <a
+              [routerLink]="['/projects', proj.slug]"
+              target="_blank"
+              class="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 py-2.5 text-xs font-bold text-white transition hover:bg-slate-800 active:scale-98 shadow-xs"
+            >
+              <lucide-icon name="eye" [size]="14" />
+              <span>View Public Portfolio Page</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- FULLSCREEN LIGHTBOX MODAL -->
+@if (activeImage()) {
+  <div
+    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4 backdrop-blur-md transition-all"
+    (click)="closeImage()"
+  >
+    <button
+      type="button"
+      (click)="closeImage()"
+      class="absolute right-5 top-5 z-[10000] flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition active:scale-95"
+      title="Close preview"
+    >
+      <lucide-icon name="x" [size]="22" />
+    </button>
+    <div
+      (click)="$event.stopPropagation()"
+      class="relative flex items-center justify-center max-h-[88vh] max-w-[92vw]"
+    >
+      <img
+        [src]="activeImage()!"
+        alt="Fullscreen Preview"
+        class="max-h-[88vh] max-w-[92vw] object-contain shadow-2xl ring-1 ring-white/10"
+      />
+    </div>
+  </div>
+}

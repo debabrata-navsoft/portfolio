@@ -1,0 +1,9 @@
+/* 
+[data-admin='true'] app-navbar,
+[data-admin='true'] app-footer {
+  display: none !important;
+}
+
+[data-admin='true'] .page-content {
+  padding-top: 0 !important;
+} */

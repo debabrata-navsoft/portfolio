@@ -1,0 +1,171 @@
+<!-- Backdrop -->
+@if (open()) {
+  <div class="fixed inset-0 z-1300 bg-black/50" (click)="closed.emit()"></div>
+}
+
+<aside
+  class="fixed inset-y-0 right-0 z-1310 flex h-full h-dvh max-h-dvh w-full max-w-85 flex-col bg-white shadow-2xl transition-all duration-300 ease-out dark:border-l dark:border-gray-900 dark:bg-black"
+  [class.translate-x-0]="open()"
+  [class.translate-x-full]="!open()"
+  [class.pointer-events-none]="!open()"
+  [class.opacity-0]="!open()"
+  [class.opacity-100]="open()"
+  [attr.aria-hidden]="!open()"
+  role="dialog"
+  aria-label="Filters"
+>
+  <!-- Header -->
+  <header
+    class="flex items-center justify-between border-b border-gray-200 px-6 py-5 dark:border-gray-800"
+  >
+    <h3 class="text-xl font-semibold text-black dark:text-white">Filters</h3>
+
+    <button
+      type="button"
+      (click)="closed.emit()"
+      aria-label="Close filters"
+      class="cursor-pointer text-gray-500 transition hover:text-black dark:hover:text-white"
+    >
+      <lucide-icon name="x" [size]="22" />
+    </button>
+  </header>
+
+  <!-- Groups -->
+  <div class="flex-1 overflow-y-auto px-6 filter-drawer-scroll">
+    @for (group of groups(); track group.id) {
+      <div class="border-b border-gray-200 py-4 last:border-b-0 dark:border-gray-800">
+        <button
+          type="button"
+          (click)="toggleGroup(group.id)"
+          class="flex w-full cursor-pointer items-center justify-between gap-3 text-left"
+        >
+          <span class="flex items-center gap-2 text-base font-medium text-black dark:text-white">
+            {{ group.label }}
+
+            @if (groupBadge(group) > 0) {
+              <span
+                class="flex h-5 min-w-5 items-center justify-center rounded-full bg-black dark:bg-white px-1 text-[11px] font-bold text-white dark:text-black"
+              >
+                {{ groupBadge(group) }}
+              </span>
+            }
+          </span>
+
+          <lucide-icon
+            [name]="isExpanded(group.id) ? 'chevron-up' : 'chevron-down'"
+            [size]="18"
+            class="text-gray-500"
+          />
+        </button>
+
+        @if (isExpanded(group.id)) {
+          @if (group.type === 'checkbox') {
+            @if (group.searchable) {
+              <div class="relative mt-4">
+                <span
+                  class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
+                >
+                  <lucide-icon name="search" [size]="16" />
+                </span>
+
+                <input
+                  type="text"
+                  [value]="optionSearchTerm(group.id)"
+                  (input)="updateOptionSearch(group.id, $any($event.target).value)"
+                  [placeholder]="'Search ' + group.label + '...'"
+                  class="h-10 w-full border border-gray-300 bg-white pr-3 pl-10 text-sm text-black outline-none focus:border-black dark:border-gray-800 dark:bg-black dark:text-white dark:focus:border-gray-500"
+                />
+              </div>
+            }
+
+            <div class="mt-2 max-h-60 space-y-1 overflow-y-auto pr-1 filter-drawer-scroll">
+              @for (option of visibleOptions(group); track option.id) {
+                <label class="flex cursor-pointer items-center gap-3 py-2">
+                  <input
+                    type="checkbox"
+                    [checked]="isChecked(group.id, option.id)"
+                    (change)="toggleOption(group.id, option.id)"
+                    class="h-4 w-4 cursor-pointer accent-black dark:accent-white"
+                  />
+
+                  <span class="flex-1 text-sm text-gray-700 dark:text-gray-300">
+                    {{ option.label }}
+                  </span>
+
+                  <span class="text-xs text-gray-400">{{ option.count }}</span>
+                </label>
+              } @empty {
+                <p class="py-2 text-sm text-gray-400">No options found</p>
+              }
+            </div>
+          } @else {
+            <!-- Quick ranges -->
+            <div class="mt-4 grid grid-cols-2 gap-2">
+              @for (preset of datePresets; track preset.id) {
+                <button
+                  type="button"
+                  (click)="applyPreset(group.id, preset.days)"
+                  [ngClass]="
+                    activePreset(group.id) === preset.id
+                      ? 'bg-black dark:bg-white text-white dark:text-black hover:opacity-90'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800'
+                  "
+                  class="h-9 cursor-pointer rounded text-xs font-medium transition"
+                >
+                  {{ preset.label }}
+                </button>
+              }
+            </div>
+
+            <!-- From / To -->
+            <div class="mt-3 space-y-2">
+              <app-date-picker
+                placeholder="From Date"
+                [value]="dateValue(group.id, 'from')"
+                [max]="dateValue(group.id, 'to')"
+                (valueChange)="updateDate(group.id, 'from', $event)"
+              />
+
+              <app-date-picker
+                placeholder="To Date"
+                [value]="dateValue(group.id, 'to')"
+                [min]="dateValue(group.id, 'from')"
+                (valueChange)="updateDate(group.id, 'to', $event)"
+              />
+            </div>
+          }
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Footer -->
+  <footer
+    class="shrink-0 border-t border-gray-200 px-6 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] dark:border-gray-800 bg-white dark:bg-black"
+  >
+    <p class="mb-6 text-center text-xs text-gray-600 dark:text-gray-400">
+      Total Results:
+      <span class="font-bold text-black dark:text-white">{{ totalResults() }}</span>
+    </p>
+
+    <div class="flex items-center justify-center gap-8 pb-1">
+      <button
+        type="button"
+        (click)="clear()"
+        class="cursor-pointer text-sm font-semibold text-gray-700 transition hover:text-black dark:text-gray-300 dark:hover:text-white"
+      >
+        Clear filter
+      </button>
+
+      <div class="pr-2 pb-2">
+        <app-custom-button
+          text="Apply"
+          (click)="apply()"
+          width="w-[100px]"
+          height="h-[34px]"
+          textSize="text-sm"
+        />
+      </div>
+    </div>
+  </footer>
+</aside>

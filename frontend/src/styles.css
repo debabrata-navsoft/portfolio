@@ -1,0 +1,441 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark-theme, .dark-theme *));
+
+:root {
+  --bg-color: #ffffff;
+  --text-color: #111827;
+  --navbar-bg: rgba(255, 255, 255, 0.9);
+  --card-bg: #f8fafc;
+
+  --logo-start: #111827;
+  --logo-middle: #6b7280;
+}
+
+html.dark-theme {
+  --bg-color: #000;
+  --text-color: #f8fafc;
+  --navbar-bg: rgba(0, 0, 0, 0.9);
+  --card-bg: #000;
+
+  --logo-start: #ffffff;
+  --logo-middle: #d1d5db;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.4) transparent;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background: var(--bg-color);
+  color: var(--text-color);
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+/* Global slim scrollbar for WebKit browsers */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.35);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.65);
+}
+
+.dark-theme ::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark-theme ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+/* input,
+textarea,
+select {
+  color: var(--text-color);
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted-text);
+} */
+
+@layer utilities {
+  .swiper-pagination-bullet {
+    background-color: #2563eb !important;
+  }
+  .swiper-pagination-bullet-active {
+    opacity: 1;
+  }
+  .dark-theme .swiper-pagination-bullet {
+    background-color: #133cd0 !important;
+  }
+}
+
+/* ==========================================================================
+   Admin Form Shared Input & Error Classes (Optimized)
+   ========================================================================== */
+.admin-input {
+  width: 100%;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  padding-left: 0.875rem;
+  padding-right: 0.875rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #111827;
+  background-color: #ffffff;
+  outline: none;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+}
+.admin-input::placeholder {
+  color: #9ca3af;
+}
+.admin-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px #dbeafe;
+}
+.admin-input.has-error {
+  border-color: #ef4444;
+}
+.admin-input.has-error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 2px #fee2e2;
+}
+
+.admin-textarea {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  padding: 0.875rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #111827;
+  background-color: #ffffff;
+  outline: none;
+  resize: vertical;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+}
+.admin-textarea::placeholder {
+  color: #9ca3af;
+}
+.admin-textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px #dbeafe;
+}
+.admin-textarea.has-error {
+  border-color: #ef4444;
+}
+.admin-textarea.has-error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 2px #fee2e2;
+}
+
+.admin-select {
+  width: 100%;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  padding-left: 0.875rem;
+  padding-right: 2.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #111827;
+  background-color: #ffffff;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,%3Csvg_xmlns='http://www.w3.org/2000/svg'_viewBox='0_0_24_24'_fill='none'_stroke='%23555'_stroke-width='2'_stroke-linecap='round'_stroke-linejoin='round'%3E%3Cpolyline_points='6_9_12_15_18_9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-size: 16px;
+  background-position: right 14px center;
+  background-repeat: no-repeat;
+  outline: none;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+}
+.admin-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px #dbeafe;
+}
+.admin-select.has-error {
+  border-color: #ef4444;
+}
+.admin-select.has-error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 2px #fee2e2;
+}
+
+.admin-upload-box {
+  border: 2px dashed #d1d5db;
+  transition: border-color 0.15s ease-in-out;
+}
+.admin-upload-box:hover {
+  border-color: #3b82f6;
+}
+.admin-upload-box.has-error {
+  border-color: #ef4444 !important;
+}
+
+/* 
+body {
+  font-family: Outfit;
+}
+.prata-regular {
+  font-family: 'Prata', serif;
+  font-weight: 400;
+  font-style: normal;
+} */
+/* .outline-none {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+} */
+
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+/* SnackBra CSS */
+.snackbar-success .mdc-snackbar__surface {
+  background-color: white !important;
+  color: #4caf50 !important;
+}
+
+.snackbar-error .mdc-snackbar__surface {
+  background-color: white !important;
+  color: #f44336 !important;
+}
+
+.snackbar-success .mat-mdc-snack-bar-action,
+.snackbar-error .mat-mdc-snack-bar-action {
+  color: #000 !important;
+  opacity: 0.9;
+}
+
+.snackbar-success .mat-mdc-snack-bar-action:hover,
+.snackbar-error .mat-mdc-snack-bar-action:hover {
+  opacity: 1;
+}
+
+/* Above the filter drawer (z-1310) so snack bars are never covered by it. */
+.cdk-overlay-container {
+  z-index: 1400 !important;
+}
+
+/* Angular Material derives its colours from `color-scheme`, so the filter
+   drawer follows the site's dark theme. */
+.dark-theme app-filter-drawer {
+  color-scheme: dark;
+}
+
+/*Pagination CSS Page List Item */
+.dark-paginator {
+  background: var(--card-bg) !important;
+  color: var(--text-color) !important;
+}
+
+/* labels */
+.dark-paginator .mat-mdc-paginator-page-size-label,
+.dark-paginator .mat-mdc-paginator-range-label {
+  color: var(--text-color) !important;
+}
+
+/* select text */
+.dark-paginator .mat-mdc-select-value-text {
+  color: var(--text-color) !important;
+}
+
+/* arrows / icons */
+.dark-paginator .mat-mdc-icon-button {
+  color: var(--text-color) !important;
+}
+
+/* hover */
+.dark-paginator .mat-mdc-icon-button:hover {
+  background: rgba(59, 130, 246, 0.1) !important;
+}
+
+/* dropdown panel */
+.mat-mdc-select-panel {
+  background: var(--card-bg) !important;
+  color: var(--text-color) !important;
+}
+
+.mat-mdc-option {
+  color: var(--text-color) !important;
+}
+
+.mat-mdc-option:hover {
+  background: rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Custom Enterprise Table Paginator (Matching reference image) */
+.mat-mdc-paginator {
+  background: #ffffff !important;
+  color: #374151 !important;
+  font-size: 12px !important;
+  min-height: 48px !important;
+}
+
+.mat-mdc-paginator-container {
+  min-height: 48px !important;
+  padding: 0 16px !important;
+  justify-content: flex-end !important;
+}
+
+.mat-mdc-paginator-page-size-label {
+  font-size: 12px !important;
+  color: #4b5563 !important;
+  margin-right: 8px !important;
+}
+
+.mat-mdc-paginator-page-size-select {
+  margin: 0 16px 0 0 !important;
+}
+
+.mat-mdc-paginator-page-size-select .mat-mdc-select-trigger {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 2px 8px;
+  background: #ffffff;
+  font-size: 12px;
+}
+
+.mat-mdc-paginator-range-label {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #1f2937 !important;
+  margin: 0 16px !important;
+}
+
+.mat-mdc-paginator-icon {
+  fill: #374151 !important;
+}
+
+/* Scroll Animation CSS */
+.reveal {
+  opacity: 0;
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+
+  will-change: opacity, transform;
+}
+
+/* Bottom */
+
+.reveal-up {
+  transform: translateY(70px);
+}
+
+/* Left */
+
+.reveal-left {
+  transform: translateX(-70px);
+}
+
+/* Right */
+
+.reveal-right {
+  transform: translateX(70px);
+}
+
+/* Scale */
+
+.reveal-scale {
+  transform: scale(0.9);
+}
+
+/* Active */
+
+.reveal-show {
+  opacity: 1;
+  transform: none;
+}
+
+/* .reveal-init {
+  opacity: 0;
+  transform: translateY(70px);
+}
+
+.reveal-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1000ms cubic-bezier(0.22, 1, 0.36, 1);
+} */
+
+/* Row action buttons — shared by the admin data table and the profile sub-lists,
+   so they live here instead of being copied into four component stylesheets. */
+.tbl-action-btn {
+  display: inline-flex;
+  height: 1.875rem;
+  width: 1.875rem;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tbl-action-btn:hover {
+  filter: brightness(0.95);
+}
+
+.tbl-action-view {
+  background-color: #d1fae5;
+  color: #059669;
+}
+.tbl-action-view:hover {
+  background-color: #a7f3d0;
+}
+
+.tbl-action-edit {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+.tbl-action-edit:hover {
+  background-color: #bfdbfe;
+}
+
+.tbl-action-delete {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+.tbl-action-delete:hover {
+  background-color: #fecaca;
+}

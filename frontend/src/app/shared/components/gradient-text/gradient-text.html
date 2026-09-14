@@ -1,0 +1,60 @@
+@if (showLine()) {
+  <div class="inline-flex items-center gap-3">
+    <span
+      class="inline-block h-[2px] w-7 shrink-0 rounded-full"
+      [class]="
+        gradient()
+          ? 'bg-gradient-to-r from-purple-400 via-red-500 to-orange-600'
+          : 'bg-gray-400 dark:bg-gray-500'
+      "
+    ></span>
+
+    @switch (tagName()) {
+      @case ('h1') {
+        <h1 [ngClass]="classes()">{{ text() }}</h1>
+      }
+      @case ('h2') {
+        <h2 [ngClass]="classes()">{{ text() }}</h2>
+      }
+      @case ('h3') {
+        <h3 [ngClass]="classes()">{{ text() }}</h3>
+      }
+      @case ('h4') {
+        <h4 [ngClass]="classes()">{{ text() }}</h4>
+      }
+      @case ('h5') {
+        <h5 [ngClass]="classes()">{{ text() }}</h5>
+      }
+      @case ('h6') {
+        <h6 [ngClass]="classes()">{{ text() }}</h6>
+      }
+      @default {
+        <span [ngClass]="classes()">{{ text() }}</span>
+      }
+    }
+  </div>
+} @else {
+  @switch (tagName()) {
+    @case ('h1') {
+      <h1 [ngClass]="classes()">{{ text() }}</h1>
+    }
+    @case ('h2') {
+      <h2 [ngClass]="classes()">{{ text() }}</h2>
+    }
+    @case ('h3') {
+      <h3 [ngClass]="classes()">{{ text() }}</h3>
+    }
+    @case ('h4') {
+      <h4 [ngClass]="classes()">{{ text() }}</h4>
+    }
+    @case ('h5') {
+      <h5 [ngClass]="classes()">{{ text() }}</h5>
+    }
+    @case ('h6') {
+      <h6 [ngClass]="classes()">{{ text() }}</h6>
+    }
+    @default {
+      <span [ngClass]="classes()">{{ text() }}</span>
+    }
+  }
+}

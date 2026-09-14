@@ -1,0 +1,20 @@
+<app-admin-card-list
+  heading="Work Experience"
+  description="Manage your career history, roles, and company milestones."
+  icon="briefcase-business"
+  noun="Experience"
+  emptyTitle="No Work Experience Listed"
+  emptyText="Add your past work history and job roles to showcase your career journey."
+  [cards]="cards()"
+  [loading]="isLoading()"
+  [error]="isErrorMsg()"
+  [formOpen]="showForm()"
+  (add)="openForm()"
+  (edit)="openForm(byId($event))"
+  (remove)="deleteExperience($event)"
+  (dismiss)="closeForm()"
+>
+  @if (showForm()) {
+    <app-admin-experience-form [editData]="editingExperience()" (closeForm)="closeForm($event)" />
+  }
+</app-admin-card-list>

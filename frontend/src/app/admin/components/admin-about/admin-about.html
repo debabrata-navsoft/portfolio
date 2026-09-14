@@ -1,0 +1,164 @@
+<div>
+  <h2 class="mb-5 text-2xl font-bold text-gray-900">About Management</h2>
+
+  @if (isLoading()) {
+    <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs animate-pulse space-y-6">
+      <div class="space-y-2">
+        <div class="h-4 w-32 bg-gray-200 rounded"></div>
+        <div class="flex gap-4">
+          @for (i of [1, 2, 3, 4]; track i) {
+            <div class="h-28 w-28 rounded-xl bg-gray-100"></div>
+          }
+        </div>
+      </div>
+      <div class="space-y-2">
+        <div class="h-4 w-28 bg-gray-200 rounded"></div>
+        <div class="h-32 w-full bg-gray-100 rounded-lg"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="h-10 bg-gray-100 rounded-lg"></div>
+        <div class="h-10 bg-gray-100 rounded-lg"></div>
+      </div>
+    </div>
+  } @else {
+    <div
+      class="rounded-2xl border border-gray-300 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
+    >
+      <!-- Image Gallery (up to 4) -->
+      <div class="mb-6">
+        <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+          About Images (up to 4)
+        </label>
+        <p class="mb-3 text-xs text-gray-500">
+          Showcase your setup, workspace, or photos across your portfolio.
+        </p>
+
+        <div class="flex flex-wrap gap-4">
+          @for (preview of imagePreviews(); track $index) {
+            <div class="relative group">
+              <label [for]="'aboutImage' + $index" class="cursor-pointer block">
+                <div
+                  class="h-28 w-28 rounded-xl border-2 border-dashed border-gray-300 group-hover:border-blue-500 bg-gray-50 overflow-hidden flex items-center justify-center transition shadow-2xs"
+                >
+                  @if (preview) {
+                    <img
+                      class="h-full w-full object-cover"
+                      [src]="preview"
+                      alt="About photo {{ $index + 1 }}"
+                    />
+                  } @else {
+                    <div
+                      class="flex flex-col items-center justify-center p-2 text-center text-gray-400 group-hover:text-blue-600 transition"
+                    >
+                      <lucide-icon
+                        name="image-plus"
+                        [size]="24"
+                        class="mb-1 opacity-70"
+                      ></lucide-icon>
+                      <span class="text-[11px] font-medium leading-none"
+                        >Photo {{ $index + 1 }}</span
+                      >
+                    </div>
+                  }
+                </div>
+                <input
+                  [id]="'aboutImage' + $index"
+                  type="file"
+                  accept="image/*"
+                  (change)="onImageSelected($event, $index)"
+                  hidden
+                />
+              </label>
+
+              @if (preview) {
+                <button
+                  type="button"
+                  (click)="removeImage($index)"
+                  class="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white shadow hover:bg-red-700 transition cursor-pointer"
+                  title="Remove photo"
+                >
+                  <lucide-icon name="x" [size]="12"></lucide-icon>
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="mb-6">
+        <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+          Description / Bio <span class="text-red-500">*</span>
+        </label>
+        <textarea
+          rows="8"
+          placeholder="Write about yourself, your skills, experience, and passions..."
+          [value]="aboutForm().description"
+          (input)="updateField('description', $any($event.target).value)"
+          (blur)="markTouched('description')"
+          class="admin-textarea"
+          [class.has-error]="isFieldInvalid('description')"
+        ></textarea>
+        @if (isFieldInvalid('description')) {
+          <p class="mt-1 text-xs font-medium text-red-500">Description / Bio is required</p>
+        }
+      </div>
+
+      <!-- Email & Location Grid -->
+      <div class="grid grid-cols-1 gap-5 md:grid-cols-2 mb-6">
+        <div>
+          <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+            Contact Email <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="email"
+            placeholder="your.email@example.com"
+            [value]="aboutForm().email"
+            (input)="updateField('email', $any($event.target).value)"
+            (blur)="markTouched('email')"
+            class="admin-input"
+            [class.has-error]="isFieldInvalid('email')"
+          />
+          @if (isFieldInvalid('email')) {
+            <p class="mt-1 text-xs font-medium text-red-500">Contact email is required</p>
+          }
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+            Location <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            placeholder="e.g. Kolkata, West Bengal, India"
+            [value]="aboutForm().location"
+            (input)="updateField('location', $any($event.target).value)"
+            (blur)="markTouched('location')"
+            class="admin-input"
+            [class.has-error]="isFieldInvalid('location')"
+          />
+          @if (isFieldInvalid('location')) {
+            <p class="mt-1 text-xs font-medium text-red-500">Location is required</p>
+          }
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end border-t border-gray-100 pt-5">
+        <button
+          type="button"
+          (click)="saveAbout()"
+          [disabled]="saving() || !isAboutChanged()"
+          class="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 active:scale-95 transition disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+        >
+          @if (saving()) {
+            <div
+              class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+            ></div>
+          }
+          {{ saving() ? 'Saving...' : 'Save About Details' }}
+        </button>
+      </div>
+    </div>
+  }
+</div>

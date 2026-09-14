@@ -1,0 +1,47 @@
+.embla {
+  overflow: hidden;
+}
+
+.embla__container {
+  display: flex;
+  margin-left: -16px;
+}
+
+.embla__slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  padding-left: 16px;
+}
+
+@media (min-width: 768px) {
+  .embla__slide {
+    flex: 0 0 50%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .embla__slide {
+    flex: 0 0 25%;
+  }
+}
+
+/* .embla {
+  overflow: hidden;
+}
+
+.embla__container {
+  display: flex;
+  margin-left: -16px;
+}
+
+.embla__slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  padding-left: 16px;
+}
+
+@media (min-width: 768px) {
+  .embla__slide {
+    flex: 0 0 400px;
+  }
+} */

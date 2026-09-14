@@ -1,0 +1,286 @@
+<div class="flex min-h-0 min-w-0 flex-1 flex-col">
+  <!-- TABLE TOOLBAR: Search on Left, Action & Filter Buttons on Right -->
+  @if (showToolbar()) {
+    <div class="mb-3 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
+      <!-- Left: Search Box -->
+      @if (searchable()) {
+        <div class="relative w-full sm:w-80">
+          <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <lucide-icon name="search" [size]="14" />
+          </span>
+
+          <input
+            #searchBox
+            type="text"
+            [value]="search()"
+            (input)="onSearch(searchBox.value)"
+            [placeholder]="searchPlaceholder()"
+            aria-label="Search"
+            class="h-8.5 w-full rounded-md border border-gray-300 bg-white pr-8 pl-9 text-xs text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-blue-500 shadow-2xs"
+          />
+
+          @if (search()) {
+            <button
+              type="button"
+              (click)="onSearch('')"
+              aria-label="Clear search"
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 cursor-pointer"
+            >
+              <lucide-icon name="x" [size]="13" />
+            </button>
+          }
+        </div>
+      }
+
+      <!-- Right: Primary Action Button & Filter Button (Matching screenshot) -->
+      <div class="flex items-center gap-2.5 sm:ml-auto">
+        @if (primaryButtonText()) {
+          <button
+            type="button"
+            (click)="primaryAction.emit()"
+            class="inline-flex h-8.5 items-center gap-1.5 rounded-lg bg-[#2563eb] px-3.5 text-xs font-bold text-white shadow-xs transition hover:bg-[#1d4ed8] active:scale-95 cursor-pointer whitespace-nowrap"
+          >
+            @if (primaryButtonIcon()) {
+              <lucide-icon [name]="primaryButtonIcon()" [size]="14" />
+            }
+            <span>{{ primaryButtonText() }}</span>
+          </button>
+        }
+
+        @if (filterGroups().length) {
+          <button
+            type="button"
+            (click)="openFilters()"
+            aria-label="Open filters"
+            class="inline-flex h-8.5 items-center gap-2 rounded-md border border-gray-300 bg-white px-3.5 text-xs font-medium text-gray-700 shadow-2xs transition hover:bg-gray-50 active:scale-95 cursor-pointer whitespace-nowrap"
+          >
+            <lucide-icon name="list-filter" [size]="14" />
+            <span>Filter</span>
+
+            @if (activeFilterCount(); as count) {
+              <span
+                class="flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white"
+              >
+                {{ count }}
+              </span>
+            }
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Applied Filter Chips -->
+  @if (chips().length) {
+    <div class="mb-3 flex flex-wrap items-center gap-2">
+      @for (chip of chips(); track chip.groupId + '|' + chip.value) {
+        <span
+          class="flex items-center gap-2 rounded-full bg-gray-100 py-0.5 pr-2 pl-3 text-xs text-gray-700"
+        >
+          <span class="font-semibold tracking-wide text-gray-500 uppercase">
+            {{ chip.groupLabel }}:
+          </span>
+          <span class="capitalize">{{ chip.label }}</span>
+          <button
+            type="button"
+            (click)="removeChip(chip)"
+            class="flex h-3.5 w-3.5 cursor-pointer items-center justify-center rounded-full text-gray-500 hover:bg-gray-300 hover:text-gray-900"
+          >
+            <lucide-icon name="x" [size]="11" />
+          </button>
+        </span>
+      }
+
+      <button
+        type="button"
+        (click)="onClearFilters()"
+        class="cursor-pointer text-xs font-semibold text-blue-600 underline-offset-2 hover:underline"
+      >
+        Clear all
+      </button>
+    </div>
+  }
+
+  <!-- DATA TABLE & FIXED PAGINATION CONTAINER -->
+  <div
+    class="flex min-h-0 min-w-0 flex-1 flex-col rounded-lg border border-gray-300 bg-white shadow-2xs overflow-hidden"
+  >
+    <!-- Scrollable Table Body -->
+    <div class="min-h-0 flex-1 overflow-auto custom-table-scroll">
+      <table [class]="'w-full border-collapse ' + tableClass()">
+        <thead class="sticky top-0 z-10 border-b border-gray-300 bg-[#e2e8f0]">
+          <tr class="text-xs font-semibold text-gray-700">
+            @for (column of viewColumns(); track column.key) {
+              <th
+                [class]="column.thClass"
+                class="border-r border-gray-300 last:border-r-0 whitespace-nowrap group"
+                (click)="toggleSort(column)"
+                [attr.title]="column.thTitle"
+              >
+                <div [class]="column.thInnerClass">
+                  <span>{{ column.header }}</span>
+
+                  @if (column.sortable) {
+                    <span
+                      class="inline-flex items-center transition-opacity"
+                      [class]="
+                        sortColumn() === column.key
+                          ? 'text-gray-800'
+                          : 'text-gray-500 opacity-0 group-hover:opacity-100'
+                      "
+                    >
+                      <lucide-icon
+                        [name]="
+                          sortColumn() === column.key && sortDirection() === 'desc'
+                            ? 'arrow-down'
+                            : 'arrow-up'
+                        "
+                        [size]="14"
+                      />
+                    </span>
+                  }
+                </div>
+              </th>
+            }
+
+            @if (actions().length) {
+              <th class="px-3 py-2.5 text-center font-semibold text-gray-700 whitespace-nowrap">
+                {{ actionsHeader() }}
+              </th>
+            }
+          </tr>
+        </thead>
+
+        <tbody class="divide-y divide-gray-200">
+          @for (row of pagedRows(); track trackValue(row, $index); let i = $index) {
+            <tr class="transition-colors hover:bg-slate-50">
+              @for (column of viewColumns(); track column.key) {
+                <td
+                  [class]="column.tdClass"
+                  class="border-r border-gray-200 last:border-r-0 text-xs"
+                >
+                  @if (templates().get(column.key); as template) {
+                    <ng-container
+                      [ngTemplateOutlet]="template"
+                      [ngTemplateOutletContext]="{ $implicit: row, column: column, index: i }"
+                    />
+                  } @else {
+                    @switch (column.type) {
+                      @case ('index') {
+                        <span class="font-medium text-gray-600">{{ rowNumber(i, column) }}</span>
+                      }
+
+                      @case ('image') {
+                        <img
+                          [src]="cellValue(column, row)"
+                          [alt]="imageAlt(column, row)"
+                          class="tbl-image"
+                          [class]="column.imageClass ?? ''"
+                        />
+                      }
+
+                      @case ('date') {
+                        {{ cellValue(column, row) | date: column.dateFormat ?? 'dd MMM yyyy' }}
+                      }
+
+                      @case ('timeAgo') {
+                        {{ cellValue(column, row) | timeAgo }}
+                      }
+
+                      @case ('badge') {
+                        <span class="tbl-badge" [class]="badgeVariant(column, row)">{{
+                          cellValue(column, row)
+                        }}</span>
+                      }
+
+                      @case ('tags') {
+                        <div class="flex flex-wrap gap-1">
+                          @for (tag of values(column, row); track tag) {
+                            <span class="tbl-tag" [class]="column.tagClass ?? ''">{{ tag }}</span>
+                          }
+                        </div>
+                      }
+
+                      @case ('progress') {
+                        <div class="flex min-w-35 items-center gap-2">
+                          <div class="h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                            <span
+                              class="block h-full rounded-full bg-blue-600 transition-[width] duration-400 ease-in-out"
+                              [style.width.%]="percent(column, row)"
+                            ></span>
+                          </div>
+
+                          <span class="text-xs whitespace-nowrap text-slate-500">
+                            {{ percent(column, row) }}%
+                          </span>
+                        </div>
+                      }
+
+                      @default {
+                        {{ cellValue(column, row) }}
+                      }
+                    }
+                  }
+                </td>
+              }
+
+              @if (actions().length) {
+                <td class="px-3 py-2 text-center whitespace-nowrap">
+                  <div class="flex items-center justify-center gap-1.5">
+                    @for (item of visibleActions(row); track item.id) {
+                      <button
+                        type="button"
+                        (click)="action.emit({ id: item.id, row: row })"
+                        [attr.aria-label]="item.label"
+                        [title]="item.label"
+                        class="tbl-action-btn"
+                        [class]="item.class || 'tbl-action-' + item.id"
+                      >
+                        <lucide-icon [name]="item.icon" [size]="15" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr>
+              <td
+                [attr.colspan]="columnCount()"
+                class="px-4 py-12 text-center text-sm text-gray-500"
+              >
+                {{ emptyMessage() }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- FIXED BOTTOM PAGINATION (Pinned at bottom of table container) -->
+    @if (paginate()) {
+      <div class="shrink-0 border-t border-gray-200 bg-white z-20">
+        <mat-paginator
+          [length]="filteredRows().length"
+          [pageSize]="activePageSize()"
+          [pageIndex]="safePageIndex()"
+          [pageSizeOptions]="pageSizeOptions()"
+          [showFirstLastButtons]="showFirstLastButtons()"
+          (page)="onPageChange($event)"
+        >
+        </mat-paginator>
+      </div>
+    }
+  </div>
+</div>
+
+<app-filter-drawer
+  [open]="filtersOpen()"
+  [groups]="filterGroups()"
+  [selection]="selection()"
+  [totalResults]="previewCount()"
+  (closed)="filtersOpen.set(false)"
+  (draftChange)="draft.set($event)"
+  (applied)="onApplyFilters($event)"
+  (cleared)="onClearFilters()"
+/>

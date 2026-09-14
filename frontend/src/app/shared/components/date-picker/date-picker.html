@@ -1,0 +1,130 @@
+<div class="relative w-full max-w-[280px]">
+  <!-- Input Display Box -->
+  <div
+    (click)="toggle($event)"
+    class="datepicker-input flex h-10 w-full items-center justify-between rounded-lg border bg-white px-3.5 text-xs text-gray-800 transition cursor-pointer select-none"
+    [class.border-red-500]="hasError()"
+    [class.border-gray-300]="!hasError() && !isOpen()"
+    [class.border-blue-500]="isOpen()"
+    [class.ring-2]="isOpen()"
+    [class.ring-blue-100]="isOpen()"
+    [class.opacity-60]="disabled()"
+    [class.cursor-not-allowed]="disabled()"
+  >
+    <span [class.text-gray-400]="!displayValue()">
+      {{ displayValue() || placeholder() }}
+    </span>
+
+    <span class="text-gray-400 flex items-center justify-center">
+      <lucide-icon name="calendar" [size]="16" />
+    </span>
+  </div>
+
+  <!-- Calendar Popover -->
+  @if (isOpen()) {
+    <div
+      class="datepicker-popover absolute left-0 top-full z-50 mt-1.5 w-full rounded-lg border border-gray-200 bg-white shadow-lg select-none"
+    >
+      <!-- Header: focused date / year range / year on the left, pager on the right -->
+      <div class="flex items-center justify-between border-b border-gray-100 px-3.5 py-2.5">
+        <button
+          type="button"
+          (click)="toggleView()"
+          class="inline-flex cursor-pointer items-center gap-1 text-xs font-semibold text-gray-900 transition hover:text-blue-600"
+        >
+          <span>{{ headerLabel() }}</span>
+          <lucide-icon [name]="view() === 'days' ? 'chevron-down' : 'chevron-up'" [size]="14" />
+        </button>
+
+        <div class="flex items-center gap-1">
+          <button
+            type="button"
+            (click)="step(-1)"
+            [title]="'Previous ' + stepLabel()"
+            [attr.aria-label]="'Previous ' + stepLabel()"
+            class="flex h-6 w-6 cursor-pointer items-center justify-center rounded text-gray-600 transition hover:bg-gray-100 active:scale-95"
+          >
+            <lucide-icon name="chevron-left" [size]="17" />
+          </button>
+
+          <button
+            type="button"
+            (click)="step(1)"
+            [title]="'Next ' + stepLabel()"
+            [attr.aria-label]="'Next ' + stepLabel()"
+            class="flex h-6 w-6 cursor-pointer items-center justify-center rounded text-gray-600 transition hover:bg-gray-100 active:scale-95"
+          >
+            <lucide-icon name="chevron-right" [size]="17" />
+          </button>
+        </div>
+      </div>
+
+      @if (view() === 'days') {
+        <div class="px-3.5 py-3">
+          <!-- Weekday Headers -->
+          <div class="mb-1 grid grid-cols-7 text-center">
+            @for (day of weekdays; track $index) {
+              <span class="py-1 text-[11px] font-medium text-gray-500">{{ day }}</span>
+            }
+          </div>
+
+          <!-- Days Grid -->
+          <div class="grid grid-cols-7 gap-y-1 text-center">
+            @for (blank of leadingBlanks(); track blank) {
+              <span></span>
+            }
+
+            @for (d of calendarDays(); track d.date) {
+              <div class="flex items-center justify-center">
+                <button
+                  type="button"
+                  [class]="d.class"
+                  [disabled]="d.disabled"
+                  (click)="select(d.date)"
+                >
+                  {{ d.day }}
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <!-- Year / Month Grid -->
+        <div
+          class="grid grid-cols-4 px-3.5"
+          [class]="view() === 'years' ? 'gap-y-2 py-3' : 'gap-y-6 py-8'"
+        >
+          @for (item of gridCells(); track item.id) {
+            <button
+              type="button"
+              [class]="item.class"
+              [disabled]="item.disabled"
+              (click)="selectCell(item.id)"
+            >
+              {{ item.label }}
+            </button>
+          }
+        </div>
+      }
+
+      <!-- Footer Actions: Clear & Today -->
+      <div class="flex items-center justify-between border-t border-gray-100 px-3.5 py-2">
+        <button
+          type="button"
+          (click)="select('')"
+          class="cursor-pointer text-xs font-semibold text-[#0075ff] transition hover:underline"
+        >
+          Clear
+        </button>
+
+        <button
+          type="button"
+          (click)="selectToday()"
+          class="cursor-pointer text-xs font-semibold text-[#0075ff] transition hover:underline"
+        >
+          Today
+        </button>
+      </div>
+    </div>
+  }
+</div>

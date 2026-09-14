@@ -1,0 +1,458 @@
+<div class="rounded-2xl border border-gray-300 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
+  <!-- Header -->
+  <div class="mb-6 flex items-center justify-between border-b border-gray-200 pb-4">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900">
+        {{ editingId() ? 'Edit Project' : 'Add Project' }}
+      </h2>
+      <p class="mt-1 text-xs text-gray-500">
+        {{
+          editingId()
+            ? 'Update project details and assets below'
+            : 'Fill in the information below to create a new project'
+        }}
+      </p>
+    </div>
+
+    <button
+      type="button"
+      (click)="onCancel()"
+      class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer"
+    >
+      <lucide-icon name="arrow-left" [size]="14"></lucide-icon>
+      Back to Projects
+    </button>
+  </div>
+
+  <form class="flex flex-col gap-6" (submit)="$event.preventDefault(); submitProject()">
+    <!-- Row 1: Title & Slug -->
+    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+      <div>
+        <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+          Project Title <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          placeholder="e.g. Portfolio Website"
+          [value]="projects().title"
+          (input)="updateTitle($any($event.target).value)"
+          (blur)="markTouched('title')"
+          class="admin-input"
+          [class.has-error]="isFieldInvalid('title')"
+        />
+        @if (isFieldInvalid('title')) {
+          <p class="mt-1 text-xs font-medium text-red-500">Project title is required</p>
+        }
+      </div>
+
+      <div>
+        <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+          Slug (Auto-generated)
+        </label>
+        <input
+          type="text"
+          readonly
+          [value]="projects().slug"
+          placeholder="portfolio-website"
+          class="admin-input bg-gray-50 text-gray-600 cursor-not-allowed"
+        />
+      </div>
+    </div>
+
+    <!-- Row 2: Category & Date -->
+    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+      <div>
+        <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+          Category <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          placeholder="e.g. Frontend / Full Stack / Angular"
+          [value]="projects().category"
+          (input)="updateField('category', $any($event.target).value)"
+          (blur)="markTouched('category')"
+          class="admin-input"
+          [class.has-error]="isFieldInvalid('category')"
+        />
+        @if (isFieldInvalid('category')) {
+          <p class="mt-1 text-xs font-medium text-red-500">Category is required</p>
+        }
+      </div>
+
+      <div>
+        <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+          Project Date <span class="text-red-500">*</span>
+        </label>
+        <app-date-picker
+          [value]="projects().projectDate"
+          (valueChange)="updateField('projectDate', $event)"
+          (blur)="markTouched('projectDate')"
+          [hasError]="isFieldInvalid('projectDate')"
+          placeholder="DD-MM-YYYY"
+        />
+        @if (isFieldInvalid('projectDate')) {
+          <p class="mt-1 text-xs font-medium text-red-500">Project date is required</p>
+        }
+      </div>
+    </div>
+
+    <!-- Row 3: Image Uploads -->
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <!-- Card 1: Project Card Image -->
+      <div>
+        <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+          Project Card Image (Thumbnail) <span class="text-red-500">*</span>
+        </label>
+        <div class="flex items-start gap-4">
+          <div class="relative shrink-0">
+            <label for="projectCardImage" class="cursor-pointer block group">
+              <div
+                class="h-28 w-28 rounded-lg admin-upload-box bg-gray-50 flex items-center justify-center overflow-hidden"
+                [class.has-error]="isFieldInvalid('projectCardImage')"
+              >
+                @if (projectCardImagePreview()) {
+                  <img
+                    class="h-full w-full object-cover"
+                    [src]="projectCardImagePreview()"
+                    alt="Card Image Preview"
+                  />
+                } @else {
+                  <div
+                    class="flex flex-col items-center justify-center p-2 text-center text-gray-400 group-hover:text-blue-600 transition"
+                  >
+                    <img class="h-8 w-8 opacity-60 mb-1" src="/upload_area.png" alt="upload" />
+                    <span class="text-[11px] font-medium leading-none">Upload</span>
+                  </div>
+                }
+              </div>
+              <input
+                id="projectCardImage"
+                type="file"
+                accept="image/*"
+                (change)="onProjectCardImageSelected($event)"
+                (blur)="markTouched('projectCardImage')"
+                hidden
+              />
+            </label>
+
+            @if (projectCardImagePreview()) {
+              <button
+                type="button"
+                (click)="removeProjectCardImage()"
+                class="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white shadow hover:bg-red-700 transition cursor-pointer"
+                title="Remove image"
+              >
+                <lucide-icon name="x" [size]="12"></lucide-icon>
+              </button>
+            }
+          </div>
+
+          <div class="text-xs text-gray-500 pt-1">
+            <p class="font-semibold text-gray-700 mb-0.5">Thumbnail Image</p>
+            <p class="text-gray-400">Recommended 4:3 ratio or square (JPG, PNG, WebP).</p>
+            @if (isFieldInvalid('projectCardImage')) {
+              <p class="mt-1 text-xs font-medium text-red-500">Thumbnail image is required</p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Project Details Banner -->
+      <div>
+        <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+          Project Details Image (Banner) <span class="text-red-500">*</span>
+        </label>
+        <div class="flex items-start gap-4">
+          <div class="relative shrink-0">
+            <label for="image" class="cursor-pointer block group">
+              <div
+                class="h-28 w-44 rounded-lg admin-upload-box bg-gray-50 flex items-center justify-center overflow-hidden"
+                [class.has-error]="isFieldInvalid('image')"
+              >
+                @if (imagePreview()) {
+                  <img
+                    class="h-full w-full object-cover"
+                    [src]="imagePreview()"
+                    alt="Details Banner Preview"
+                  />
+                } @else {
+                  <div
+                    class="flex flex-col items-center justify-center p-2 text-center text-gray-400 group-hover:text-blue-600 transition"
+                  >
+                    <img class="h-8 w-8 opacity-60 mb-1" src="/upload_area.png" alt="upload" />
+                    <span class="text-[11px] font-medium leading-none">Upload Banner</span>
+                  </div>
+                }
+              </div>
+              <input
+                id="image"
+                type="file"
+                accept="image/*"
+                (change)="onImageSelected($event)"
+                (blur)="markTouched('image')"
+                hidden
+              />
+            </label>
+
+            @if (imagePreview()) {
+              <button
+                type="button"
+                (click)="removeImage()"
+                class="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white shadow hover:bg-red-700 transition cursor-pointer"
+                title="Remove image"
+              >
+                <lucide-icon name="x" [size]="12"></lucide-icon>
+              </button>
+            }
+          </div>
+
+          <div class="text-xs text-gray-500 pt-1">
+            <p class="font-semibold text-gray-700 mb-0.5">Full Details Banner</p>
+            <p class="text-gray-400">High resolution screenshot or banner showcase.</p>
+            @if (isFieldInvalid('image')) {
+              <p class="mt-1 text-xs font-medium text-red-500">Banner image is required</p>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 4: Technologies -->
+    <div>
+      <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+        Technologies & Tools <span class="text-red-500">*</span>
+      </label>
+      <div class="flex max-w-xl items-center gap-2">
+        <input
+          type="text"
+          placeholder="e.g. Angular, Tailwind, Node.js"
+          [value]="technologyInput()"
+          (input)="technologyInput.set($any($event.target).value)"
+          (keydown.enter)="addTechnology(); $event.preventDefault()"
+          (blur)="markTouched('technologies')"
+          class="admin-input flex-1"
+          [class.has-error]="isFieldInvalid('technologies')"
+        />
+
+        <button
+          type="button"
+          (click)="addTechnology()"
+          class="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white transition hover:bg-blue-700 active:scale-95 cursor-pointer shadow-xs"
+        >
+          <lucide-icon name="plus" [size]="14"></lucide-icon>
+          Add
+        </button>
+      </div>
+
+      @if (isFieldInvalid('technologies')) {
+        <p class="mt-1 text-xs font-medium text-red-500">At least one technology is required</p>
+      }
+
+      @if (projects().technologies.length > 0) {
+        <div class="mt-3 flex flex-wrap gap-2">
+          @for (tech of projects().technologies; track tech; let i = $index) {
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 shadow-2xs"
+            >
+              {{ tech }}
+              <button
+                type="button"
+                (click)="removeTechnology(i)"
+                class="rounded-full text-blue-400 hover:text-red-600 transition cursor-pointer"
+                title="Remove {{ tech }}"
+              >
+                <lucide-icon name="x" [size]="13"></lucide-icon>
+              </button>
+            </span>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Row 5: Links -->
+    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+      <div>
+        <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+          Live URL
+        </label>
+        <input
+          type="url"
+          placeholder="https://example.com"
+          [value]="projects().liveUrl"
+          (input)="updateField('liveUrl', $any($event.target).value)"
+          class="admin-input"
+        />
+      </div>
+
+      <div>
+        <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+          GitHub URL
+        </label>
+        <input
+          type="url"
+          placeholder="https://github.com/username/repository"
+          [value]="projects().githubUrl"
+          (input)="updateField('githubUrl', $any($event.target).value)"
+          class="admin-input"
+        />
+      </div>
+    </div>
+
+    <!-- Row 6: Overview -->
+    <div>
+      <div class="mb-1.5 flex items-center justify-between">
+        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-700">
+          Project Overview <span class="text-red-500">*</span>
+        </label>
+        <div class="flex items-center gap-1.5">
+          <button
+            type="button"
+            (click)="applyFormat('overview', 'bold')"
+            class="inline-flex h-6 w-6 items-center justify-center rounded border border-gray-200 bg-gray-50 text-xs font-bold text-gray-700 hover:bg-gray-200 hover:text-black transition cursor-pointer"
+            title="Bold: wrap in **bold**"
+          >
+            B
+          </button>
+          <button
+            type="button"
+            (click)="applyFormat('overview', 'italic')"
+            class="inline-flex h-6 w-6 items-center justify-center rounded border border-gray-200 bg-gray-50 text-xs italic font-serif text-gray-700 hover:bg-gray-200 hover:text-black transition cursor-pointer"
+            title="Italic: wrap in *italic*"
+          >
+            I
+          </button>
+          <span class="text-[11px] text-gray-400 ml-1"
+            >Tip: Use <code class="text-indigo-600 font-semibold">**bold**</code></span
+          >
+        </div>
+      </div>
+      <textarea
+        id="projectOverviewInput"
+        rows="2"
+        maxlength="250"
+        placeholder="e.g. Built with **HTML**, **CSS**, and **JavaScript**..."
+        [value]="projects().overview"
+        (input)="updateField('overview', $any($event.target).value)"
+        (blur)="markTouched('overview')"
+        class="admin-textarea"
+        [class.has-error]="isFieldInvalid('overview')"
+      ></textarea>
+      <div class="mt-1 flex items-center justify-between">
+        <div>
+          @if (isFieldInvalid('overview')) {
+            <p class="text-xs font-medium text-red-500">Project overview is required</p>
+          }
+        </div>
+        <span class="text-[11px] font-medium text-gray-400">
+          {{ projects().overview.length || 0 }}/250
+        </span>
+      </div>
+      @if (projects().overview) {
+        <div class="mt-2 rounded-lg bg-gray-50 border border-gray-100 p-2.5 text-xs text-gray-600">
+          <span class="font-semibold text-gray-400 uppercase tracking-wider text-[10px] block mb-1"
+            >Overview Preview:</span
+          >
+          <p
+            class="whitespace-pre-line text-slate-800"
+            [innerHTML]="projects().overview | formatText"
+          ></p>
+        </div>
+      }
+    </div>
+
+    <!-- Row 7: Description -->
+    <div>
+      <div class="mb-1.5 flex items-center justify-between">
+        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-700">
+          Detailed Description <span class="text-red-500">*</span>
+        </label>
+        <div class="flex items-center gap-1.5">
+          <button
+            type="button"
+            (click)="applyFormat('description', 'bold')"
+            class="inline-flex h-6 w-6 items-center justify-center rounded border border-gray-200 bg-gray-50 text-xs font-bold text-gray-700 hover:bg-gray-200 hover:text-black transition cursor-pointer"
+            title="Bold: wrap in **bold**"
+          >
+            B
+          </button>
+          <button
+            type="button"
+            (click)="applyFormat('description', 'italic')"
+            class="inline-flex h-6 w-6 items-center justify-center rounded border border-gray-200 bg-gray-50 text-xs italic font-serif text-gray-700 hover:bg-gray-200 hover:text-black transition cursor-pointer"
+            title="Italic: wrap in *italic*"
+          >
+            I
+          </button>
+          <button
+            type="button"
+            (click)="applyFormat('description', 'code')"
+            class="inline-flex h-6 w-6 items-center justify-center rounded border border-gray-200 bg-gray-50 text-[10px] font-mono font-bold text-gray-700 hover:bg-gray-200 hover:text-black transition cursor-pointer"
+            title="Code: wrap in `code`"
+          >
+            &lt;/&gt;
+          </button>
+          <span class="text-[11px] text-gray-400 ml-1"
+            >Tip: Use <code class="text-indigo-600 font-semibold">**bold**</code> or
+            <code class="text-indigo-600 font-semibold">&lt;b&gt;bold&lt;/b&gt;</code></span
+          >
+        </div>
+      </div>
+      <textarea
+        id="projectDescriptionInput"
+        rows="6"
+        maxlength="1000"
+        placeholder="Full project breakdown... Highlight key skills with **HTML**, **CSS**, and **JavaScript**"
+        [value]="projects().description"
+        (input)="updateField('description', $any($event.target).value)"
+        (blur)="markTouched('description')"
+        class="admin-textarea"
+        [class.has-error]="isFieldInvalid('description')"
+      ></textarea>
+      <div class="mt-1 flex items-center justify-between">
+        <div>
+          @if (isFieldInvalid('description')) {
+            <p class="text-xs font-medium text-red-500">Project description is required</p>
+          }
+        </div>
+        <span class="text-[11px] font-medium text-gray-400">
+          {{ projects().description.length || 0 }}/1000
+        </span>
+      </div>
+      @if (projects().description) {
+        <div class="mt-2.5 rounded-lg bg-gray-50 border border-gray-100 p-3 text-xs text-gray-600">
+          <span class="font-semibold text-gray-400 uppercase tracking-wider text-[10px] block mb-1"
+            >Description Preview:</span
+          >
+          <div
+            class="whitespace-pre-line text-slate-800 leading-relaxed"
+            [innerHTML]="projects().description | formatText"
+          ></div>
+        </div>
+      }
+    </div>
+
+    <!-- Form Footer Buttons -->
+    <div class="flex items-center justify-end gap-3 border-t border-gray-100 pt-5">
+      <button
+        type="button"
+        (click)="onCancel()"
+        class="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-2xs hover:bg-gray-50 transition cursor-pointer"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="submit"
+        [disabled]="loading()"
+        class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+      >
+        @if (loading()) {
+          <div
+            class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+          ></div>
+        }
+        {{ loading() ? 'Saving...' : editingId() ? 'Update Project' : 'Create Project' }}
+      </button>
+    </div>
+  </form>
+</div>

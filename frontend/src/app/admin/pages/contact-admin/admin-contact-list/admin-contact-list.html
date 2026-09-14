@@ -1,0 +1,18 @@
+<div class="flex min-h-0 min-w-0 flex-1 flex-col h-full">
+  @if (isErrorMsg()) {
+    <app-error />
+  } @else {
+    <app-data-table
+      [rows]="contacts()"
+      [columns]="columns"
+      [filters]="filters"
+      [actions]="actions"
+      [pageSize]="10"
+      [pageSizeOptions]="[10, 25, 50]"
+      searchPlaceholder="Search"
+      emptyMessage="No contact messages found."
+      tableClass="w-full min-w-[760px]"
+      (action)="onAction($event)"
+    />
+  }
+</div>

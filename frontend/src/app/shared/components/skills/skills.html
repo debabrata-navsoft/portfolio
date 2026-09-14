@@ -1,0 +1,63 @@
+<section id="skills" class="my-20 scroll-mt-32">
+  <!-- Heading Section -->
+  <div appReveal revealAnimation="left" [revealDelay]="0" class="mb-16 flex flex-col items-start">
+    <app-gradient-text
+      tagName="h6"
+      text="Toolkit"
+      [showLine]="true"
+      class="text-2xl uppercase font-bold tracking-[4px]"
+    />
+    <h2 class="max-w-2xl mt-4 text-3xl font-bold leading-[120%] lg:text-[54px]">
+      What I reach for
+      <!-- Where skills meet real-world application -->
+    </h2>
+
+    <p class="mt-4 max-w-2xl text-base lg:text-lg leading-8 text-gray-500 dark:text-gray-400">
+      Chosen for what they let me ship and maintain, not for what's new this quarter.
+      <!-- Technologies and tools I use to build fast, scalable, and user-friendly applications. -->
+    </p>
+  </div>
+
+  <!-- Categories Horizontal List -->
+  <div class="border-t border-gray-200/80 dark:border-neutral-800">
+    @for (group of categorySkills(); track group.category; let g = $index) {
+      <div
+        appReveal
+        revealAnimation="up"
+        [revealDelay]="g * 80"
+        class="flex flex-col md:flex-row md:items-baseline gap-4 md:gap-12 py-7 md:py-8 border-b border-gray-200/80 dark:border-neutral-800 transition-colors"
+      >
+        <!-- Category Title (Left Column) -->
+        <div class="w-full md:w-56 lg:w-64 shrink-0">
+          <span
+            class="text-xs font-semibold uppercase tracking-[3px] text-gray-400 dark:text-gray-500"
+          >
+            {{ group.category }}
+          </span>
+        </div>
+
+        <!-- Skills Text List (Right Column) -->
+        <div class="flex flex-wrap items-center gap-x-8 md:gap-x-10 gap-y-3">
+          @for (skill of group.list; track skill._id) {
+            @if (skill.websiteUrl) {
+              <a
+                [href]="skill.websiteUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-base md:text-lg text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white transition-colors duration-150"
+              >
+                {{ skill.name }}
+              </a>
+            } @else {
+              <span
+                class="text-base md:text-lg text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white transition-colors duration-150 cursor-default"
+              >
+                {{ skill.name }}
+              </span>
+            }
+          }
+        </div>
+      </div>
+    }
+  </div>
+</section>

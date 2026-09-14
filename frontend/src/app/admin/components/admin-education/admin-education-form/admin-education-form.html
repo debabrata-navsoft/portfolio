@@ -1,0 +1,83 @@
+<form class="flex flex-col gap-4" (submit)="$event.preventDefault(); submitEducation()">
+  <div>
+    <h3 class="text-xl font-bold text-gray-900">
+      {{ editData() ? 'Edit Education' : 'Add Academic Record' }}
+    </h3>
+    <p class="text-xs text-gray-500 mt-0.5">
+      Provide details regarding your institution, degree, and graduation years.
+    </p>
+  </div>
+
+  <div class="space-y-4">
+    <div>
+      <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+        School / College / University <span class="text-red-500">*</span>
+      </label>
+      <input
+        type="text"
+        placeholder="e.g. Harvard University, MIT, MAKAUT"
+        [value]="educationForm().school"
+        (input)="updateField('school', $any($event.target).value)"
+        (blur)="markTouched('school')"
+        class="admin-input"
+        [class.has-error]="isFieldInvalid('school')"
+      />
+      @if (isFieldInvalid('school')) {
+        <p class="mt-1 text-xs font-medium text-red-500">
+          School / College / University is required
+        </p>
+      }
+    </div>
+
+    <div>
+      <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+        Department / Degree <span class="text-red-500">*</span>
+      </label>
+      <input
+        type="text"
+        placeholder="e.g. B.Tech in Computer Science & Engineering"
+        [value]="educationForm().degree"
+        (input)="updateField('degree', $any($event.target).value)"
+        (blur)="markTouched('degree')"
+        class="admin-input"
+        [class.has-error]="isFieldInvalid('degree')"
+      />
+      @if (isFieldInvalid('degree')) {
+        <p class="mt-1 text-xs font-medium text-red-500">Department / Degree is required</p>
+      }
+    </div>
+
+    <div>
+      <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+        Duration / Years <span class="text-red-500">*</span>
+      </label>
+      <input
+        type="text"
+        placeholder="e.g. 2019 - 2023"
+        [value]="educationForm().years"
+        (input)="updateField('years', $any($event.target).value)"
+        (blur)="markTouched('years')"
+        class="admin-input"
+        [class.has-error]="isFieldInvalid('years')"
+      />
+      @if (isFieldInvalid('years')) {
+        <p class="mt-1 text-xs font-medium text-red-500">Duration / Years is required</p>
+      }
+    </div>
+  </div>
+
+  <div class="mt-2 flex justify-end gap-3 border-t border-gray-100 pt-4">
+    <button
+      type="submit"
+      [disabled]="loading()"
+      class="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 active:scale-95 transition disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+    >
+      @if (loading()) {
+        <div
+          class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+        ></div>
+      }
+      {{ loading() ? 'Saving...' : editData() ? 'Update Education' : 'Save Education' }}
+    </button>
+  </div>
+</form>

@@ -1,0 +1,86 @@
+@if (isErrorMsg()) {
+  <app-error />
+} @else if (articles()) {
+  <section class="py-12 md:py-20">
+    <div class="mx-auto max-w-7xl px-5">
+      <!-- Hero -->
+      <div class="flex flex-col gap-8 xl:flex-row xl:items-center xl:justify-between">
+        <div
+          appReveal
+          revealAnimation="left"
+          [revealDelay]="100"
+          class="flex flex-col-reverse gap-4 xl:flex-col"
+        >
+          <app-gradient-text
+            tagName="h6"
+            [text]="
+              (articles()!.createdAt | timeAgo) +
+              ' • ' +
+              articles()!.estimatedReadingTime +
+              ' min read'
+            "
+            className="text-[13px] font-bold tracking-[4px] uppercase md:text-sm"
+          />
+
+          <h1 class="max-w-162.5 text-4xl font-bold leading-[110%] dark:text-white md:text-6xl">
+            {{ articles()!.title }}
+          </h1>
+        </div>
+
+        <div
+          appReveal
+          revealAnimation="scale"
+          [revealDelay]="200"
+          class="overflow-hidden rounded-xl bg-neutral-800"
+          (click)="imagePopup.set(true)"
+        >
+          <img
+            [src]="articles()!.image"
+            [alt]="articles()!.title"
+            class="w-full cursor-zoom-in transition-transform duration-300 hover:scale-105 xl:w-120"
+          />
+        </div>
+
+        @if (imagePopup()) {
+          <div
+            appReveal
+            revealAnimation="scale"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+            (click)="imagePopup.set(false)"
+          >
+            <button
+              type="button"
+              class="absolute right-4 sm:right-30 top-25 text-white cursor-pointer"
+              (click)="imagePopup.set(false)"
+            >
+              <lucide-icon name="x" [size]="32"></lucide-icon>
+            </button>
+
+            <img
+              [src]="articles()!.image"
+              [alt]="articles()!.title"
+              class="max-h-[75vh] max-w-[90vw] object-contain"
+              (click)="$event.stopPropagation()"
+            />
+          </div>
+        }
+      </div>
+
+      <div appReveal revealAnimation="up" [revealDelay]="300" class="my-20">
+        <h2 class="max-w-225 text-2xl font-medium leading-relaxed text-gray-700 dark:text-gray-400">
+          {{ articles()!.excerpt }}
+        </h2>
+      </div>
+
+      <!-- Article -->
+      <div
+        appReveal
+        revealAnimation="up"
+        [revealDelay]="400"
+        class="prose prose-invert whitespace-pre-wrap text-2xl"
+      >
+        {{ articles()!.content }}
+      </div>
+    </div>
+  </section>
+}

@@ -1,0 +1,19 @@
+<div class="flex min-h-0 min-w-0 flex-1 flex-col h-full">
+  @if (isErrorMsg()) {
+    <app-error />
+  } @else {
+    <app-data-table
+      [rows]="articles()"
+      [columns]="columns"
+      [filters]="filters"
+      [actions]="actions"
+      primaryButtonText="Add Article"
+      primaryButtonIcon="plus"
+      searchPlaceholder="Search"
+      emptyMessage="No articles found."
+      tableClass="w-full min-w-[760px]"
+      (primaryAction)="addArticle()"
+      (action)="onAction($event)"
+    />
+  }
+</div>

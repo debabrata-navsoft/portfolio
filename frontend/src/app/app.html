@@ -1,0 +1,34 @@
+<!-- <div class="overflow-x-clip"> -->
+@if (loaderService.startupLoading() && !isAdminPage()) {
+  <app-startup-loader />
+}
+
+@if (loaderService.apiLoading()) {
+  <app-api-loader />
+}
+<div class="overflow-x-clip">
+  <!-- [class.invisible]="loaderService.startupLoading()" -->
+
+  <div
+    [ngClass]="{
+      'w-full max-w-7xl mx-auto px-5 md:px-8 lg:px-10 xl:px-0': !isAdminPage(),
+    }"
+  >
+    @if (!isAdminPage()) {
+      <app-navbar />
+    }
+
+    <!-- <div [class.page-content]="!isAdminPage()"> -->
+    <div [class]="!isAdminPage() ? 'min-h-screen pt-18' : 'min-h-screen pt-0'">
+      <router-outlet />
+    </div>
+  </div>
+
+  @if (!isAdminPage()) {
+    <app-footer />
+  }
+</div>
+<!-- </div> -->
+
+<!-- <div [class.app-main]="!isAdminPage()" class="mx-5 md:mx-[15vw]"  > -->
+

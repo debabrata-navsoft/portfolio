@@ -1,0 +1,163 @@
+/* Admin Header & Services Menu Animation */
+
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.profile-dropdown,
+.services-drawer {
+  animation: dropdownEnter 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top right;
+}
+
+.services-drawer {
+  transform-origin: top left;
+}
+
+@keyframes dropdownEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Custom mini scrollbar for services list */
+.services-drawer ::-webkit-scrollbar {
+  width: 4px;
+}
+
+.services-drawer ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.services-drawer ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.services-drawer ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Hide scrollbars for sub-header tabs */
+.sub-header-tabs {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sub-header-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* Animated 9-Dot Launcher Button */
+.menu-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-btn-wrapper {
+  width: 1.125rem;
+  height: 1.125rem;
+  margin: 0 auto;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  place-items: center;
+  gap: 0.125rem;
+  cursor: pointer;
+}
+
+.menu-btn-wrapper [class*='menu-dot'] {
+  width: 0.225rem;
+  height: 0.225rem;
+  background-color: #374151;
+  display: block;
+  border-radius: 50%;
+  transition:
+    background-color 100ms ease,
+    transform 200ms ease;
+  transform-origin: 50% 50%;
+  will-change: scale, background-color;
+}
+
+.waffle-btn:hover [class*='menu-dot'],
+.menu-btn:hover [class*='menu-dot'] {
+  animation: menu-dot-anim 200ms 2 alternate ease-in-out;
+}
+
+.waffle-btn:hover .menu-dot1,
+.waffle-btn:hover .menu-dot2,
+.waffle-btn:hover .menu-dot3,
+.menu-btn:hover .menu-dot1,
+.menu-btn:hover .menu-dot2,
+.menu-btn:hover .menu-dot3 {
+  background-color: #2f829c;
+}
+
+.waffle-btn:hover .menu-dot4,
+.waffle-btn:hover .menu-dot5,
+.waffle-btn:hover .menu-dot7,
+.menu-btn:hover .menu-dot4,
+.menu-btn:hover .menu-dot5,
+.menu-btn:hover .menu-dot7 {
+  background-color: #c20f68;
+}
+
+.waffle-btn:hover .menu-dot6,
+.waffle-btn:hover .menu-dot8,
+.waffle-btn:hover .menu-dot9,
+.menu-btn:hover .menu-dot6,
+.menu-btn:hover .menu-dot8,
+.menu-btn:hover .menu-dot9 {
+  background-color: #e38100;
+}
+
+.waffle-btn:hover .menu-dot2,
+.waffle-btn:hover .menu-dot4,
+.menu-btn:hover .menu-dot2,
+.menu-btn:hover .menu-dot4 {
+  transition-delay: 50ms;
+  animation-delay: 50ms;
+}
+
+.waffle-btn:hover .menu-dot3,
+.waffle-btn:hover .menu-dot5,
+.waffle-btn:hover .menu-dot7,
+.menu-btn:hover .menu-dot3,
+.menu-btn:hover .menu-dot5,
+.menu-btn:hover .menu-dot7 {
+  transition-delay: 100ms;
+  animation-delay: 100ms;
+}
+
+.waffle-btn:hover .menu-dot6,
+.waffle-btn:hover .menu-dot8,
+.menu-btn:hover .menu-dot6,
+.menu-btn:hover .menu-dot8 {
+  transition-delay: 150ms;
+  animation-delay: 150ms;
+}
+
+.waffle-btn:hover .menu-dot9,
+.menu-btn:hover .menu-dot9 {
+  transition-delay: 200ms;
+  animation-delay: 200ms;
+}
+
+@keyframes menu-dot-anim {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.45);
+  }
+}

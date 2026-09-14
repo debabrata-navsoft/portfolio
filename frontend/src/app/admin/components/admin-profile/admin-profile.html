@@ -1,0 +1,219 @@
+<div>
+  <h2 class="mb-5 text-2xl font-bold text-gray-900">Profile Content</h2>
+
+  @if (isLoading()) {
+    <div class="space-y-6 animate-pulse">
+      <div
+        class="flex flex-col gap-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-xs md:flex-row"
+      >
+        <div class="flex-1 flex flex-col items-start gap-3">
+          <div class="h-4 w-36 bg-gray-200 rounded"></div>
+          <div class="h-44 w-44 rounded-2xl bg-gray-100"></div>
+          <div class="h-10 w-44 rounded-lg bg-gray-200"></div>
+        </div>
+        <div class="flex-1 space-y-3">
+          <div class="h-4 w-36 bg-gray-200 rounded"></div>
+          <div class="h-10 w-full bg-gray-100 rounded-lg"></div>
+          <div class="h-10 w-40 bg-gray-200 rounded-lg"></div>
+          <div class="h-64 w-full bg-gray-100 rounded-xl"></div>
+        </div>
+      </div>
+      <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs space-y-4">
+        <div class="h-4 w-32 bg-gray-200 rounded"></div>
+        <div class="h-10 bg-gray-100 rounded-lg"></div>
+        <div class="h-16 bg-gray-100 rounded-lg"></div>
+        <div class="h-10 bg-gray-100 rounded-lg"></div>
+        <div class="h-24 bg-gray-100 rounded-lg"></div>
+      </div>
+    </div>
+  } @else {
+    <!-- Profile Image & Resume Card -->
+    <div
+      class="flex flex-col gap-8 rounded-2xl border border-gray-300 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] md:flex-row"
+    >
+      <!-- Left: Profile Image -->
+      <div class="flex-1 flex flex-col items-start">
+        <h3 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-700">
+          Upload Profile Image
+        </h3>
+
+        <label for="profileImage" class="mb-4 inline-block cursor-pointer group">
+          <div
+            class="relative overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 group-hover:border-blue-500 transition shadow-xs"
+          >
+            <img
+              [src]="previewUrl() || currentImageUrl() || '/upload_area.png'"
+              alt="Profile Preview"
+              class="h-44 w-44 object-cover"
+            />
+            <div
+              class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition text-white text-xs font-semibold"
+            >
+              Change Photo
+            </div>
+          </div>
+        </label>
+
+        <input
+          #fileInput
+          id="profileImage"
+          type="file"
+          accept=".jpg,.jpeg,.png,.webp"
+          (change)="onFileSelect($event)"
+          hidden
+        />
+
+        <button
+          (click)="uploadProfileImage()"
+          [disabled]="!selectedFile() || uploading()"
+          class="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 active:scale-95 transition disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+        >
+          @if (uploading()) {
+            <div
+              class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+            ></div>
+          }
+          {{ uploading() ? 'Uploading...' : 'Upload Profile Image' }}
+        </button>
+      </div>
+
+      <!-- Right: Resume Management -->
+      <div class="flex-1">
+        <h3 class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-700">
+          Resume Management
+        </h3>
+
+        <input
+          type="url"
+          placeholder="Paste Google Drive resume link..."
+          [value]="resumeUrl()"
+          (input)="resumeUrl.set($any($event.target).value)"
+          (blur)="markTouched('resumeUrl')"
+          class="admin-input mb-3"
+          [class.has-error]="isFieldInvalid('resumeUrl')"
+        />
+        @if (isFieldInvalid('resumeUrl')) {
+          <p class="mb-3 -mt-2 text-xs font-medium text-red-500">Resume link is required</p>
+        }
+
+        <button
+          (click)="saveResume()"
+          [disabled]="saving()"
+          class="mb-4 inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 active:scale-95 transition disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+        >
+          @if (saving()) {
+            <div
+              class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+            ></div>
+          }
+          {{ saving() ? 'Saving...' : 'Save Resume Link' }}
+        </button>
+
+        @if (resumePreviewUrl()) {
+          <iframe
+            [src]="resumePreviewUrl()"
+            class="h-80 w-full rounded-xl border border-gray-300 shadow-2xs"
+            allow="autoplay"
+          ></iframe>
+        } @else if (hasInvalidResumeLink()) {
+          <p class="text-xs text-red-600 font-medium">
+            Couldn't detect a valid Google Drive file link — please check the URL format.
+          </p>
+        } @else {
+          <div
+            class="flex h-80 w-full items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 text-xs text-gray-400"
+          >
+            No resume preview available
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Hero Content Card -->
+    <div
+      class="mt-6 rounded-2xl border border-gray-300 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
+    >
+      <h3 class="mb-5 text-sm font-semibold uppercase tracking-wider text-gray-700">
+        Hero Content
+      </h3>
+
+      <div class="grid grid-cols-1 gap-5">
+        <!-- Hero Gradient Text -->
+        <div>
+          <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+            Hero Gradient Text
+          </label>
+          <input
+            type="text"
+            placeholder="e.g. I develop frontend"
+            [value]="profileForm().heroGradientText"
+            (input)="updateField('heroGradientText', $any($event.target).value)"
+            class="admin-input"
+          />
+        </div>
+
+        <!-- Hero Heading -->
+        <div>
+          <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+            Hero Heading
+          </label>
+          <textarea
+            rows="2"
+            placeholder="solutions that delight and inspire users."
+            [value]="profileForm().heroHeading"
+            (input)="updateField('heroHeading', $any($event.target).value)"
+            class="admin-textarea resize-none"
+          ></textarea>
+        </div>
+
+        <!-- Introduction -->
+        <div>
+          <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+            Introduction
+          </label>
+          <input
+            type="text"
+            placeholder="Hi, I'm Debabrata Das, a Frontend Developer."
+            [value]="profileForm().introduction"
+            (input)="updateField('introduction', $any($event.target).value)"
+            class="admin-input"
+          />
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
+            Description <span class="text-red-500">*</span>
+          </label>
+          <textarea
+            rows="4"
+            placeholder="Enter profile description..."
+            [value]="profileForm().profileDescription"
+            (input)="updateField('profileDescription', $any($event.target).value)"
+            (blur)="markTouched('profileDescription')"
+            class="admin-textarea"
+            [class.has-error]="isFieldInvalid('profileDescription')"
+          ></textarea>
+          @if (isFieldInvalid('profileDescription')) {
+            <p class="mt-1 text-xs font-medium text-red-500">Description is required</p>
+          }
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end border-t border-gray-100 pt-5">
+        <button
+          (click)="saveProfileContent()"
+          [disabled]="savingContent() || !isProfileChanged()"
+          class="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 active:scale-95 transition disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+        >
+          @if (savingContent()) {
+            <div
+              class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+            ></div>
+          }
+          {{ savingContent() ? 'Saving...' : 'Save Hero Content' }}
+        </button>
+      </div>
+    </div>
+  }
+</div>

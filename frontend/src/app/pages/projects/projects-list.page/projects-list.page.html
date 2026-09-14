@@ -1,0 +1,145 @@
+@if (isErrorMsg()) {
+  <app-error />
+} @else {
+  <section class="overflow-hidden py-12 md:py-20">
+    <!-- [@listAnimation]="paginatedProjects().length" -->
+
+    <div class="mx-auto mb-10 max-w-7xl px-5 md:mb-14">
+      <app-list-toolbar
+        label="projects"
+        placeholder="Search projects..."
+        [total]="total()"
+        [search]="search()"
+        [activeFilterCount]="activeFilterCount()"
+        [chips]="filterChips()"
+        (searchChange)="onSearch($event)"
+        (openFilters)="openFilters()"
+        (removeChip)="onRemoveChip($event)"
+      />
+    </div>
+
+    <!-- <div class="mx-auto flex max-w-7xl flex-col gap-32 px-5 xl:gap-20"> -->
+    <div
+      class="mx-auto flex max-w-7xl flex-col items-center gap-32 px-5 xl:items-stretch xl:gap-20"
+    >
+      <!-- @for (project of filteredProjects(); track project._id; let i = $index) { -->
+      @for (project of projects(); track project._id; let i = $index) {
+        <article
+          appReveal
+          revealAnimation="up"
+          [revealDelay]="i * 150"
+          class="group relative mx-auto flex w-full md:max-w-175 xl:max-w-150 cursor-pointer flex-col xl:flex-row xl:items-center xl:justify-end"
+          [ngClass]="{
+            'xl:mr-auto xl:ml-30': i % 2 === 0,
+            'xl:ml-auto xl:mr-30': i % 2 !== 0,
+          }"
+          (click)="viewProject(project.slug)"
+        >
+          <!-- [ngClass]="{
+            'mr-auto xl:ml-30': i % 2 === 0,
+            'ml-auto xl:mr-30': i % 2 !== 0,
+          }" -->
+
+          <div
+            class="h-60 w-full md:h-80 overflow-hidden bg-neutral-500 dark:border dark:border-gray-900 xl:h-110"
+          >
+            <img
+              [src]="project.projectCardImage"
+              [alt]="project.title"
+              class="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-110"
+            />
+          </div>
+
+          <div
+            class="relative z-10 w-full self-center bg-black px-6 py-7 shadow-2xl dark:border dark:border-gray-900 md:w-full md:px-8 md:py-10 xl:absolute xl:top-1/2 xl:mt-0 xl:-translate-y-1/2"
+            [ngClass]="{
+              'xl:-right-100': i % 2 === 0,
+              'xl:-left-100': i % 2 !== 0,
+            }"
+          >
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <app-gradient-text
+                tagName="h6"
+                [text]="project.category | uppercase"
+                className="text-[14px] font-bold tracking-[4px] md:text-lg"
+              />
+
+              <app-gradient-text
+                tagName="h6"
+                [text]="'Created At: ' + (project.createdAt | timeAgo)"
+                [gradient]="false"
+                className="text-[10px] font-bold tracking-[2px] md:tracking-[4px] uppercase text-white"
+              />
+            </div>
+
+            <app-gradient-text
+              tagName="h6"
+              [text]="(project.projectDate | date: 'dd MMM yyyy') ?? ''"
+              className="mt-2 text-[10px] font-bold tracking-[2px] md:tracking-[4px] uppercase md:text-sm"
+            />
+
+            <h2 class="my-4 text-2xl font-bold leading-none text-white md:my-7 md:text-5xl">
+              {{ project.title }}
+            </h2>
+
+            <div class="mb-5 flex flex-wrap gap-2">
+              @for (tech of project.technologies; track tech) {
+                <span class="rounded-full bg-white/10 px-3 py-1 text-xs text-white">
+                  {{ tech }}
+                </span>
+              }
+            </div>
+
+            <app-custom-nav
+              text="View Project"
+              [iconSize]="24"
+              class="text-sm md:text-lg text-white group-hover:text-cyan-400"
+            />
+          </div>
+        </article>
+      } @empty {
+        @if (!isLoading()) {
+          <p class="py-10 text-center text-lg text-gray-500">
+            No projects found. Try a different search or clear the filters.
+          </p>
+        }
+      }
+    </div>
+
+    @if (totalPages > 1) {
+      <div class="mt-16 flex items-center justify-center gap-4 md:justify-end">
+        <button
+          type="button"
+          (click)="previousPage()"
+          [disabled]="pageIndex() === 0"
+          class="flex h-14 w-14 items-center cursor-pointer justify-center dark:text-black border border-gray-300 bg-white transition hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <lucide-icon name="chevron-left" [size]="20" />
+        </button>
+
+        <span class="text-sm text-gray-500"> {{ currentPage }} / {{ totalPages }} </span>
+
+        <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="pageIndex() === totalPages - 1"
+          class="flex h-14 w-14 items-center cursor-pointer justify-center dark:text-black border border-gray-300 bg-white transition hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <lucide-icon name="chevron-right" [size]="20" />
+        </button>
+      </div>
+    }
+  </section>
+
+  <app-filter-drawer
+    [open]="isFilterOpen()"
+    [groups]="filterGroups()"
+    [selection]="appliedFilters()"
+    [totalResults]="previewCount()"
+    (closed)="closeFilters()"
+    (draftChange)="onDraftFiltersChange($event)"
+    (applied)="onApplyFilters($event)"
+    (cleared)="onClearFilters()"
+  />
+}
+

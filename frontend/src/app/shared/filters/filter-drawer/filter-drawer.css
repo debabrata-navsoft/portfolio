@@ -1,0 +1,22 @@
+/* Slim elegant scrollbars inside filter drawer */
+.filter-drawer-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.4) transparent;
+}
+
+.filter-drawer-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.filter-drawer-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.filter-drawer-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.4);
+  border-radius: 9999px;
+}
+
+.filter-drawer-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.7);
+}

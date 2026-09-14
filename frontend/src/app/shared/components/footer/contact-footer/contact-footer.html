@@ -1,0 +1,98 @@
+<section class="pt-24 lg:pt-40">
+  <!-- Heading -->
+  <div appReveal revealAnimation="up" [revealDelay]="100" [revealOnce]="false" class="mb-14">
+    <h2 class="text-4xl mb-4 font-bold leading-tight text-white md:text-5xl xl:text-6xl">
+      Ready to build something amazing?
+    </h2>
+
+    <a routerLink="/contact" class="group inline-block">
+      <app-gradient-text
+        tagName="h3"
+        text="Let's work together."
+        class="cursor-pointer text-3xl font-bold leading-tight md:text-5xl xl:text-6xl"
+      />
+      <span
+        class="block h-1 w-0 bg-gradient-to-r from-purple-400 via-red-500 to-orange-600 transition-all duration-300 group-hover:w-full"
+      ></span>
+    </a>
+  </div>
+
+  <!-- Content -->
+  <div
+    appReveal
+    revealAnimation="up"
+    [revealDelay]="200"
+    [revealOnce]="false"
+    class="flex flex-col gap-16 lg:flex-row lg:justify-between"
+  >
+    <div>
+
+      <p class="mt-3 text-gray-400 flex items-center gap-2">
+        <lucide-icon name="map-pin" size="18"></lucide-icon>
+        {{ location }}
+      </p>
+
+      <a
+        class="mt-4 flex items-center gap-2 text-gray-400 transition hover:text-white"
+        href="mailto:{{ email }}"
+      >
+        <lucide-icon name="mail" size="18"></lucide-icon>
+        {{ email }}
+      </a>
+
+      <a
+        class="mt-4 flex items-center gap-2 text-gray-400 transition hover:text-white"
+        href="tel:{{ phone }}"
+      >
+        <lucide-icon name="phone" size="18"></lucide-icon>
+        {{ phone }}
+      </a>
+    </div>
+
+    <!-- Right -->
+    <div
+      appReveal
+      revealAnimation="up"
+      [revealDelay]="400"
+      [revealOnce]="false"
+      class="grid grid-cols-2 gap-x-16 gap-y-6 md:grid-cols-3"
+    >
+      @for (item of footerMenu; track item.id) {
+        <a
+          href="javascript:void(0)"
+          (click)="handleNavigation(item)"
+          class="group relative inline-block w-fit text-xl text-white transition-colors duration-300 hover:text-primary"
+        >
+          {{ item.title }}
+
+          <span
+            class="absolute -bottom-1 left-0 h-0.5 w-0 rounded-full bg-white transition-all duration-300 group-hover:w-24"
+          ></span>
+        </a>
+      }
+
+      @for (item of socialLinks; track item.title) {
+        <a
+          [href]="item.link"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group relative inline-block w-fit text-xl text-white transition-colors duration-300 hover:text-primary"
+        >
+          {{ item.title }}
+
+          <span
+            class="absolute -bottom-1 left-0 h-0.5 w-0 rounded-full bg-white transition-all duration-300 group-hover:w-24"
+          ></span>
+        </a>
+      }
+    </div>
+  </div>
+
+  <!-- Bottom -->
+  <p class="mt-20 pb-4 text-center text-base text-gray-500">
+    © {{ currentYear }}
+
+    <app-gradient-text tagName="span" text="<Debabrata Das />" /> Rights Reserved. Built using
+    Angular, TypeScript, Tailwind CSS, GSAP, Node.js, Express.js and MongoDB.
+  </p>
+</section>

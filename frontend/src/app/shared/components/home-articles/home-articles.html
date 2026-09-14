@@ -1,0 +1,60 @@
+<section class="relative left-1/2 right-1/2 -mx-[50vw] w-screen bg-black mt-20">
+  <!-- <div class="relative bg-black"> -->
+  <div
+    class="mx-auto max-w-7xl flex flex-col items-start justify-between gap-16 px-5 py-24 md:flex-row md:px-8 lg:px-10 xl:px-0"
+  >
+    <div
+      appReveal
+      revealAnimation="left"
+      [revealDelay]="0"
+      class="flex flex-col items-start flex-1 md:sticky md:top-28"
+    >
+      <app-gradient-text
+        tagName="h6"
+        text="ARTICLES"
+        [showLine]="true"
+        class="text-2xl uppercase font-bold tracking-[4px]"
+      />
+
+      <h2
+        class="mt-4 mb-6 text-3xl font-bold leading-[120%] tracking-[0.5px] text-white lg:text-[54px]"
+      >
+        Latest Articles
+      </h2>
+
+      <app-custom-nav text="View All" [iconSize]="20" class="text-lg text-white" to="/articles" />
+    </div>
+
+    <!-- Right Side -->
+    <div class="flex-1">
+      @for (article of articles(); track article._id; let i = $index) {
+        <article
+          appReveal
+          revealAnimation="up"
+          [revealDelay]="i * 150"
+          class="group cursor-pointer border-b border-gray-700 py-12 pb-5 last:border-b-0"
+          (click)="viewArticle(article.slug)"
+        >
+          <p class="text-lg font-medium leading-[130%] text-[#666]">
+            {{ article.createdAt | timeAgo }}
+            •
+            {{ article.estimatedReadingTime + ' min read' }}
+          </p>
+
+          <h3
+            class="my-5 text-2xl font-bold leading-tight text-white transition-opacity duration-300 group-hover:opacity-70 md:text-3xl"
+          >
+            {{ article.title }}
+          </h3>
+
+          <app-custom-nav
+            text="Read the article"
+            class="flex items-center gap-2 text-white md:text-[18px]"
+            [iconSize]="18"
+          />
+        </article>
+      }
+    </div>
+  </div>
+  <!-- </div> -->
+</section>

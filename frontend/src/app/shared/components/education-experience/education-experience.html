@@ -1,0 +1,98 @@
+<section id="experience" class="my-30 scroll-mt-32">
+  <div appReveal revealAnimation="left" [revealDelay]="0" class="mb-16 flex flex-col items-start">
+    <app-gradient-text
+      tagName="h6"
+      text="EXPERIENCE"
+      [showLine]="true"
+      class="text-2xl uppercase font-bold tracking-[4px]"
+    />
+
+    <h2 class="mt-4 max-w-3xl text-3xl font-bold leading-[120%] lg:text-[54px]">
+      Where experience meets education
+    </h2>
+
+    <p class="mt-4 max-w-2xl text-base lg:text-lg leading-8 text-gray-500">
+      Every line of code is shaped by real-world experience and sharpened by continuous learning —
+      built to deliver scalable, high-performing web applications.
+    </p>
+  </div>
+
+  <div class="flex flex-col justify-between gap-16 xl:flex-row xl:gap-10">
+    <!-- <div class="grid gap-10 md:grid-cols-2"> -->
+    <!-- Experience -->
+    <div appReveal revealAnimation="up" [revealDelay]="150" class="flex w-full max-w-3xl flex-col">
+      <div class="mb-10 flex items-center gap-4">
+        <!-- <lucide-icon name="briefcase" size="28"></lucide-icon> -->
+        <lucide-icon name="briefcase-business" class="h-8 w-8 md:h-10 md:w-10"></lucide-icon>
+
+        <h4 class="text-[28px] md:text-4xl font-bold">Work Experience</h4>
+      </div>
+
+      <div class="flex flex-col gap-10">
+        @for (item of experiences(); track item._id; let i = $index) {
+          <div appReveal revealAnimation="right" [revealDelay]="i * 150" class="group flex gap-8">
+            <!-- Timeline -->
+            <div class="relative ml-2 h-[90px] w-px bg-gray-300">
+              <div
+                class="absolute -left-[5px] top-0 h-[11px] w-[11px] rounded-full bg-blue-600 transition-all duration-500 group-hover:translate-y-[75px]"
+              ></div>
+            </div>
+
+            <!-- Content -->
+            <div>
+              <h3 class="mb-2 text-xl font-semibold">
+                {{ item.company }}
+              </h3>
+
+              <p class="mb-3 text-lg text-gray-500">
+                {{ item.role }}
+              </p>
+
+              <p class="text-sm text-gray-900 dark:text-gray-300">
+                {{ item.years }}
+              </p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Education -->
+    <div appReveal revealAnimation="up" [revealDelay]="300" class="flex w-full max-w-3xl flex-col">
+      <div class="mb-10 flex items-center gap-4">
+        <lucide-icon name="graduation-cap" class="h-8 w-8 md:h-10 md:w-10"></lucide-icon>
+
+        <h4 class="text-[28px] md:text-4xl font-bold">Education</h4>
+      </div>
+
+      <div class="flex flex-col gap-10">
+        @for (item of educations(); track item._id; let i = $index) {
+          <div appReveal revealAnimation="right" [revealDelay]="i * 150" class="group flex gap-8">
+            <!-- Timeline -->
+            <div class="relative ml-2 h-[95px] w-px bg-gray-300">
+              <div
+                class="absolute -left-[5px] top-0 h-[11px] w-[11px] rounded-full bg-blue-600 transition-all duration-500 group-hover:translate-y-[84px]"
+              ></div>
+            </div>
+
+            <!-- Content -->
+            <div>
+              <h3 class="text-xl font-semibold">
+                {{ item.school }}
+              </h3>
+
+              <p class="mb-3 text-lg text-gray-500">
+                {{ item.degree }}
+              </p>
+
+              <p class="text-sm text-gray-900 dark:text-gray-300">
+                {{ item.years }}
+              </p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+    <!-- </div> -->
+  </div>
+</section>

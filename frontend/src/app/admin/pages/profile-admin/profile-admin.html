@@ -1,0 +1,23 @@
+<div class="profile-admin">
+  <div class="profile-content">
+    @if (tabService.activeTab() === 'image') {
+      <app-admin-profile />
+    }
+
+    @if (tabService.activeTab() === 'about') {
+      <app-admin-about />
+    }
+
+    @if (tabService.activeTab() === 'skills') {
+      <app-admin-skill-list />
+    }
+
+    @if (tabService.activeTab() === 'experience') {
+      <app-admin-experience-list />
+    }
+
+    @if (tabService.activeTab() === 'education') {
+      <app-admin-education-list />
+    }
+  </div>
+</div>
