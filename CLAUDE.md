@@ -71,8 +71,8 @@ unmounted** — uploads happen inline on each resource route. Ignore them.
 - **Profile** `imageUrl, heroGradientText, heroHeading, introduction, profileDescription` — a
   singleton doc. **Resume** `resumeUrl`.
 - **About** `description, email, location, images[]` (up to 4) — also a singleton (upsert).
-- **Skills** `name, imageUrl, websiteUrl, category, percentage` (0–100, drives the proficiency
-  bar + Expert/Advanced/… badge on the public skills section)
+- **Skills** `name, imageUrl, websiteUrl, category, percentage` (0–100; edited in the admin
+  skills form, but **not displayed on the public site** — see §6)
 - **Experience** `company, role, years` · **Education** `school, degree, years`
 - **Project** `title, slug, projectDate, overview, description, category, projectCardImage,
   image, technologies[], liveUrl, githubUrl`
@@ -180,8 +180,7 @@ pick list before a template can use it.**
   (`about, admin, article, contact, education, experience, faq, profile, project, skills`).
   Uniform shape: `inject(HttpClient)`, `private apiUrl = ${environment.apiUrl}/<resource>`, thin
   methods returning `Observable<T>` typed by `app/models/`. **Add API calls here, never in
-  components.** The non-HTTP services alongside them are `loader`, `snack-bar`, `admin-tab` and
-  `percentage-animation`.
+  components.** The non-HTTP services alongside them are `loader`, `snack-bar` and `admin-tab`.
 - [admin.service.ts](frontend/src/app/core/services/admin.service.ts) is the exception — it also
   owns the `adminToken` in `localStorage` (`saveToken/getToken/isLoggedIn`) and
   `scheduleAutoLogout()` driven by the JWT `exp`.
@@ -202,9 +201,6 @@ pick list before a template can use it.**
   `clear()` in `ngOnDestroy`; [admin-header](frontend/src/app/admin/components/admin-header/)
   renders it. Only [profile-admin](frontend/src/app/admin/pages/profile-admin/profile-admin.ts)
   uses it today (Profile Image / About / Skills / Experience / Education).
-- [percentage-animation.service.ts](frontend/src/app/core/services/percentage-animation.service.ts)
-  — `requestAnimationFrame` count-up keyed by id (`start(id, pct)` / `reset(id)`), read back
-  through the `animatedPercentages()` record. Drives the skill proficiency bars.
 - [interceptors/auth-interceptor.ts](frontend/src/app/core/interceptors/auth-interceptor.ts) —
   attaches the bearer token, and on 401 clears it and routes to `/admin/login`.
 - [guards/admin-guard.ts](frontend/src/app/core/guards/admin-guard.ts) — decodes the JWT payload
@@ -222,8 +218,8 @@ pick list before a template can use it.**
   `FacetOption` / `PagedResponse<T>` / `ListQuery` (API envelope). `project.model.ts` and
   `article.model.ts` extend those into `XListResponse` / `XListFilters` / `XQuery`.
 - [app/portfolio-data.ts](frontend/src/app/portfolio-data.ts) — hardcoded `NAVBAR_MENU`,
-  `FOOTER_MENU`, `SOCIAL_LINKS`, project tabs. Nav/footer links are **not** in the DB; edit them
-  here.
+  `FOOTER_MENU` and `SOCIAL_LINKS`. Nav/footer links are **not** in the DB; edit them here.
+  `FOOTER_MENU`/`SOCIAL_LINKS` are rendered by `footer/contact-footer`, not by `footer` itself.
 
 ### Component map
 
@@ -269,8 +265,10 @@ pick list before a template can use it.**
     ([table-cell.directive.ts](frontend/src/app/shared/components/data-table/table-cell.directive.ts)).
   - It renders its own toolbar/chips/drawer — it does **not** use `list-toolbar`, though it does
     reuse `filter-drawer` and `filter.utils`. The `.tbl-*` classes it applies
-    (`tbl-badge-*`, `tbl-col-*`, `tbl-action-*`, `tbl-tag`, `tbl-image`) are defined in
-    [data-table.css](frontend/src/app/shared/components/data-table/data-table.css).
+    (`tbl-badge-*`, `tbl-col-*`, `tbl-tag`, `tbl-image`) are defined in
+    [data-table.css](frontend/src/app/shared/components/data-table/data-table.css). The row-action
+    buttons (`.tbl-action-btn` / `-view` / `-edit` / `-delete`) are **global** in
+    [styles.css](frontend/src/styles.css), because the profile sub-lists use them too.
 - **[date-picker](frontend/src/app/shared/components/date-picker/)** — hand-rolled
   `<app-date-picker>`, the **only** datepicker in the app (the admin project form and both
   From/To bounds in `filter-drawer`). `DD-MM-YYYY` display, emits ISO `yyyy-MM-dd` on
@@ -309,14 +307,19 @@ pick list before a template can use it.**
   `admin-about`, `admin-skills/*`, `admin-experiences/*`, `admin-education/*`; and
   `pages/{projects,articles,faq,contact}-admin/*` with `-list` / `-form` / `-detail` trios.
   - The layout shell is **header-only** — `admin-layout.html` is `<app-admin-header/>` over a
-    `<router-outlet/>`. `components/admin-sidebar` still exists on disk but nothing imports it.
+    `<router-outlet/>` — there is no sidebar.
   - `admin-header` owns the waffle "services" drawer (its own hardcoded `services` list of admin
     sections), the profile dropdown + logout, the page title derived from the URL, and the tab
     strip fed by `AdminTabService`.
   - The four top-level admin lists (projects, articles, faqs, contacts) render through
-    `app-data-table`. The profile sub-lists (skills, experiences, education) are still
-    hand-rolled `<table>` markup with their own copies of the `.tbl-*` classes — if you touch
-    one of those, consider moving it onto `data-table` rather than extending the copy.
+    `app-data-table`.
+  - The education and experience sub-lists share
+    [components/admin-card-list](frontend/src/app/admin/components/admin-card-list/) — the card
+    grid, loading skeleton, empty state and modal shell. A consumer maps its rows to
+    `AdminCard[]` (`id/title/subtitle/meta`) and projects its own form into the modal, wrapped in
+    its own `@if` so the form is still destroyed on close. Add a third card list this way rather
+    than copying markup.
+  - `admin-skills` stays hand-rolled: it is a table grouped by category, not a card grid.
 
 ### Styling / theming
 
@@ -422,8 +425,10 @@ a scaffold.
   (see §2).
 - `data-table` renders no result counter — unlike the public `list-toolbar` there is no
   "Total N found" line, so the `label` input it used to carry was dead and has been removed.
-- `components/admin-sidebar` is dead — `admin-layout` renders only `admin-header`.
 - `slider-view` is imported but commented out of `home.page.ts`'s `imports`, so it never renders.
+- The public skills section was rebuilt as a plain text list grouped by category, so it shows
+  neither `imageUrl` nor `percentage`. The admin form still marks proficiency % as **required**,
+  so that data is collected and never surfaced — wire it up or drop the field.
 - Two agent maps describe this repo — this file and [ANTIGRAVITY.md](ANTIGRAVITY.md). They drift
   independently; update both if you change something structural.
 - Large blocks of commented-out legacy code sit at the bottom of many files (`app.config.ts`,
