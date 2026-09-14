@@ -25,7 +25,6 @@ export class HomeArticles {
   private destroyRef = inject(DestroyRef);
 
   articles = signal<ArticleResponse[]>([]);
-  isErrorMsg = signal(false);
 
   ngOnInit(): void {
     this.loaderService.trackRequest();
@@ -43,7 +42,7 @@ export class HomeArticles {
       // },
 
       error: (err) => {
-        this.isErrorMsg.set(true);
+        this.loaderService.reportContentError();
 
         console.log(err.message);
         this.loaderService.completeRequest();

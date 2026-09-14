@@ -25,7 +25,6 @@ export class AdminCardList {
   emptyText = input('');
 
   cards = input.required<AdminCard[]>();
-  loading = input(false);
   error = input(false);
   formOpen = input(false);
 
@@ -33,6 +32,4 @@ export class AdminCardList {
   edit = output<string>();
   remove = output<string>();
   dismiss = output<void>();
-
-  readonly skeletons = [1, 2, 3, 4];
 }

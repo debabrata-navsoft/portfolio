@@ -1,10 +1,12 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import { EMPTY, switchMap } from 'rxjs';
+import { EMPTY, switchMap, finalize } from 'rxjs';
 
 import { ProjectService } from '../../../../core/services/project.service';
 import { SnackBarService } from '../../../../core/services/snack-bar.service';
+import { LoaderService } from '../../../../core/services/loader.service';
+import { Error } from '../../../../shared/components/error/error';
 import { ProjectForm } from '../../../../models/project.model';
 import { DatePicker } from '../../../../shared/components/date-picker/date-picker';
 import { FormatTextPipe } from '../../../../pipes/format-text.pipe';
@@ -13,7 +15,7 @@ import { CodeCopyDirective } from '../../../../shared/directives/code-copy.direc
 @Component({
   selector: 'app-admin-project-form',
   standalone: true,
-  imports: [LucideAngularModule, DatePicker, FormatTextPipe, CodeCopyDirective],
+  imports: [LucideAngularModule, DatePicker, FormatTextPipe, CodeCopyDirective, Error],
   templateUrl: './admin-project-form.html',
   styleUrl: './admin-project-form.css',
 })
@@ -22,9 +24,11 @@ export class AdminProjectForm implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private snackBarService = inject(SnackBarService);
+  private loaderService = inject(LoaderService);
   private destroyRef = inject(DestroyRef);
 
   loading = signal(false);
+  isErrorMsg = signal(false);
   imagePreview = signal<string | null>(null);
   projectCardImagePreview = signal<string | null>(null);
   technologyInput = signal('');
@@ -72,7 +76,11 @@ export class AdminProjectForm implements OnInit {
 
           if (!slug) return EMPTY;
 
-          return this.projectService.getProjectBySlug(slug);
+          this.loaderService.showApi();
+
+          return this.projectService
+            .getProjectBySlug(slug)
+            .pipe(finalize(() => this.loaderService.hideApi()));
         }),
       )
       .subscribe({
@@ -99,7 +107,7 @@ export class AdminProjectForm implements OnInit {
         },
         error: (err) => {
           this.snackBarService.error(err.error?.message || 'Project not found');
-          this.router.navigate(['/admin/projects']);
+          this.isErrorMsg.set(true);
         },
       });
 
@@ -287,12 +295,13 @@ export class AdminProjectForm implements OnInit {
     }
 
     this.loading.set(true);
+    this.loaderService.showApi();
 
     const projectUpdate = id
       ? this.projectService.updateProject(id, formData)
       : this.projectService.createProject(formData);
 
-    const projectSub = projectUpdate.subscribe({
+    const projectSub = projectUpdate.pipe(finalize(() => this.loaderService.hideApi())).subscribe({
       next: (res) => {
         this.loading.set(false);
         this.snackBarService.success(res.message);

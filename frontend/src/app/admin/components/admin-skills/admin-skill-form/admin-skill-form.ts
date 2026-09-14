@@ -15,6 +15,8 @@ import { LucideAngularModule } from 'lucide-angular';
 import { SkillFormData, SkillResponse } from '../../../../models/skills.model';
 import { SkillsService } from '../../../../core/services/skills.service';
 import { SnackBarService } from '../../../../core/services/snack-bar.service';
+import { LoaderService } from '../../../../core/services/loader.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-admin-skill-form',
@@ -30,6 +32,7 @@ export class AdminSkillForm implements OnInit {
 
   private skillsService = inject(SkillsService);
   private snackBarService = inject(SnackBarService);
+  private loaderService = inject(LoaderService);
   private destroyRef = inject(DestroyRef);
 
   readonly categories: string[] = ['Frontend', 'Backend', 'Language', 'Tools'];
@@ -201,12 +204,13 @@ export class AdminSkillForm implements OnInit {
     }
 
     this.loading.set(true);
+    this.loaderService.showApi();
 
     const request$ = this.isEditMode
       ? this.skillsService.updateSkill(this.skill()!._id!, formData)
       : this.skillsService.createSkill(formData);
 
-    const skillSub = request$.subscribe({
+    const skillSub = request$.pipe(finalize(() => this.loaderService.hideApi())).subscribe({
       next: (res) => {
         this.snackBarService.success(res.message);
         this.loading.set(false);

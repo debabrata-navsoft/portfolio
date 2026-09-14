@@ -1,8 +1,12 @@
-<app-hero />
-<!-- <app-slider-view /> -->
-<app-about />
-<app-education-experience />
-<app-skills />
-<app-home-projects />
-<app-home-articles />
-<app-home-services />
+@if (loaderService.contentError()) {
+  <app-error />
+} @else {
+  <app-hero />
+  <!-- <app-slider-view /> -->
+  <app-about />
+  <app-education-experience />
+  <app-skills />
+  <app-home-projects />
+  <app-home-articles />
+  <app-home-services />
+}

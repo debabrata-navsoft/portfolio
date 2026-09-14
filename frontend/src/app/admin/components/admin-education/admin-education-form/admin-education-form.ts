@@ -3,6 +3,8 @@ import { Component, DestroyRef, effect, inject, input, output, signal } from '@a
 import { EducationForm, EducationResponse } from '../../../../models/education.model';
 import { EducationService } from '../../../../core/services/education.service';
 import { SnackBarService } from '../../../../core/services/snack-bar.service';
+import { LoaderService } from '../../../../core/services/loader.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-admin-education-form',
@@ -17,6 +19,7 @@ export class AdminEducationForm {
 
   private EducationService = inject(EducationService);
   private snackBarService = inject(SnackBarService);
+  private loaderService = inject(LoaderService);
   private destroyRef = inject(DestroyRef);
 
   loading = signal(false);
@@ -110,6 +113,7 @@ export class AdminEducationForm {
     }
 
     this.loading.set(true);
+    this.loaderService.showApi();
 
     const editEducation = this.editData();
 
@@ -117,18 +121,20 @@ export class AdminEducationForm {
       ? this.EducationService.updateEducation(editEducation._id, form)
       : this.EducationService.createEducation(form);
 
-    const educationSub = educationUpdate.subscribe({
-      next: (res) => {
-        this.snackBarService.success(res.message);
-        this.loading.set(false);
-        this.closeForm.emit(res.education);
-      },
+    const educationSub = educationUpdate
+      .pipe(finalize(() => this.loaderService.hideApi()))
+      .subscribe({
+        next: (res) => {
+          this.snackBarService.success(res.message);
+          this.loading.set(false);
+          this.closeForm.emit(res.education);
+        },
 
-      error: (err) => {
-        this.snackBarService.error(err.error?.message || 'Education save failed');
-        this.loading.set(false);
-      },
-    });
+        error: (err) => {
+          this.snackBarService.error(err.error?.message || 'Education save failed');
+          this.loading.set(false);
+        },
+      });
 
     this.destroyRef.onDestroy(() => {
       educationSub.unsubscribe();

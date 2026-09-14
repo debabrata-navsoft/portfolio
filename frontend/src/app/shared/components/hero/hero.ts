@@ -42,6 +42,7 @@ export class Hero implements OnInit {
         this.loaderService.completeRequest();
       },
       error: (err) => {
+        this.loaderService.reportContentError();
         console.error('Profile fetch failed', err);
         this.loaderService.completeRequest();
       },

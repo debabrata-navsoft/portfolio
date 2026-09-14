@@ -1,73 +1,83 @@
 <section class="pt-14 lg:pt-20">
-  <div class="flex flex-col gap-10 md:flex-row">
-    <!-- LEFT COLUMN -->
-    <div class="flex w-full flex-col gap-6 md:w-1/2">
-      @for (faq of faqs().slice(0, 4); track $index) {
-        <div
-          appReveal
-          revealAnimation="up"
-          [revealDelay]="$index * 100"
-          [revealOnce]="false"
-          class="border-b border-gray-200 pb-4"
-        >
-          <!-- QUESTION -->
+  @if (isErrorMsg()) {
+    <app-error />
+  } @else {
+    <div class="flex flex-col gap-10 md:flex-row">
+      <!-- LEFT COLUMN -->
+      <div class="flex w-full flex-col gap-6 md:w-1/2">
+        @for (faq of faqs().slice(0, 4); track $index) {
           <div
-            class="flex cursor-pointer items-center justify-between text-xl md:text-2xl text-white"
-            (click)="toggleFAQ(faq._id)"
+            appReveal
+            revealAnimation="up"
+            [revealDelay]="$index * 100"
+            [revealOnce]="false"
+            class="border-b border-gray-200 pb-4"
           >
-            <p class="pr-4">{{ faq.question }}</p>
-
-            <span
-              class="transition-transform duration-300 text-gray-500"
-              [class.rotate-180]="activeId() === faq._id"
+            <!-- QUESTION -->
+            <div
+              class="flex cursor-pointer items-center justify-between text-xl md:text-2xl text-white"
+              (click)="toggleFAQ(faq._id)"
             >
-              <lucide-icon name="chevron-down"></lucide-icon>
-            </span>
-          </div>
+              <p class="pr-4">{{ faq.question }}</p>
 
-          <!-- ANSWER -->
-          <div [@faqAnimation]="activeId() === faq._id ? 'open' : 'closed'" class="overflow-hidden">
-            <div class="text-base md:text-lg leading-relaxed text-gray-600">
-              {{ faq.answer }}
+              <span
+                class="transition-transform duration-300 text-gray-500"
+                [class.rotate-180]="activeId() === faq._id"
+              >
+                <lucide-icon name="chevron-down"></lucide-icon>
+              </span>
+            </div>
+
+            <!-- ANSWER -->
+            <div
+              [@faqAnimation]="activeId() === faq._id ? 'open' : 'closed'"
+              class="overflow-hidden"
+            >
+              <div class="text-base md:text-lg leading-relaxed text-gray-600">
+                {{ faq.answer }}
+              </div>
             </div>
           </div>
-        </div>
-      }
-    </div>
+        }
+      </div>
 
-    <!-- RIGHT COLUMN -->
-    <div class="flex w-full flex-col gap-6 md:w-1/2">
-      @for (faq of faqs().slice(4, 8); track $index) {
-        <div
-          appReveal
-          revealAnimation="up"
-          [revealDelay]="$index * 100"
-          [revealOnce]="false"
-          class="border-b border-gray-200 pb-4"
-        >
-          <!-- QUESTION -->
+      <!-- RIGHT COLUMN -->
+      <div class="flex w-full flex-col gap-6 md:w-1/2">
+        @for (faq of faqs().slice(4, 8); track $index) {
           <div
-            class="flex cursor-pointer items-center justify-between text-xl md:text-2xl text-white"
-            (click)="toggleFAQ(faq._id)"
+            appReveal
+            revealAnimation="up"
+            [revealDelay]="$index * 100"
+            [revealOnce]="false"
+            class="border-b border-gray-200 pb-4"
           >
-            <p class="pr-4">{{ faq.question }}</p>
-
-            <span
-              class="transition-transform duration-300 text-gray-500"
-              [class.rotate-180]="activeId() === faq._id"
+            <!-- QUESTION -->
+            <div
+              class="flex cursor-pointer items-center justify-between text-xl md:text-2xl text-white"
+              (click)="toggleFAQ(faq._id)"
             >
-              <lucide-icon name="chevron-down"></lucide-icon>
-            </span>
-          </div>
+              <p class="pr-4">{{ faq.question }}</p>
 
-          <!-- ANSWER -->
-          <div [@faqAnimation]="activeId() === faq._id ? 'open' : 'closed'" class="overflow-hidden">
-            <div class="text-base md:text-lg leading-relaxed text-gray-600">
-              {{ faq.answer }}
+              <span
+                class="transition-transform duration-300 text-gray-500"
+                [class.rotate-180]="activeId() === faq._id"
+              >
+                <lucide-icon name="chevron-down"></lucide-icon>
+              </span>
+            </div>
+
+            <!-- ANSWER -->
+            <div
+              [@faqAnimation]="activeId() === faq._id ? 'open' : 'closed'"
+              class="overflow-hidden"
+            >
+              <div class="text-base md:text-lg leading-relaxed text-gray-600">
+                {{ faq.answer }}
+              </div>
             </div>
           </div>
-        </div>
-      }
+        }
+      </div>
     </div>
-  </div>
+  }
 </section>

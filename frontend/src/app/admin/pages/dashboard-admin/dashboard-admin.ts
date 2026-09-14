@@ -1,8 +1,8 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { catchError, forkJoin, of } from 'rxjs';
+import { catchError, forkJoin, Observable, of } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
 
 import { ProjectService } from '../../../core/services/project.service';
@@ -15,6 +15,7 @@ import { FaqService } from '../../../core/services/faq.service';
 import { ProfileService } from '../../../core/services/profile.service';
 import { AdminService } from '../../../core/services/admin.service';
 import { SnackBarService } from '../../../core/services/snack-bar.service';
+import { LoaderService } from '../../../core/services/loader.service';
 
 import { ProjectResponse } from '../../../models/project.model';
 import { ArticleResponse } from '../../../models/article.model';
@@ -25,6 +26,7 @@ import { EducationResponse } from '../../../models/education.model';
 import { FAQResponse } from '../../../models/faq.model';
 import { ProfileResponse } from '../../../models/profile.model';
 import { TimeAgoPipe } from '../../../pipes/time-ago.pipe';
+import { Error } from '../../../shared/components/error/error';
 
 interface CategoryMetric {
   name: string;
@@ -44,7 +46,7 @@ interface ChecklistItem {
 @Component({
   selector: 'app-dashboard-admin',
   standalone: true,
-  imports: [CommonModule, RouterLink, DatePipe, TimeAgoPipe, LucideAngularModule],
+  imports: [CommonModule, RouterLink, DatePipe, TimeAgoPipe, LucideAngularModule, Error],
   templateUrl: './dashboard-admin.html',
   styleUrl: './dashboard-admin.css',
 })
@@ -59,10 +61,16 @@ export class DashboardAdmin implements OnInit {
   private profileService = inject(ProfileService);
   private adminService = inject(AdminService);
   private snackBar = inject(SnackBarService);
+  private loaderService = inject(LoaderService);
+  private destroyRef = inject(DestroyRef);
 
   // States
-  isLoading = signal(true);
   isRefreshing = signal(false);
+  isErrorMsg = signal(false);
+
+  /** Sources that failed in the current load — see `guard()`. */
+  private failedRequests = 0;
+  private readonly requestCount = 9;
 
   adminName = signal('Admin');
   adminEmail = signal('');
@@ -206,55 +214,82 @@ export class DashboardAdmin implements OnInit {
   }
 
   loadDashboardData(isRefresh = false): void {
+    if (isRefresh && this.isRefreshing()) return;
+
     if (isRefresh) this.isRefreshing.set(true);
-    else this.isLoading.set(true);
+
+    this.loaderService.showApi();
+    this.failedRequests = 0;
 
     forkJoin({
-      admin: this.adminService.getProfile().pipe(catchError(() => of(null))),
-      profile: this.profileService.getProfile().pipe(catchError(() => of(null))),
-      projects: this.projectService.getProjects().pipe(catchError(() => of([]))),
-      articles: this.articleService.getArticles().pipe(catchError(() => of([]))),
-      contacts: this.contactService.getContacts().pipe(catchError(() => of([]))),
-      skills: this.skillsService.getSkills().pipe(catchError(() => of([]))),
-      experiences: this.experienceService.getExperiences().pipe(catchError(() => of([]))),
-      education: this.educationService.getEducation().pipe(catchError(() => of([]))),
-      faqs: this.faqService.getFAQs().pipe(catchError(() => of([]))),
-    }).subscribe({
-      next: ({
-        admin,
-        profile,
-        projects,
-        articles,
-        contacts,
-        skills,
-        experiences,
-        education,
-        faqs,
-      }) => {
-        const adminObj = (admin as any)?.admin;
-        if (adminObj?.name) {
-          this.adminName.set(adminObj.name);
-          this.adminEmail.set(adminObj.email || '');
-        }
+      admin: this.guard(this.adminService.getProfile(), null),
+      profile: this.guard(this.profileService.getProfile(), null),
+      projects: this.guard(this.projectService.getProjects(), []),
+      articles: this.guard(this.articleService.getArticles(), []),
+      contacts: this.guard(this.contactService.getContacts(), []),
+      skills: this.guard(this.skillsService.getSkills(), []),
+      experiences: this.guard(this.experienceService.getExperiences(), []),
+      education: this.guard(this.educationService.getEducation(), []),
+      faqs: this.guard(this.faqService.getFAQs(), []),
+    })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({
+          admin,
+          profile,
+          projects,
+          articles,
+          contacts,
+          skills,
+          experiences,
+          education,
+          faqs,
+        }) => {
+          const adminObj = (admin as any)?.admin;
+          if (adminObj?.name) {
+            this.adminName.set(adminObj.name);
+            this.adminEmail.set(adminObj.email || '');
+          }
 
-        this.profile.set(profile as ProfileResponse | null);
-        this.projects.set(projects || []);
-        this.articles.set(articles || []);
-        this.contacts.set(contacts || []);
-        this.skills.set(skills || []);
-        this.experiences.set(experiences || []);
-        this.education.set(education || []);
-        this.faqs.set(faqs || []);
+          this.profile.set(profile as ProfileResponse | null);
+          this.projects.set(projects || []);
+          this.articles.set(articles || []);
+          this.contacts.set(contacts || []);
+          this.skills.set(skills || []);
+          this.experiences.set(experiences || []);
+          this.education.set(education || []);
+          this.faqs.set(faqs || []);
 
-        this.isLoading.set(false);
-        this.isRefreshing.set(false);
-      },
-      error: () => {
-        this.isLoading.set(false);
-        this.isRefreshing.set(false);
-        this.snackBar.error('Failed to load some dashboard data');
-      },
-    });
+          this.isErrorMsg.set(this.failedRequests === this.requestCount);
+          this.settleLoading();
+
+          // if (isRefresh) this.snackBar.success('Dashboard updated');
+        },
+        error: () => {
+          this.isErrorMsg.set(true);
+          this.settleLoading();
+          // this.snackBar.error('Failed to load some dashboard data');
+        },
+      });
+  }
+
+  /**
+   * Keeps one dead endpoint from blanking the whole dashboard: each source falls back
+   * to an empty value and only counts itself as failed. `<app-error />` shows when
+   * every one of them failed, i.e. the API itself is down.
+   */
+  private guard<T>(source: Observable<T>, fallback: T): Observable<T> {
+    return source.pipe(
+      catchError(() => {
+        this.failedRequests++;
+        return of(fallback);
+      }),
+    );
+  }
+
+  private settleLoading(): void {
+    this.isRefreshing.set(false);
+    this.loaderService.hideApi();
   }
 
   markContactRead(contact: ContactResponse, event: MouseEvent): void {

@@ -1,7 +1,9 @@
 import { Component, DestroyRef, effect, inject, input, output, signal } from '@angular/core';
 import { ExperienceService } from '../../../../core/services/experience.service';
 import { SnackBarService } from '../../../../core/services/snack-bar.service';
+import { LoaderService } from '../../../../core/services/loader.service';
 import { ExperienceForm, ExperienceResponse } from '../../../../models/experience.model';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-admin-experience-form',
@@ -16,6 +18,7 @@ export class AdminExperienceForm {
 
   private experienceService = inject(ExperienceService);
   private snackBarService = inject(SnackBarService);
+  private loaderService = inject(LoaderService);
   private destroyRef = inject(DestroyRef);
 
   loading = signal(false);
@@ -109,6 +112,7 @@ export class AdminExperienceForm {
     }
 
     this.loading.set(true);
+    this.loaderService.showApi();
 
     const editExperience = this.editData();
 
@@ -116,17 +120,19 @@ export class AdminExperienceForm {
       ? this.experienceService.updateExperience(editExperience._id, form)
       : this.experienceService.createExperience(form);
 
-    const experienceSub = experienceUpdate.subscribe({
-      next: (res) => {
-        this.snackBarService.success(res.message);
-        this.loading.set(false);
-        this.closeForm.emit(res.experience);
-      },
-      error: (err) => {
-        this.snackBarService.error(err.error?.message || 'Experience save failed');
-        this.loading.set(false);
-      },
-    });
+    const experienceSub = experienceUpdate
+      .pipe(finalize(() => this.loaderService.hideApi()))
+      .subscribe({
+        next: (res) => {
+          this.snackBarService.success(res.message);
+          this.loading.set(false);
+          this.closeForm.emit(res.experience);
+        },
+        error: (err) => {
+          this.snackBarService.error(err.error?.message || 'Experience save failed');
+          this.loading.set(false);
+        },
+      });
 
     this.destroyRef.onDestroy(() => {
       experienceSub.unsubscribe();

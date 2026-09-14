@@ -56,6 +56,7 @@ export class Skills implements OnInit {
         this.loaderService.completeRequest();
       },
       error: (err) => {
+        this.loaderService.reportContentError();
         console.log(err.message);
         this.loaderService.completeRequest();
       },

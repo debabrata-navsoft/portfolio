@@ -37,6 +37,7 @@ export class About implements OnInit {
       },
 
       error: (err) => {
+        this.loaderService.reportContentError();
         console.error('About fetch failed', err);
         this.loaderService.completeRequest();
       },

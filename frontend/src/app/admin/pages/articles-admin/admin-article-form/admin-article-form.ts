@@ -1,16 +1,18 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EMPTY, switchMap } from 'rxjs';
+import { EMPTY, switchMap, finalize } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
 
 import { ArticleService } from '../../../../core/services/article.service';
 import { SnackBarService } from '../../../../core/services/snack-bar.service';
+import { LoaderService } from '../../../../core/services/loader.service';
+import { Error } from '../../../../shared/components/error/error';
 import { ArticleForm } from '../../../../models/article.model';
 
 @Component({
   selector: 'app-admin-article-form',
   standalone: true,
-  imports: [LucideAngularModule],
+  imports: [LucideAngularModule, Error],
   templateUrl: './admin-article-form.html',
   styleUrl: './admin-article-form.css',
 })
@@ -19,9 +21,11 @@ export class AdminArticleForm implements OnInit {
   private route = inject(ActivatedRoute);
   private articleService = inject(ArticleService);
   private snackBarService = inject(SnackBarService);
+  private loaderService = inject(LoaderService);
   private destroyRef = inject(DestroyRef);
 
   loading = signal(false);
+  isErrorMsg = signal(false);
   imagePreview = signal<string | null>(null);
   tagsInput = signal('');
   editingId = signal<string | null>(null);
@@ -56,7 +60,11 @@ export class AdminArticleForm implements OnInit {
         switchMap((params) => {
           const slug = params.get('slug');
           if (!slug) return EMPTY;
-          return this.articleService.getArticleBySlug(slug);
+          this.loaderService.showApi();
+
+          return this.articleService
+            .getArticleBySlug(slug)
+            .pipe(finalize(() => this.loaderService.hideApi()));
         }),
       )
       .subscribe({
@@ -75,7 +83,7 @@ export class AdminArticleForm implements OnInit {
         },
         error: (err) => {
           this.snackBarService.error(err.error?.message || 'Article not found');
-          this.router.navigate(['/admin/articles']);
+          this.isErrorMsg.set(true);
         },
       });
 
@@ -208,12 +216,13 @@ export class AdminArticleForm implements OnInit {
     }
 
     this.loading.set(true);
+    this.loaderService.showApi();
 
     const articleUpdate = id
       ? this.articleService.updateArticle(id, formData)
       : this.articleService.createArticle(formData);
 
-    const articleSub = articleUpdate.subscribe({
+    const articleSub = articleUpdate.pipe(finalize(() => this.loaderService.hideApi())).subscribe({
       next: (res) => {
         this.loading.set(false);
         this.snackBarService.success(res.message);

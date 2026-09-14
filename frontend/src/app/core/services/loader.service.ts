@@ -49,6 +49,18 @@ export class LoaderService {
     this.pendingRequests.set(0);
   }
 
+  // Page-level failure. The home sections each fetch their own data, so without a
+  // shared flag a dead API renders one error card per section.
+  contentError = signal(false);
+
+  reportContentError() {
+    this.contentError.set(true);
+  }
+
+  clearContentError() {
+    this.contentError.set(false);
+  }
+
   // API loader control
   showApi() {
     this.apiLoading.set(true);

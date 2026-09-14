@@ -73,6 +73,7 @@ export class HomeProjects implements OnInit {
       },
 
       error: (err) => {
+        this.loaderService.reportContentError();
         console.log(err.message);
         this.loaderService.completeRequest();
       },

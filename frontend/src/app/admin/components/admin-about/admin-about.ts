@@ -3,24 +3,28 @@ import { FormsModule } from '@angular/forms';
 
 import { AboutService } from '../../../core/services/about.service';
 import { SnackBarService } from '../../../core/services/snack-bar.service';
+import { LoaderService } from '../../../core/services/loader.service';
+import { Error } from '../../../shared/components/error/error';
 import { AboutForm } from '../../../models/about.model';
 
 import { LucideAngularModule } from 'lucide-angular';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-admin-about',
   standalone: true,
-  imports: [FormsModule, LucideAngularModule],
+  imports: [FormsModule, LucideAngularModule, Error],
   templateUrl: './admin-about.html',
   styleUrl: './admin-about.css',
 })
 export class AdminAbout implements OnInit {
   private aboutService = inject(AboutService);
   private snackBarService = inject(SnackBarService);
+  private loaderService = inject(LoaderService);
   private destroyRef = inject(DestroyRef);
 
+  isErrorMsg = signal(false);
   saving = signal(false);
-  isLoading = signal(true);
   imagePreviews = signal<(string | null)[]>([null, null, null, null]);
   originalAboutForm = signal<AboutForm | null>(null);
 
@@ -47,33 +51,35 @@ export class AdminAbout implements OnInit {
   });
 
   ngOnInit() {
-    const aboutSub = this.aboutService.getAbout().subscribe({
-      next: (res) => {
-        const images = res.images || [];
+    this.loaderService.showApi();
+    const aboutSub = this.aboutService
+      .getAbout()
+      .pipe(finalize(() => this.loaderService.hideApi()))
+      .subscribe({
+        next: (res) => {
+          const images = res.images || [];
 
-        const formData = {
-          description: res.description,
-          email: res.email,
-          location: res.location,
-          imageFiles: [null, null, null, null],
-          existingImages: images,
-        };
+          const formData = {
+            description: res.description,
+            email: res.email,
+            location: res.location,
+            imageFiles: [null, null, null, null],
+            existingImages: images,
+          };
 
-        this.aboutForm.set(formData);
-        this.originalAboutForm.set(formData);
-        this.imagePreviews.set([
-          images[0] || null,
-          images[1] || null,
-          images[2] || null,
-          images[3] || null,
-        ]);
-        this.isLoading.set(false);
-      },
-      error: () => {
-        this.isLoading.set(false);
-        console.log('No about data found');
-      },
-    });
+          this.aboutForm.set(formData);
+          this.originalAboutForm.set(formData);
+          this.imagePreviews.set([
+            images[0] || null,
+            images[1] || null,
+            images[2] || null,
+            images[3] || null,
+          ]);
+        },
+        error: () => {
+          this.isErrorMsg.set(true);
+        },
+      });
 
     this.destroyRef.onDestroy(() => {
       aboutSub.unsubscribe();
@@ -164,18 +170,22 @@ export class AdminAbout implements OnInit {
     });
 
     this.saving.set(true);
+    this.loaderService.showApi();
 
-    const saveAboutSub = this.aboutService.saveAbout(formData).subscribe({
-      next: (res) => {
-        this.snackBarService.success(res.message);
-        this.originalAboutForm.set(this.aboutForm());
-        this.saving.set(false);
-      },
-      error: (err) => {
-        this.snackBarService.error(err.message);
-        this.saving.set(false);
-      },
-    });
+    const saveAboutSub = this.aboutService
+      .saveAbout(formData)
+      .pipe(finalize(() => this.loaderService.hideApi()))
+      .subscribe({
+        next: (res) => {
+          this.snackBarService.success(res.message);
+          this.originalAboutForm.set(this.aboutForm());
+          this.saving.set(false);
+        },
+        error: (err) => {
+          this.snackBarService.error(err.message);
+          this.saving.set(false);
+        },
+      });
 
     this.destroyRef.onDestroy(() => {
       saveAboutSub.unsubscribe();

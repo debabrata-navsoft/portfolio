@@ -32,6 +32,7 @@ export class EducationExperience {
         this.loaderService.completeRequest();
       },
       error: (err) => {
+        this.loaderService.reportContentError();
         console.log(err.message);
         this.loaderService.completeRequest();
       },
@@ -44,6 +45,7 @@ export class EducationExperience {
         this.loaderService.completeRequest();
       },
       error: (err) => {
+        this.loaderService.reportContentError();
         console.log(err.message);
         this.loaderService.completeRequest();
       },

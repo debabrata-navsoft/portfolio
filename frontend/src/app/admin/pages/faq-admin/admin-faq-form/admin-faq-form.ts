@@ -2,15 +2,17 @@ import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FaqService } from '../../../../core/services/faq.service';
 import { SnackBarService } from '../../../../core/services/snack-bar.service';
+import { LoaderService } from '../../../../core/services/loader.service';
+import { Error } from '../../../../shared/components/error/error';
 import { FAQForm } from '../../../../models/faq.model';
-import { EMPTY, switchMap } from 'rxjs';
+import { EMPTY, switchMap, finalize } from 'rxjs';
 
 import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-admin-faq-form',
   standalone: true,
-  imports: [LucideAngularModule],
+  imports: [LucideAngularModule, Error],
   templateUrl: './admin-faq-form.html',
   styleUrl: './admin-faq-form.css',
 })
@@ -19,9 +21,11 @@ export class AdminFaqForm {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private snackBarService = inject(SnackBarService);
+  private loaderService = inject(LoaderService);
   private destroyRef = inject(DestroyRef);
 
   loading = signal(false);
+  isErrorMsg = signal(false);
   editingId = signal<string | null>(null);
 
   touched = signal<{
@@ -47,7 +51,9 @@ export class AdminFaqForm {
 
           if (!id) return EMPTY;
 
-          return this.faqService.getFAQById(id);
+          this.loaderService.showApi();
+
+          return this.faqService.getFAQById(id).pipe(finalize(() => this.loaderService.hideApi()));
         }),
       )
       .subscribe({
@@ -62,7 +68,7 @@ export class AdminFaqForm {
         },
         error: (err) => {
           this.snackBarService.error(err.error?.message || 'FAQ not found');
-          this.router.navigate(['/admin/faqs']);
+          this.isErrorMsg.set(true);
         },
       });
 
@@ -117,12 +123,13 @@ export class AdminFaqForm {
     };
 
     this.loading.set(true);
+    this.loaderService.showApi();
 
     const faqUpdate = id
       ? this.faqService.updateFAQ(id, payload)
       : this.faqService.createFAQ(payload);
 
-    const Sub = faqUpdate.subscribe({
+    const Sub = faqUpdate.pipe(finalize(() => this.loaderService.hideApi())).subscribe({
       next: (res) => {
         this.loading.set(false);
         this.snackBarService.success(res.message);

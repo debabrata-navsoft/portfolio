@@ -4,8 +4,10 @@ import { LucideAngularModule } from 'lucide-angular';
 
 import { SkillsService } from '../../../../core/services/skills.service';
 import { SnackBarService } from '../../../../core/services/snack-bar.service';
+import { LoaderService } from '../../../../core/services/loader.service';
 import { SkillResponse } from '../../../../models/skills.model';
 import { Error } from '../../../../shared/components/error/error';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-admin-skill-list',
@@ -18,11 +20,11 @@ export class AdminSkillList implements OnInit {
 
   private destroyRef = inject(DestroyRef);
   private snackBarService = inject(SnackBarService);
+  private loaderService = inject(LoaderService);
 
   skills = signal<SkillResponse[]>([]);
   showForm = signal(false);
   isErrorMsg = signal(false);
-  isLoading = signal(true);
   editingSkill = signal<SkillResponse | null>(null);
 
   // Display order of the category boxes — anything else is appended after these.
@@ -56,17 +58,19 @@ export class AdminSkillList implements OnInit {
   }
 
   ngOnInit(): void {
-    const skillsSub = this.skillsService.getSkills().subscribe({
-      next: (res) => {
-        this.skills.set(res);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        this.isErrorMsg.set(true);
-        this.isLoading.set(false);
-        console.log(err.message);
-      },
-    });
+    this.loaderService.showApi();
+    const skillsSub = this.skillsService
+      .getSkills()
+      .pipe(finalize(() => this.loaderService.hideApi()))
+      .subscribe({
+        next: (res) => {
+          this.skills.set(res);
+        },
+        error: (err) => {
+          this.isErrorMsg.set(true);
+          console.log(err.message);
+        },
+      });
 
     this.destroyRef.onDestroy(() => {
       skillsSub.unsubscribe();
@@ -80,15 +84,20 @@ export class AdminSkillList implements OnInit {
       return;
     }
 
-    const skillSub = this.skillsService.deleteSkill(id).subscribe({
-      next: (res) => {
-        this.skills.update((skills) => skills.filter((skill) => skill._id !== id));
-        this.snackBarService.success(res.message);
-      },
-      error: (err) => {
-        this.snackBarService.error(err.message);
-      },
-    });
+    this.loaderService.showApi();
+
+    const skillSub = this.skillsService
+      .deleteSkill(id)
+      .pipe(finalize(() => this.loaderService.hideApi()))
+      .subscribe({
+        next: (res) => {
+          this.skills.update((skills) => skills.filter((skill) => skill._id !== id));
+          this.snackBarService.success(res.message);
+        },
+        error: (err) => {
+          this.snackBarService.error(err.message);
+        },
+      });
 
     this.destroyRef.onDestroy(() => {
       skillSub.unsubscribe();

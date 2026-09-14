@@ -129,12 +129,18 @@ export class AdminHeader implements OnInit {
 
     this.profileService
       .getProfile()
-      .pipe(takeUntilDestroyed(this.destroyRef), catchError(() => EMPTY))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError(() => EMPTY),
+      )
       .subscribe((profile) => profile?.imageUrl && this.imageUrl.set(profile.imageUrl));
 
     this.adminService
       .getProfile()
-      .pipe(takeUntilDestroyed(this.destroyRef), catchError(() => EMPTY))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError(() => EMPTY),
+      )
       .subscribe(({ admin }: any) => {
         if (!admin?.name) return;
 

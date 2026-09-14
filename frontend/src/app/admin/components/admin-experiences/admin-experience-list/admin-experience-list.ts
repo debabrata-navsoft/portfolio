@@ -1,9 +1,11 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { ExperienceService } from '../../../../core/services/experience.service';
 import { SnackBarService } from '../../../../core/services/snack-bar.service';
+import { LoaderService } from '../../../../core/services/loader.service';
 import { ExperienceResponse } from '../../../../models/experience.model';
 import { AdminExperienceForm } from '../admin-experience-form/admin-experience-form';
 import { AdminCard, AdminCardList } from '../../admin-card-list/admin-card-list';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-admin-experience-list',
@@ -15,12 +17,12 @@ export class AdminExperienceList implements OnInit {
   private experienceService = inject(ExperienceService);
   private destroyRef = inject(DestroyRef);
   private snackBarService = inject(SnackBarService);
+  private loaderService = inject(LoaderService);
 
   experiences = signal<ExperienceResponse[]>([]);
   editingExperience = signal<ExperienceResponse | null>(null);
   showForm = signal(false);
   isErrorMsg = signal(false);
-  isLoading = signal(true);
 
   cards = computed<AdminCard[]>(() =>
     this.experiences().map((experience) => ({
@@ -36,18 +38,20 @@ export class AdminExperienceList implements OnInit {
   }
 
   ngOnInit(): void {
-    const experienceSub = this.experienceService.getExperiences().subscribe({
-      next: (res) => {
-        this.experiences.set(res);
-        this.isLoading.set(false);
-      },
+    this.loaderService.showApi();
+    const experienceSub = this.experienceService
+      .getExperiences()
+      .pipe(finalize(() => this.loaderService.hideApi()))
+      .subscribe({
+        next: (res) => {
+          this.experiences.set(res);
+        },
 
-      error: (err) => {
-        this.isErrorMsg.set(true);
-        this.isLoading.set(false);
-        console.log(err.message);
-      },
-    });
+        error: (err) => {
+          this.isErrorMsg.set(true);
+          console.log(err.message);
+        },
+      });
 
     this.destroyRef.onDestroy(() => {
       experienceSub.unsubscribe();
@@ -61,17 +65,22 @@ export class AdminExperienceList implements OnInit {
       return;
     }
 
-    const exSub = this.experienceService.deleteExperience(id).subscribe({
-      next: (res) => {
-        this.experiences.update((experiences) =>
-          experiences.filter((experience) => experience._id !== id),
-        );
-        this.snackBarService.success(res.message);
-      },
-      error: (err) => {
-        this.snackBarService.error(err.message);
-      },
-    });
+    this.loaderService.showApi();
+
+    const exSub = this.experienceService
+      .deleteExperience(id)
+      .pipe(finalize(() => this.loaderService.hideApi()))
+      .subscribe({
+        next: (res) => {
+          this.experiences.update((experiences) =>
+            experiences.filter((experience) => experience._id !== id),
+          );
+          this.snackBarService.success(res.message);
+        },
+        error: (err) => {
+          this.snackBarService.error(err.message);
+        },
+      });
 
     this.destroyRef.onDestroy(() => {
       exSub.unsubscribe();

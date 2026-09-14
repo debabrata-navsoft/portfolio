@@ -1,9 +1,11 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { EducationService } from '../../../../core/services/education.service';
 import { SnackBarService } from '../../../../core/services/snack-bar.service';
+import { LoaderService } from '../../../../core/services/loader.service';
 import { EducationResponse } from '../../../../models/education.model';
 import { AdminEducationForm } from '../admin-education-form/admin-education-form';
 import { AdminCard, AdminCardList } from '../../admin-card-list/admin-card-list';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-admin-education-list',
@@ -14,13 +16,13 @@ import { AdminCard, AdminCardList } from '../../admin-card-list/admin-card-list'
 export class AdminEducationList implements OnInit {
   private educationService = inject(EducationService);
   private snackBarService = inject(SnackBarService);
+  private loaderService = inject(LoaderService);
   private destroyRef = inject(DestroyRef);
 
   educations = signal<EducationResponse[]>([]);
   editingEducation = signal<EducationResponse | null>(null);
   showForm = signal(false);
   isErrorMsg = signal(false);
-  isLoading = signal(true);
 
   cards = computed<AdminCard[]>(() =>
     this.educations().map((education) => ({
@@ -36,18 +38,20 @@ export class AdminEducationList implements OnInit {
   }
 
   ngOnInit(): void {
-    const educationSub = this.educationService.getEducation().subscribe({
-      next: (res) => {
-        this.educations.set(res);
-        this.isLoading.set(false);
-      },
+    this.loaderService.showApi();
+    const educationSub = this.educationService
+      .getEducation()
+      .pipe(finalize(() => this.loaderService.hideApi()))
+      .subscribe({
+        next: (res) => {
+          this.educations.set(res);
+        },
 
-      error: (err) => {
-        this.isErrorMsg.set(true);
-        this.isLoading.set(false);
-        console.log(err.message);
-      },
-    });
+        error: (err) => {
+          this.isErrorMsg.set(true);
+          console.log(err.message);
+        },
+      });
 
     this.destroyRef.onDestroy(() => {
       educationSub.unsubscribe();
@@ -61,18 +65,23 @@ export class AdminEducationList implements OnInit {
       return;
     }
 
-    const eduSub = this.educationService.deleteEducation(id).subscribe({
-      next: (res) => {
-        this.educations.update((educations) =>
-          educations.filter((education) => education._id !== id),
-        );
-        this.snackBarService.success(res.message);
-      },
+    this.loaderService.showApi();
 
-      error: (err) => {
-        this.snackBarService.error(err.message);
-      },
-    });
+    const eduSub = this.educationService
+      .deleteEducation(id)
+      .pipe(finalize(() => this.loaderService.hideApi()))
+      .subscribe({
+        next: (res) => {
+          this.educations.update((educations) =>
+            educations.filter((education) => education._id !== id),
+          );
+          this.snackBarService.success(res.message);
+        },
+
+        error: (err) => {
+          this.snackBarService.error(err.message);
+        },
+      });
 
     this.destroyRef.onDestroy(() => {
       eduSub.unsubscribe();

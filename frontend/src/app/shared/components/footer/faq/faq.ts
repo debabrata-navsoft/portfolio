@@ -5,11 +5,12 @@ import { FaqService } from '../../../../core/services/faq.service';
 import { FAQResponse } from '../../../../models/faq.model';
 import { RevealDirective } from '../../../directives/reveal.directive';
 import { faqAnimation } from '../../../animation/page.animations';
+import { Error } from '../../error/error';
 
 @Component({
   selector: 'app-faq',
   standalone: true,
-  imports: [LucideAngularModule, RevealDirective],
+  imports: [LucideAngularModule, RevealDirective, Error],
   templateUrl: './faq.html',
   styleUrl: './faq.css',
   animations: [faqAnimation],
@@ -29,7 +30,6 @@ export class FAQ implements OnInit {
       },
       error: (err) => {
         this.isErrorMsg.set(true);
-
         console.log(err.message);
       },
     });
