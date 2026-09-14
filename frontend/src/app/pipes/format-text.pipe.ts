@@ -27,15 +27,15 @@ const escapeHtml = (value: string): string =>
 
 const codeBlock = (code: string, lang: string): string =>
   [
-    '<div class="code-block my-5 rounded-xl border border-gray-800 bg-gray-900 text-left">',
-    '<div class="flex items-center justify-between gap-3 rounded-t-xl border-b border-gray-800 px-4 py-2">',
-    `<span class="font-mono text-[11px] font-semibold uppercase tracking-wider text-gray-500">${escapeHtml(lang)}</span>`,
-    '<button type="button" title="Copy code" class="code-copy inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-semibold text-gray-400 transition hover:bg-gray-800 hover:text-gray-100">',
+    '<div class="code-block">',
+    '<div class="code-block-bar">',
+    `<span class="code-block-lang">${escapeHtml(lang)}</span>`,
+    '<button type="button" class="code-copy" title="Copy code">',
     COPY_ICON,
     '<span class="code-copy-label">Copy</span>',
     '</button>',
     '</div>',
-    `<pre class="m-0 overflow-x-auto rounded-b-xl p-4"><code class="block whitespace-pre font-mono text-sm leading-relaxed text-gray-100">${escapeHtml(code)}</code></pre>`,
+    `<pre><code>${escapeHtml(code)}</code></pre>`,
     '</div>',
   ].join('');
 
