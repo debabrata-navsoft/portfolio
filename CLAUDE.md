@@ -24,6 +24,7 @@ cd backend  && npm run dev     # nodemon server.js  → :5000
 cd frontend && npm start       # ng serve           → :4200
 cd frontend && npm run build   # ng build (browser + SSR bundles into dist/)
 cd frontend && npm test        # karma/jasmine — specs are unmodified CLI scaffolds
+cd frontend && npm run mobile:sync   # build + copy into the Capacitor Android project (§6)
 ```
 
 There is **no linter and no real test suite**. Backend `npm test` is a stub that exits 1.
@@ -42,7 +43,8 @@ Deploy: frontend → Vercel ([frontend/vercel.json](frontend/vercel.json) rewrit
 ## 2. Backend
 
 Entry: [backend/server.js](backend/server.js) — loads dotenv, `express.json()`, CORS
-(`CLIENT_URL` + `http://localhost:4200`), mounts routers, then `connectDB()` before `listen`.
+(`CLIENT_URL`, `http://localhost:4200`, plus the Capacitor origins — see §6), mounts routers,
+then `connectDB()` before `listen`.
 
 ### Resource pattern
 
@@ -72,7 +74,7 @@ unmounted** — uploads happen inline on each resource route. Ignore them.
   singleton doc. **Resume** `resumeUrl`.
 - **About** `description, email, location, images[]` (up to 4) — also a singleton (upsert).
 - **Skills** `name, imageUrl, websiteUrl, category, percentage` (0–100; edited in the admin
-  skills form, but **not displayed on the public site** — see §6)
+  skills form, but **not displayed on the public site** — see §7)
 - **Experience** `company, role, years` · **Education** `school, degree, years`
 - **Project** `title, slug, projectDate, overview, description, category, projectCardImage,
   image, technologies[], liveUrl, githubUrl`
@@ -414,7 +416,51 @@ and they exit at the 2s minimum as before. Behaviour is covered by
 (`ng test --include='**/startup-loader.timing.spec.ts'`) — the one spec in the repo that is not
 a scaffold.
 
-## 6. Known rough edges
+## 6. Mobile app (Ionic + Capacitor)
+
+The same Angular build ships as an Android/iOS app. `frontend/android/` is a generated
+Capacitor project — **never hand-edit files under it**, they are overwritten by `cap sync`.
+
+```bash
+cd frontend
+npm run build:mobile    # ng build + scripts/prepare-mobile.mjs
+npm run mobile:sync     # build:mobile + npx cap sync
+npm run mobile:android  # sync + open Android Studio
+npm run mobile:apk      # sync + ./gradlew assembleDebug (no Android Studio needed)
+```
+
+**Toolchain.** The generated project needs **JDK 21**, **compileSdk/targetSdk 36** (minSdk 24),
+AGP **8.13.0** and Gradle **8.14.3** (the wrapper downloads Gradle itself) — see
+`android/variables.gradle`. Install with `sudo snap install android-studio --classic`, then
+launch it once so it downloads SDK platform 36. `mobile:apk` writes
+`android/app/build/outputs/apk/debug/app-debug.apk`.
+
+- `npx cap open android` only probes `/usr/local/android-studio/bin/studio.sh`, which misses snap
+  installs and Studio 2024.2+ (where `studio.sh` became `studio`).
+  [scripts/open-android.mjs](frontend/scripts/open-android.mjs) resolves the real launcher and
+  passes it through `CAPACITOR_ANDROID_STUDIO_PATH`; set that env var yourself to override.
+
+- Capacitor packages the **browser** bundle only (`webDir: dist/frontend/browser` in
+  [capacitor.config.ts](frontend/capacitor.config.ts)); the SSR `dist/frontend/server` output is
+  unused inside the app, and `app.routes.server.ts` is irrelevant there.
+- ⚠️ The SSR builder emits **`index.csr.html`, not `index.html`**, and Capacitor requires a real
+  `index.html` in `webDir`. [scripts/prepare-mobile.mjs](frontend/scripts/prepare-mobile.mjs)
+  copies it. This is why you must run `build:mobile`, never a bare `ng build`, before syncing.
+- ⚠️ The packaged app has its **own origin** — `https://localhost` on Android (`androidScheme`)
+  and `capacitor://localhost` on iOS. Both are in the CORS allowlist in
+  [backend/server.js](backend/server.js); dropping them breaks every request in the app.
+- `ng build` uses `environment.prod.ts`, so the app talks to the Render API over HTTPS. Pointing
+  it at a LAN `http://` address for debugging also needs `allowMixedContent: true` in
+  `capacitor.config.ts` (Android blocks cleartext by default).
+- Ionic is registered via `provideIonicAngular()` in
+  [app.config.ts](frontend/src/app/app.config.ts) for its platform services only. **Its global
+  stylesheets are deliberately not imported** — they would restyle the Tailwind UI — so an
+  `ion-*` component will render unstyled until you add the matching CSS.
+- iOS needs macOS + Xcode + CocoaPods; only the Android platform is scaffolded here.
+
+---
+
+## 7. Known rough edges
 
 - [environment.ts](frontend/src/environments/environment.ts) (dev) currently points at
   `http://localhost:5000/api`, with the Render URL commented out — so `ng serve` needs the local

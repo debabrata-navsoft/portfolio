@@ -24,6 +24,14 @@ app.use(express.json());
 const allowedOrigins = [
   process.env.CLIENT_URL,
   "http://localhost:4200",
+  // Capacitor packages the app with its own origin: Android serves it from
+  // https://localhost (androidScheme in frontend/capacitor.config.ts) and iOS
+  // from capacitor://localhost. Without these the mobile build gets CORS errors
+  // on every request.
+  "https://localhost",
+  "capacitor://localhost",
+  // Only needed if androidScheme is switched back to "http".
+  "http://localhost",
 ];
 
 app.use(

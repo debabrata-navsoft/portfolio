@@ -11,6 +11,7 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth-interceptor';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideIonicAngular } from '@ionic/angular';
 
 import {
   LucideAngularModule,
@@ -89,6 +90,12 @@ export const appConfig: ApplicationConfig = {
     ),
     provideClientHydration(withEventReplay()),
     provideAnimationsAsync(),
+
+    // Ionic is wired in for its platform services (hardware back button, safe-area
+    // insets, platform detection) under Capacitor. Its global stylesheets are
+    // deliberately NOT imported — they would restyle the Tailwind UI — so don't
+    // use `ion-*` components without adding the matching CSS first.
+    provideIonicAngular(),
 
     provideHttpClient(withInterceptors([authInterceptor])),
 
