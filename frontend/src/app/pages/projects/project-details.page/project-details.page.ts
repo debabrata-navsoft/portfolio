@@ -7,10 +7,9 @@ import {
   inject,
   NgZone,
   OnInit,
-  PLATFORM_ID,
   signal,
 } from '@angular/core';
-import { CommonModule, DatePipe, isPlatformBrowser, NgClass, UpperCasePipe } from '@angular/common';
+import { CommonModule, DatePipe, NgClass, UpperCasePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { EMPTY, switchMap } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
@@ -51,7 +50,6 @@ export class ProjectDetailsPage implements OnInit {
   private loaderService = inject(LoaderService);
   private snackBarService = inject(SnackBarService);
   private destroyRef = inject(DestroyRef);
-  private platformId = inject(PLATFORM_ID);
   private ngZone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
 
@@ -74,8 +72,6 @@ export class ProjectDetailsPage implements OnInit {
   });
 
   ngOnInit(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-
     const projectSub = this.route.paramMap
       .pipe(
         switchMap((params) => {

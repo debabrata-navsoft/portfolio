@@ -173,6 +173,13 @@ pick list before a template can use it.**
   `contacts{,/:id}`.
 - [app.routes.server.ts](frontend/src/app/app.routes.server.ts) — `admin/**` is
   `RenderMode.Client`, everything else `RenderMode.Server`.
+  ⚠️ **Do not "fix" the blank View Source on `/admin` by switching it to `RenderMode.Server`.**
+  `adminGuard` returns `true` on the server (no `localStorage`), so server-rendering admin would
+  put the admin shell in publicly fetchable HTML, and `authInterceptor` sends no bearer token
+  server-side, so every admin call would 401 and render error states rather than data.
+- Every **public** route must server-render its content. A page whose `ngOnInit` returns early
+  behind `isPlatformBrowser` fetches nothing on the server and ships an empty shell — guard the
+  individual `window`/`document` call instead, never the data fetch.
 
 ### Core ([app/core/](frontend/src/app/core/))
 
