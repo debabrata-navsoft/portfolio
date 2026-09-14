@@ -42,10 +42,10 @@
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2 shrink-0">
+      <div class="grid grid-cols-2 gap-2 shrink-0 sm:flex sm:flex-wrap sm:items-center">
         <a
           routerLink="/admin/articles"
-          class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:text-slate-900 transition active:scale-95"
+          class="inline-flex w-full justify-center items-center gap-1.5 rounded-xl sm:w-auto border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:text-slate-900 transition active:scale-95"
         >
           <lucide-icon name="arrow-left" [size]="14" />
           <span>Back</span>
@@ -55,7 +55,7 @@
           <a
             [routerLink]="['/articles', art.slug]"
             target="_blank"
-            class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 transition active:scale-95"
+            class="inline-flex w-full justify-center items-center gap-1.5 rounded-xl sm:w-auto border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 transition active:scale-95"
             title="View live public article"
           >
             <lucide-icon name="external-link" [size]="14" />
@@ -65,7 +65,7 @@
 
         <a
           [routerLink]="['/admin/articles/edit', art.slug]"
-          class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-emerald-500 transition active:scale-95"
+          class="inline-flex w-full justify-center items-center gap-1.5 rounded-xl sm:w-auto bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-emerald-500 transition active:scale-95"
         >
           <lucide-icon name="square-pen" [size]="14" />
           <span>Edit Article</span>
@@ -74,7 +74,7 @@
         <button
           type="button"
           (click)="deleteArticle()"
-          class="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50/80 px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-100 transition active:scale-95 cursor-pointer"
+          class="inline-flex w-full justify-center items-center gap-1.5 rounded-xl sm:w-auto border border-rose-200 bg-rose-50/80 px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-100 transition active:scale-95 cursor-pointer"
           title="Delete this article"
         >
           <lucide-icon name="trash-2" [size]="14" />
