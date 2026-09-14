@@ -44,7 +44,6 @@ export class AdminHeader implements OnInit {
   tabService = inject(AdminTabService);
   private destroyRef = inject(DestroyRef);
 
-  // States
   isMenuOpen = signal(false);
   isProfileOpen = signal(false);
   searchQuery = signal('');
@@ -54,7 +53,6 @@ export class AdminHeader implements OnInit {
   adminEmail = signal('');
   imageUrl = signal('');
 
-  /** The horizontally scrolling tab strip, when a page has published tabs. */
   private tabStrip = viewChild<ElementRef<HTMLElement>>('tabStrip');
   canScrollLeft = signal(false);
   canScrollRight = signal(false);
@@ -110,9 +108,6 @@ export class AdminHeader implements OnInit {
   });
 
   constructor() {
-    // Stays here because afterRenderEffect needs an injection context. Tabs arrive
-    // asynchronously (a page publishes them in its own ngOnInit) and the arrows
-    // depend on measured widths, so re-measure after every render that changes them.
     afterRenderEffect(() => {
       this.tabService.tabs();
       this.updateTabScroll();
@@ -132,8 +127,6 @@ export class AdminHeader implements OnInit {
         this.closeAllMenus();
       });
 
-    // Two different profiles: the portfolio one owns the avatar, the admin account
-    // owns the name/email. Either may fail without breaking the header.
     this.profileService
       .getProfile()
       .pipe(takeUntilDestroyed(this.destroyRef), catchError(() => EMPTY))
@@ -188,14 +181,12 @@ export class AdminHeader implements OnInit {
       return;
     }
 
-    // 1px of slack — fractional scroll positions never settle exactly on the end.
     const maxScroll = el.scrollWidth - el.clientWidth;
 
     this.canScrollLeft.set(el.scrollLeft > 1);
     this.canScrollRight.set(el.scrollLeft < maxScroll - 1);
   }
 
-  /** Pages the strip by most of a screenful, so a tap always reveals new tabs. */
   scrollTabs(direction: -1 | 1): void {
     const el = this.tabStrip()?.nativeElement;
 

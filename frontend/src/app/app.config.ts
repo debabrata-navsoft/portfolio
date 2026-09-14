@@ -91,10 +91,6 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(withEventReplay()),
     provideAnimationsAsync(),
 
-    // Ionic is wired in for its platform services (hardware back button, safe-area
-    // insets, platform detection) under Capacitor. Its global stylesheets are
-    // deliberately NOT imported — they would restyle the Tailwind UI — so don't
-    // use `ion-*` components without adding the matching CSS first.
     provideIonicAngular(),
 
     provideHttpClient(withInterceptors([authInterceptor])),

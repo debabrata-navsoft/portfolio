@@ -20,7 +20,6 @@ export class Skills implements OnInit {
 
   skills = signal<SkillResponse[]>([]);
 
-  // Display order of the category cards — anything else is appended after these.
   private readonly categoryOrder = ['language', 'backend', 'frontend', 'tool'];
 
   categorySkills = computed(() => {

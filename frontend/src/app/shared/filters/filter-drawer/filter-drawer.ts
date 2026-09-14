@@ -21,7 +21,6 @@ import { cloneFilterSelection, emptyFilterSelection } from '../filter.utils';
 import { CustomButton } from '../../components/custom-button/custom-button';
 import { DatePicker } from '../../components/date-picker/date-picker';
 
-/** Quick ranges offered above the From / To fields. `days: 0` means "clear". */
 const DATE_PRESETS = [
   { id: 'today', label: 'Today', days: 1 },
   { id: 'last-7', label: 'Last 7 days', days: 7 },
@@ -60,9 +59,7 @@ export class FilterDrawer {
 
   open = input(false);
   groups = input<FilterGroup[]>([]);
-  /** The currently applied selection — the draft is re-seeded from it on every open. */
   selection = input<FilterSelection>(emptyFilterSelection());
-  /** Live result count for the draft selection, shown above the action buttons. */
   totalResults = input(0);
 
   closed = output<void>();
@@ -150,7 +147,6 @@ export class FilterDrawer {
     return this.draft().dates[groupId]?.[bound] ?? '';
   }
 
-  /** Which quick range the current bounds match — 'all' when nothing is set. */
   activePreset(groupId: string): string {
     const range = this.draft().dates[groupId];
 

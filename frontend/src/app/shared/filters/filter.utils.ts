@@ -14,7 +14,6 @@ export function emptyFilterSelection(): FilterSelection {
   return { checkboxes: {}, dates: {} };
 }
 
-/** Deep copy so a drawer draft never mutates the applied selection. */
 export function cloneFilterSelection(selection: FilterSelection): FilterSelection {
   const checkboxes: Record<string, string[]> = {};
   const dates: Record<string, DateRange> = {};
@@ -30,7 +29,6 @@ export function cloneFilterSelection(selection: FilterSelection): FilterSelectio
   return { checkboxes, dates };
 }
 
-/** Number of groups that actually narrow the list — drives the badge on the filter icon. */
 export function countActiveFilters(selection: FilterSelection): number {
   const checkboxCount = Object.values(selection.checkboxes).filter(
     (values) => values.length > 0,
@@ -63,7 +61,6 @@ const dateRangeLabel = (range: DateRange): string => {
   return `Until ${formatChipDate(range.to)}`;
 };
 
-/** The applied filters as chips, labelled from the group/option metadata. */
 export function buildFilterChips(groups: FilterGroup[], selection: FilterSelection): FilterChip[] {
   const chips: FilterChip[] = [];
 
@@ -98,7 +95,6 @@ export function buildFilterChips(groups: FilterGroup[], selection: FilterSelecti
   return chips;
 }
 
-/** Drops the chip's value from the selection (a date chip clears the whole range). */
 export function removeFilterChip(selection: FilterSelection, chip: FilterChip): FilterSelection {
   const next = cloneFilterSelection(selection);
 
@@ -113,7 +109,6 @@ export function removeFilterChip(selection: FilterSelection, chip: FilterChip): 
   return next;
 }
 
-/** Turns an API facet (value + count) into a drawer checkbox option. */
 export function facetToOption(facet: FacetOption): FilterOption {
   return { id: facet.value, label: facet.label, count: facet.count };
 }
@@ -130,10 +125,6 @@ export function dateBound(
   return selection.dates[groupId]?.[bound] || undefined;
 }
 
-/**
- * Accepts either the paged envelope or a bare array (an API that hasn't been
- * redeployed yet) so a shape mismatch degrades instead of crashing the page.
- */
 export function normalizeListResponse<T, F>(
   res: unknown,
   emptyFilters: F,
@@ -167,7 +158,6 @@ export function normalizeListResponse<T, F>(
   };
 }
 
-/** Drops empty values and joins arrays into the comma-separated form the API expects. */
 export function toHttpParams(query: Record<string, unknown>): HttpParams {
   let params = new HttpParams();
 
