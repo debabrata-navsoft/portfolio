@@ -58,10 +58,6 @@ const COLUMN_CLASS: Partial<Record<TableColumnType, string>> = {
   date: 'tbl-col-date',
 };
 
-/**
- * Badge pill picked from the cell text, first match wins. Matched on word
- * boundaries so "Inactive" cannot be read as "active".
- */
 const BADGE_VARIANTS: [RegExp, string][] = [
   [/\b(approved|active|published)\b/, 'tbl-badge-success'],
   [/\b(rejected|inactive|inquiry|danger)\b/, 'tbl-badge-danger'],
@@ -69,10 +65,6 @@ const BADGE_VARIANTS: [RegExp, string][] = [
   [/\bread\b/, 'tbl-badge-read'],
 ];
 
-/**
- * Generic admin table: search, filter drawer, sorting and paging all run
- * **client-side** over the `rows` input — it never talks to the API itself.
- */
 @Component({
   selector: 'app-data-table',
   standalone: true,
@@ -137,7 +129,6 @@ export class DataTable<T> {
       ),
   );
 
-  /** Columns with their class strings resolved once, instead of per cell per CD pass. */
   viewColumns = computed<ViewColumn<T>[]>(() =>
     this.columns().map((column) => {
       const type = column.type ?? 'text';
@@ -245,12 +236,10 @@ export class DataTable<T> {
     return this.filteredRows().slice(start, start + size);
   });
 
-  /** Raw value behind a column or a filter. */
   cellValue(source: ValueSource<T>, row: T): any {
     return source.value ? source.value(row) : (row as Record<string, any>)[source.key];
   }
 
-  /** Same, normalised to a list of non-empty strings (a `tags` cell holds an array). */
   values(source: ValueSource<T>, row: T): string[] {
     const raw = this.cellValue(source, row);
 
@@ -343,7 +332,6 @@ export class DataTable<T> {
     this.activePageSize.set(event.pageSize);
   }
 
-  /** Applies every filter group, then the search term. */
   private narrow(selection: FilterSelection): T[] {
     let rows = this.rows();
 
@@ -385,7 +373,6 @@ export class DataTable<T> {
   }
 }
 
-/** Ascending comparison of two cell values; the caller flips it for descending. */
 function compare(a: any, b: any, isDate: boolean): number {
   if (isDate || a instanceof Date || b instanceof Date) {
     return (new Date(a).getTime() || 0) - (new Date(b).getTime() || 0);

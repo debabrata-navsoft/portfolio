@@ -319,7 +319,10 @@ pick list before a template can use it.**
     `<router-outlet/>` — there is no sidebar.
   - `admin-header` owns the waffle "services" drawer (its own hardcoded `services` list of admin
     sections), the profile dropdown + logout, the page title derived from the URL, and the tab
-    strip fed by `AdminTabService`.
+    strip fed by `AdminTabService`. The strip is `overflow-x-auto` with the scrollbar hidden, so
+    it renders `‹` / `›` buttons whenever it overflows — each is shown only when there is room to
+    move that way. Widths are measured in `updateTabScroll()`, re-run on `window:resize`, on the
+    strip's own `scroll`, and via `afterNextRender` whenever `tabService.tabs()` changes.
   - The four top-level admin lists (projects, articles, faqs, contacts) render through
     `app-data-table`.
   - The education and experience sub-lists share
@@ -344,6 +347,12 @@ pick list before a template can use it.**
   [angular.json](frontend/angular.json). Material 20 derives its colours from `color-scheme`, so
   the dark-mode override for the filter drawer lives in `styles.css` rather than in the theme
   file. `<app-date-picker>` is plain Tailwind and stays white in both themes.
+- **Admin accent colour.** Tailwind v4 compiles `bg-blue-600` to
+  `background-color: var(--color-blue-600)`, so `styles.css` redefines
+  `--color-blue-600` / `--color-blue-700` on `.admin-layout, app-admin-login`. That retints
+  every blue fill, hover, text and border inside admin from one place; the public site keeps
+  Tailwind's default blue. **Use `bg-blue-600`, never an arbitrary `bg-[#hex]`**, or the button
+  will opt out of the theme.
 - **z-index ladder** (all of it hand-rolled as Tailwind arbitrary/bare values in the templates,
   keep it in sync): admin header `40` (`admin-header.css`) → navbar `z-[999]`, its backdrop
   `z-[998]`, its mobile menu `z-[1000]` → filter-drawer backdrop `z-1300`, panel `z-1310` →
@@ -456,6 +465,16 @@ launch it once so it downloads SDK platform 36. `mobile:apk` writes
   [app.config.ts](frontend/src/app/app.config.ts) for its platform services only. **Its global
   stylesheets are deliberately not imported** — they would restyle the Tailwind UI — so an
   `ion-*` component will render unstyled until you add the matching CSS.
+- **Safe areas / edge-to-edge.** `targetSdk 36` means Android 15+ forces edge-to-edge, so the
+  WebView draws under the status and gesture bars. `index.html` therefore sets
+  **`viewport-fit=cover`** (without it `env(safe-area-inset-*)` reports 0), and the three
+  edge-touching elements pad themselves: the public navbar and the admin header with
+  `env(safe-area-inset-top)`, the public footer with `env(safe-area-inset-bottom)`. The page
+  offset in `app.html` is `calc(4.5rem + env(safe-area-inset-top))` so it keeps clearing the
+  navbar as that grows. On desktop every inset is 0, so the web layout is unchanged.
+- Verified responsive at 360x800: no horizontal overflow on any public or admin page. The admin
+  data tables are intentionally `min-w-[760px]` inside an `overflow-auto` wrapper, so on a phone
+  they scroll sideways within the card rather than stretching the page.
 - iOS needs macOS + Xcode + CocoaPods; only the Android platform is scaffolded here.
 
 ---

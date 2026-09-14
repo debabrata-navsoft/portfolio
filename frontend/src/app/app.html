@@ -19,7 +19,13 @@
     }
 
     <!-- <div [class.page-content]="!isAdminPage()"> -->
-    <div [class]="!isAdminPage() ? 'min-h-screen pt-18' : 'min-h-screen pt-0'">
+    <div
+      [class]="
+        !isAdminPage()
+          ? 'min-h-screen pt-[calc(4.5rem+env(safe-area-inset-top,0px))]'
+          : 'min-h-screen pt-0'
+      "
+    >
       <router-outlet />
     </div>
   </div>

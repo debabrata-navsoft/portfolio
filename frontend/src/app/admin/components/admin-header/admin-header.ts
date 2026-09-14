@@ -1,8 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, HostListener, inject, OnInit, signal } from '@angular/core';
+import {
+  afterRenderEffect,
+  Component,
+  computed,
+  DestroyRef,
+  ElementRef,
+  HostListener,
+  inject,
+  OnInit,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
-import { filter } from 'rxjs';
+import { catchError, EMPTY, filter } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
 
 import { AdminService } from '../../../core/services/admin.service';
@@ -31,6 +42,7 @@ export class AdminHeader implements OnInit {
   private snackBar = inject(SnackBarService);
   private router = inject(Router);
   tabService = inject(AdminTabService);
+  private destroyRef = inject(DestroyRef);
 
   // States
   isMenuOpen = signal(false);
@@ -41,6 +53,11 @@ export class AdminHeader implements OnInit {
   adminName = signal('Admin');
   adminEmail = signal('');
   imageUrl = signal('');
+
+  /** The horizontally scrolling tab strip, when a page has published tabs. */
+  private tabStrip = viewChild<ElementRef<HTMLElement>>('tabStrip');
+  canScrollLeft = signal(false);
+  canScrollRight = signal(false);
 
   readonly services: AdminServiceItem[] = [
     {
@@ -93,40 +110,44 @@ export class AdminHeader implements OnInit {
   });
 
   constructor() {
+    // Stays here because afterRenderEffect needs an injection context. Tabs arrive
+    // asynchronously (a page publishes them in its own ngOnInit) and the arrows
+    // depend on measured widths, so re-measure after every render that changes them.
+    afterRenderEffect(() => {
+      this.tabService.tabs();
+      this.updateTabScroll();
+    });
+  }
+
+  ngOnInit(): void {
+    this.updateTitleFromUrl(this.router.url);
+
     this.router.events
       .pipe(
         filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-        takeUntilDestroyed(),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((e) => {
         this.updateTitleFromUrl(e.urlAfterRedirects || e.url);
         this.closeAllMenus();
       });
 
+    // Two different profiles: the portfolio one owns the avatar, the admin account
+    // owns the name/email. Either may fail without breaking the header.
     this.profileService
       .getProfile()
-      .pipe(takeUntilDestroyed())
-      .subscribe({
-        next: (profile) => profile?.imageUrl && this.imageUrl.set(profile.imageUrl),
-        error: () => {},
-      });
+      .pipe(takeUntilDestroyed(this.destroyRef), catchError(() => EMPTY))
+      .subscribe((profile) => profile?.imageUrl && this.imageUrl.set(profile.imageUrl));
 
     this.adminService
       .getProfile()
-      .pipe(takeUntilDestroyed())
-      .subscribe({
-        next: (res: any) => {
-          if (res?.admin?.name) {
-            this.adminName.set(res.admin.name);
-            this.adminEmail.set(res.admin.email || '');
-          }
-        },
-        error: () => {},
-      });
-  }
+      .pipe(takeUntilDestroyed(this.destroyRef), catchError(() => EMPTY))
+      .subscribe(({ admin }: any) => {
+        if (!admin?.name) return;
 
-  ngOnInit(): void {
-    this.updateTitleFromUrl(this.router.url);
+        this.adminName.set(admin.name);
+        this.adminEmail.set(admin.email ?? '');
+      });
   }
 
   @HostListener('document:click', ['$event'])
@@ -155,6 +176,32 @@ export class AdminHeader implements OnInit {
   @HostListener('document:keydown.escape')
   onEscape(): void {
     this.closeAllMenus();
+  }
+
+  @HostListener('window:resize')
+  updateTabScroll(): void {
+    const el = this.tabStrip()?.nativeElement;
+
+    if (!el) {
+      this.canScrollLeft.set(false);
+      this.canScrollRight.set(false);
+      return;
+    }
+
+    // 1px of slack — fractional scroll positions never settle exactly on the end.
+    const maxScroll = el.scrollWidth - el.clientWidth;
+
+    this.canScrollLeft.set(el.scrollLeft > 1);
+    this.canScrollRight.set(el.scrollLeft < maxScroll - 1);
+  }
+
+  /** Pages the strip by most of a screenful, so a tap always reveals new tabs. */
+  scrollTabs(direction: -1 | 1): void {
+    const el = this.tabStrip()?.nativeElement;
+
+    if (!el) return;
+
+    el.scrollBy({ left: direction * Math.max(120, el.clientWidth * 0.7), behavior: 'smooth' });
   }
 
   toggleMenu(event: MouseEvent): void {

@@ -10,21 +10,16 @@ import {
 } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 
-/** Panel views, in drill-down order: a 24-year grid → a 12-month grid → the days. */
 export type CalendarView = 'days' | 'years' | 'months';
 
 export interface CalendarDay {
   day: number;
-  /** ISO `yyyy-mm-dd` — what the picker emits. */
   date: string;
   disabled: boolean;
-  /** Ready-built button classes, so the grids do no work per change-detection pass. */
   class: string;
 }
 
-/** One cell of the year or the month grid — they share a layout. */
 export interface CalendarCell {
-  /** Year number, or month index. */
   id: number;
   label: string;
   disabled: boolean;
@@ -44,11 +39,6 @@ const toIso = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.
 const toDisplay = (d: Date) => `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
 const daysIn = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
 
-/**
- * Accepts `DD-MM-YYYY` (what the field shows) or `yyyy-mm-dd` (what it emits).
- * ISO strings are parsed as **local** midnight — `new Date('2026-09-14')` alone
- * is UTC and lands on the 13th in any negative-offset timezone.
- */
 const parse = (value: string): Date | null => {
   if (!value) return null;
 
@@ -81,7 +71,6 @@ export class DatePicker {
   placeholder = input('DD-MM-YYYY');
   hasError = input(false);
   disabled = input(false);
-  /** Selectable bounds, `yyyy-mm-dd` or `DD-MM-YYYY`. Empty means unbounded. */
   min = input('');
   max = input('');
 
@@ -95,7 +84,6 @@ export class DatePicker {
   currentYear = signal(new Date().getFullYear());
   currentMonth = signal(new Date().getMonth());
   private yearPageStart = signal(new Date().getFullYear());
-  /** Day-of-month the header shows; survives month and year navigation. */
   private focusDay = signal(new Date().getDate());
 
   selectedDate = computed(() => parse(this.value()));
@@ -107,10 +95,6 @@ export class DatePicker {
   private minTime = computed(() => parse(this.min())?.setHours(0, 0, 0, 0) ?? null);
   private maxTime = computed(() => parse(this.max())?.setHours(23, 59, 59, 999) ?? null);
 
-  /**
-   * Year range, year, or the focused `DD/MM/YYYY`. The day-of-month is sticky,
-   * so paging keeps it (14/09/2026 → 14/06/2040) and only clamps on short months.
-   */
   headerLabel = computed(() => {
     const year = this.currentYear();
 
@@ -124,10 +108,8 @@ export class DatePicker {
     return `${pad(Math.min(this.focusDay(), daysIn(year, month)))}/${pad(month + 1)}/${year}`;
   });
 
-  /** What the `‹` / `›` arrows page through in the current view. */
   stepLabel = computed(() => STEP_LABEL[this.view()]);
 
-  /** Empty cells before the 1st, so the month starts under the right weekday. */
   leadingBlanks = computed(() =>
     Array.from({ length: new Date(this.currentYear(), this.currentMonth(), 1).getDay() }, (_, i) => i),
   );
@@ -159,7 +141,6 @@ export class DatePicker {
     });
   });
 
-  /** The year grid or the month grid, whichever view is open. */
   gridCells = computed<CalendarCell[]>(() => {
     const selected = this.selectedDate();
 
@@ -196,7 +177,6 @@ export class DatePicker {
     this.view.set('days');
   }
 
-  /** Header click drills out to the year grid, and back down again. */
   toggleView(): void {
     this.view.update((view) => (view === 'years' ? 'days' : 'years'));
     if (this.view() === 'years') this.yearPageStart.set(this.currentYear());
@@ -214,7 +194,6 @@ export class DatePicker {
     }
   }
 
-  /** A year drills down to its months; a month drills down to its days. */
   selectCell(id: number): void {
     if (this.view() === 'years') {
       this.currentYear.set(id);
@@ -247,7 +226,6 @@ export class DatePicker {
     }
   }
 
-  /** Grid cell, disabled when no day in `[first … last]` month span is selectable. */
   private cell(
     id: number,
     label: string,

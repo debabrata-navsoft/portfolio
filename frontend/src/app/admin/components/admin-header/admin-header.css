@@ -5,6 +5,7 @@
   position: sticky;
   top: 0;
   z-index: 40;
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 .profile-dropdown,
@@ -28,7 +29,6 @@
   }
 }
 
-/* Custom mini scrollbar for services list */
 .services-drawer ::-webkit-scrollbar {
   width: 4px;
 }
@@ -46,7 +46,6 @@
   background: #94a3b8;
 }
 
-/* Hide scrollbars for sub-header tabs */
 .sub-header-tabs {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -56,7 +55,6 @@
   display: none;
 }
 
-/* Animated 9-Dot Launcher Button */
 .menu-btn {
   position: relative;
   display: inline-flex;

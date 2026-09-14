@@ -137,22 +137,52 @@
 
     <!-- DYNAMIC PAGE TABS IN SUB-HEADER (e.g. Profile Image, About, Skills, Experience, Education) -->
     @if (tabService.tabs().length > 0) {
-      <div
-        class="sub-header-tabs flex h-full items-center overflow-x-auto overflow-y-hidden -mb-[2px]"
-      >
-        @for (tab of tabService.tabs(); track tab.id) {
+      <div class="flex h-full min-w-0 items-center">
+        <!-- Arrows appear only when the strip actually overflows, so tapping beats
+             swiping on a phone. -->
+        @if (canScrollLeft()) {
           <button
             type="button"
-            (click)="tabService.selectTab(tab.id)"
-            class="relative flex h-full items-center px-4.5 text-xs font-semibold transition-colors duration-150 cursor-pointer whitespace-nowrap border-b-2"
-            [class.text-gray-900]="tabService.activeTab() === tab.id"
-            [class.border-gray-900]="tabService.activeTab() === tab.id"
-            [class.border-transparent]="tabService.activeTab() !== tab.id"
-            [class.text-gray-500]="tabService.activeTab() !== tab.id"
-            [class.hover:bg-gray-100]="tabService.activeTab() !== tab.id"
-            [class.hover:text-gray-800]="tabService.activeTab() !== tab.id"
+            (click)="scrollTabs(-1)"
+            aria-label="Scroll tabs left"
+            title="Scroll tabs left"
+            class="flex h-full shrink-0 cursor-pointer items-center pr-1.5 text-gray-500 transition-colors hover:text-gray-900"
           >
-            <span>{{ tab.label }}</span>
+            <lucide-icon name="chevron-left" [size]="16" />
+          </button>
+        }
+
+        <div
+          #tabStrip
+          (scroll)="updateTabScroll()"
+          class="sub-header-tabs flex h-full items-center overflow-x-auto overflow-y-hidden -mb-[2px]"
+        >
+          @for (tab of tabService.tabs(); track tab.id) {
+            <button
+              type="button"
+              (click)="tabService.selectTab(tab.id)"
+              class="relative flex h-full items-center px-4.5 text-xs font-semibold transition-colors duration-150 cursor-pointer whitespace-nowrap border-b-2"
+              [class.text-gray-900]="tabService.activeTab() === tab.id"
+              [class.border-gray-900]="tabService.activeTab() === tab.id"
+              [class.border-transparent]="tabService.activeTab() !== tab.id"
+              [class.text-gray-500]="tabService.activeTab() !== tab.id"
+              [class.hover:bg-gray-100]="tabService.activeTab() !== tab.id"
+              [class.hover:text-gray-800]="tabService.activeTab() !== tab.id"
+            >
+              <span>{{ tab.label }}</span>
+            </button>
+          }
+        </div>
+
+        @if (canScrollRight()) {
+          <button
+            type="button"
+            (click)="scrollTabs(1)"
+            aria-label="Scroll tabs right"
+            title="Scroll tabs right"
+            class="flex h-full shrink-0 cursor-pointer items-center pl-1.5 text-gray-500 transition-colors hover:text-gray-900"
+          >
+            <lucide-icon name="chevron-right" [size]="16" />
           </button>
         }
       </div>
