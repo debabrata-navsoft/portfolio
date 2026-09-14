@@ -17,9 +17,6 @@ import { LoaderService } from '../../core/services/loader.service';
 
 type RevealAnimation = 'up' | 'left' | 'right' | 'scale';
 
-/** Matches the 0.9s transition on `.reveal` in styles.css, plus a frame of slack. */
-const TRANSITION_MS = 950;
-
 @Directive({
   selector: '[appReveal]',
   standalone: true,
@@ -32,7 +29,6 @@ export class RevealDirective implements AfterViewInit, OnDestroy {
 
   private observer?: IntersectionObserver;
   private settleTimer?: ReturnType<typeof setTimeout>;
-  private cleanupTimer?: ReturnType<typeof setTimeout>;
   private initialized = signal(false);
 
   revealAnimation = input<RevealAnimation>('up');
@@ -86,8 +82,6 @@ export class RevealDirective implements AfterViewInit, OnDestroy {
             setTimeout(() => {
               this.renderer.addClass(host, 'reveal-show');
               this.revealComplete.emit();
-
-              if (this.revealOnce()) this.settle(host);
             }, this.revealDelay());
 
             if (this.revealOnce()) {
@@ -107,25 +101,8 @@ export class RevealDirective implements AfterViewInit, OnDestroy {
     }, 150);
   }
 
-  /**
-   * Strips the reveal classes once the transition has finished. The element is then
-   * plain markup again — no opacity, transform or will-change left on it. WebKit
-   * otherwise keeps the host on its own compositing layer and paints nested scroll
-   * containers (the article code blocks) blank.
-   */
-  private settle(host: HTMLElement) {
-    this.cleanupTimer = setTimeout(() => {
-      this.cleanupTimer = undefined;
-
-      this.renderer.removeClass(host, 'reveal-show');
-      this.renderer.removeClass(host, `reveal-${this.revealAnimation()}`);
-      this.renderer.removeClass(host, 'reveal');
-    }, TRANSITION_MS);
-  }
-
   ngOnDestroy(): void {
     if (this.settleTimer) clearTimeout(this.settleTimer);
-    if (this.cleanupTimer) clearTimeout(this.cleanupTimer);
     this.observer?.disconnect();
   }
 }

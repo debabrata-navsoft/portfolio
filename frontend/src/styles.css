@@ -520,7 +520,7 @@ app-admin-login {
 
 /* Wrap instead of scrolling on phones: a nested scroll container is what WebKit
    fails to paint inside the revealed (composited) article body. */
-@media (max-width: 640px) {
+/* @media (max-width: 640px) {
   .code-block pre {
     overflow-x: visible;
   }
@@ -529,4 +529,4 @@ app-admin-login {
     white-space: pre-wrap;
     overflow-wrap: break-word;
   }
-}
+} */
