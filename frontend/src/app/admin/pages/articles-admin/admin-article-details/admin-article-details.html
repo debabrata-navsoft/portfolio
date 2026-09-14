@@ -179,9 +179,11 @@
             </span>
           </div>
 
-          <div class="whitespace-pre-line text-sm sm:text-base leading-relaxed text-slate-700">
-            {{ art.content }}
-          </div>
+          <div
+            appCodeCopy
+            class="whitespace-pre-line text-sm sm:text-base leading-relaxed text-slate-700"
+            [innerHTML]="art.content | formatText"
+          ></div>
         </div>
 
         <!-- Assigned Tags Card -->

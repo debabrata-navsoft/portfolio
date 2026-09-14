@@ -19,11 +19,21 @@ import { SnackBarService } from '../../../../core/services/snack-bar.service';
 import { LoaderService } from '../../../../core/services/loader.service';
 import { ArticleResponse } from '../../../../models/article.model';
 import { Error } from '../../../../shared/components/error/error';
+import { FormatTextPipe } from '../../../../pipes/format-text.pipe';
+import { CodeCopyDirective } from '../../../../shared/directives/code-copy.directive';
 
 @Component({
   selector: 'app-admin-article-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, DatePipe, LucideAngularModule, Error],
+  imports: [
+    CommonModule,
+    RouterLink,
+    DatePipe,
+    LucideAngularModule,
+    Error,
+    FormatTextPipe,
+    CodeCopyDirective,
+  ],
   templateUrl: './admin-article-details.html',
   styleUrl: './admin-article-details.css',
 })

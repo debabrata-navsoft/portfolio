@@ -76,11 +76,11 @@
       <div
         appReveal
         revealAnimation="up"
-        [revealDelay]="400"
-        class="prose prose-invert whitespace-pre-wrap text-2xl"
-      >
-        {{ articles()!.content }}
-      </div>
+        [revealDelay]="200"
+        appCodeCopy
+        class="whitespace-pre-wrap text-lg leading-relaxed text-gray-800 dark:text-gray-300 md:text-xl"
+        [innerHTML]="articles()!.content | formatText"
+      ></div>
     </div>
   </section>
 }

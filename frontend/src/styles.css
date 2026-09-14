@@ -385,6 +385,11 @@ body {
 .reveal-show {
   opacity: 1;
   transform: none;
+
+  /* Drop the hint once the element has revealed. A permanent will-change keeps the
+     element on its own compositing layer, and WebKit then paints nested scrollers
+     (the article code blocks) blank. */
+  will-change: auto;
 }
 
 /* .reveal-init {

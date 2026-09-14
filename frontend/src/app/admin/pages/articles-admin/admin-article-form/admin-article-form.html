@@ -196,9 +196,13 @@
       <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
         Article Content <span class="text-red-500">*</span>
       </label>
+      <p class="mb-1.5 text-xs text-gray-500">
+        Supports <code class="font-mono">**bold**</code>, <code class="font-mono">*italic*</code>,
+        <code class="font-mono">`inline code`</code> and ```ts … ``` fences for code blocks.
+      </p>
       <textarea
         rows="8"
-        placeholder="Write your article in markdown or plain text..."
+        placeholder="Write your article. Use ```ts … ``` for code blocks."
         [value]="articles().content"
         (input)="updateField('content', $any($event.target).value)"
         (blur)="markTouched('content')"

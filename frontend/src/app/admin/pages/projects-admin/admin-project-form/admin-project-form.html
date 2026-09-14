@@ -352,10 +352,11 @@
           <span class="font-semibold text-gray-400 uppercase tracking-wider text-[10px] block mb-1"
             >Overview Preview:</span
           >
-          <p
+          <div
+            appCodeCopy
             class="whitespace-pre-line text-slate-800"
             [innerHTML]="projects().overview | formatText"
-          ></p>
+          ></div>
         </div>
       }
     </div>
@@ -424,6 +425,7 @@
             >Description Preview:</span
           >
           <div
+            appCodeCopy
             class="whitespace-pre-line text-slate-800 leading-relaxed"
             [innerHTML]="projects().description | formatText"
           ></div>

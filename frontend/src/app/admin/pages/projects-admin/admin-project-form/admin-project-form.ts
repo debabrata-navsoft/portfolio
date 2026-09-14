@@ -8,11 +8,12 @@ import { SnackBarService } from '../../../../core/services/snack-bar.service';
 import { ProjectForm } from '../../../../models/project.model';
 import { DatePicker } from '../../../../shared/components/date-picker/date-picker';
 import { FormatTextPipe } from '../../../../pipes/format-text.pipe';
+import { CodeCopyDirective } from '../../../../shared/directives/code-copy.directive';
 
 @Component({
   selector: 'app-admin-project-form',
   standalone: true,
-  imports: [LucideAngularModule, DatePicker, FormatTextPipe],
+  imports: [LucideAngularModule, DatePicker, FormatTextPipe, CodeCopyDirective],
   templateUrl: './admin-project-form.html',
   styleUrl: './admin-project-form.css',
 })

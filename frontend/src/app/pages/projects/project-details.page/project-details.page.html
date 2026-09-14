@@ -37,10 +37,11 @@
           <div class="flex-1">
             <h3 class="mb-4 text-2xl font-bold md:text-3xl">Project Overview</h3>
 
-            <p
+            <div
+              appCodeCopy
               class="whitespace-pre-line text-base leading-8 text-gray-700 dark:text-gray-500 md:text-lg"
               [innerHTML]="project()!.overview | formatText"
-            ></p>
+            ></div>
           </div>
         </div>
 
@@ -82,10 +83,11 @@
           <div class="mb-12">
             <h3 class="mb-4 text-2xl font-bold md:text-3xl">Project Description</h3>
 
-            <p
+            <div
+              appCodeCopy
               class="whitespace-pre-line text-base leading-8 text-gray-700 dark:text-gray-500 md:text-lg"
               [innerHTML]="project()!.description | formatText"
-            ></p>
+            ></div>
           </div>
 
           <div appReveal revealAnimation="up" [revealDelay]="250">

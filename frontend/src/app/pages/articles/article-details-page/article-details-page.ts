@@ -17,6 +17,8 @@ import { SnackBarService } from '../../../core/services/snack-bar.service';
 import { ArticleResponse } from '../../../models/article.model';
 import { Error } from '../../../shared/components/error/error';
 import { TimeAgoPipe } from '../../../pipes/time-ago.pipe';
+import { FormatTextPipe } from '../../../pipes/format-text.pipe';
+import { CodeCopyDirective } from '../../../shared/directives/code-copy.directive';
 import { GradientText } from '../../../shared/components/gradient-text/gradient-text';
 import { fadeUpAnimation } from '../../../shared/animation/page.animations';
 import { RevealDirective } from '../../../shared/directives/reveal.directive';
@@ -24,7 +26,15 @@ import { RevealDirective } from '../../../shared/directives/reveal.directive';
 @Component({
   selector: 'app-article-details-page',
   standalone: true,
-  imports: [Error, TimeAgoPipe, GradientText, LucideAngularModule, RevealDirective],
+  imports: [
+    Error,
+    TimeAgoPipe,
+    FormatTextPipe,
+    CodeCopyDirective,
+    GradientText,
+    LucideAngularModule,
+    RevealDirective,
+  ],
   templateUrl: './article-details-page.html',
   styleUrl: './article-details-page.css',
   animations: [fadeUpAnimation],

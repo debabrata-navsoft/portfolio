@@ -24,6 +24,7 @@ import { fadeUpAnimation } from '../../../shared/animation/page.animations';
 import { RevealDirective } from '../../../shared/directives/reveal.directive';
 import { TimeAgoPipe } from '../../../pipes/time-ago.pipe';
 import { FormatTextPipe } from '../../../pipes/format-text.pipe';
+import { CodeCopyDirective } from '../../../shared/directives/code-copy.directive';
 
 @Component({
   selector: 'app-project-details.page',
@@ -38,6 +39,7 @@ import { FormatTextPipe } from '../../../pipes/format-text.pipe';
     TimeAgoPipe,
     DatePipe,
     FormatTextPipe,
+    CodeCopyDirective,
   ],
   templateUrl: './project-details.page.html',
   styleUrl: './project-details.page.css',

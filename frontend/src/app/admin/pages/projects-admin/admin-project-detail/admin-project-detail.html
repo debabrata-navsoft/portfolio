@@ -197,10 +197,11 @@
             </span>
             <h2 class="text-base font-bold text-slate-900">Project Overview</h2>
           </div>
-          <p
+          <div
+            appCodeCopy
             class="text-sm sm:text-base leading-relaxed text-slate-700 font-medium whitespace-pre-line"
             [innerHTML]="proj.overview || 'No overview provided for this project.' | formatText"
-          ></p>
+          ></div>
         </div>
 
         <!-- Description -->
@@ -214,6 +215,7 @@
             <h2 class="text-base font-bold text-slate-900">Detailed Description</h2>
           </div>
           <div
+            appCodeCopy
             class="whitespace-pre-line text-sm sm:text-base leading-relaxed text-slate-700"
             [innerHTML]="proj.description || 'No detailed description provided.' | formatText"
           ></div>

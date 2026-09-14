@@ -19,11 +19,20 @@ import { LoaderService } from '../../../../core/services/loader.service';
 import { ProjectResponse } from '../../../../models/project.model';
 import { Error } from '../../../../shared/components/error/error';
 import { FormatTextPipe } from '../../../../pipes/format-text.pipe';
+import { CodeCopyDirective } from '../../../../shared/directives/code-copy.directive';
 
 @Component({
   selector: 'app-admin-project-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, DatePipe, LucideAngularModule, Error, FormatTextPipe],
+  imports: [
+    CommonModule,
+    RouterLink,
+    DatePipe,
+    LucideAngularModule,
+    Error,
+    FormatTextPipe,
+    CodeCopyDirective,
+  ],
   templateUrl: './admin-project-detail.html',
   styleUrl: './admin-project-detail.css',
 })
