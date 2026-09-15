@@ -12,6 +12,14 @@ import { AboutForm } from '../../../models/about.model';
 import { LucideAngularModule } from 'lucide-angular';
 import { finalize } from 'rxjs';
 
+const IMAGE_SLOTS = 4;
+
+/** The gallery is always `IMAGE_SLOTS` slots wide, padded with nulls. */
+const imageSlots = (images: readonly string[] = []): (string | null)[] =>
+  Array.from({ length: IMAGE_SLOTS }, (_, i) => images[i] || null);
+
+const emptySlots = <T>(): (T | null)[] => Array.from({ length: IMAGE_SLOTS }, () => null);
+
 @Component({
   selector: 'app-admin-about',
   standalone: true,
@@ -27,15 +35,15 @@ export class AdminAbout implements OnInit {
 
   isErrorMsg = signal(false);
   saving = signal(false);
-  imagePreviews = signal<(string | null)[]>([null, null, null, null]);
+  imagePreviews = signal<(string | null)[]>(imageSlots());
   originalAboutForm = signal<AboutForm | null>(null);
 
   aboutForm = signal<AboutForm>({
     description: '',
     email: '',
     location: '',
-    imageFiles: [null, null, null, null],
-    existingImages: [],
+    imageFiles: emptySlots<File>(),
+    existingImages: imageSlots(),
   });
 
   touched = signal<{
@@ -59,24 +67,15 @@ export class AdminAbout implements OnInit {
       .pipe(finalize(() => this.loaderService.hideApi()))
       .subscribe({
         next: (res) => {
-          const images = res.images || [];
-
-          const formData = {
+          this.aboutForm.update((form) => ({
+            ...form,
             description: res.description,
             email: res.email,
             location: res.location,
-            imageFiles: [null, null, null, null],
-            existingImages: images,
-          };
+          }));
 
-          this.aboutForm.set(formData);
-          this.originalAboutForm.set(formData);
-          this.imagePreviews.set([
-            images[0] || null,
-            images[1] || null,
-            images[2] || null,
-            images[3] || null,
-          ]);
+          this.setSavedImages(res.images);
+          this.originalAboutForm.set(this.aboutForm());
         },
         error: () => {
           this.isErrorMsg.set(true);
@@ -115,34 +114,35 @@ export class AdminAbout implements OnInit {
 
   onImageSelected(event: Event, index: number) {
     const file = (event.target as HTMLInputElement).files?.[0];
-
     if (!file) return;
 
-    this.aboutForm.update((form) => {
-      const imageFiles = [...form.imageFiles];
-      imageFiles[index] = file;
-      return { ...form, imageFiles };
-    });
-
-    this.imagePreviews.update((previews) => {
-      const updated = [...previews];
-      updated[index] = URL.createObjectURL(file);
-      return updated;
-    });
+    this.setSlot(index, file, URL.createObjectURL(file));
   }
 
   removeImage(index: number) {
-    this.aboutForm.update((form) => {
-      const imageFiles = [...form.imageFiles];
-      imageFiles[index] = null;
-      return { ...form, imageFiles };
-    });
+    this.setSlot(index, null, null);
+  }
 
-    this.imagePreviews.update((previews) => {
-      const updated = [...previews];
-      updated[index] = null;
-      return updated;
-    });
+  /** Adopt the gallery the API just returned, so the next save keeps these images too. */
+  private setSavedImages(images?: string[]) {
+    const slots = imageSlots(images);
+
+    this.aboutForm.update((form) => ({
+      ...form,
+      imageFiles: emptySlots<File>(),
+      existingImages: slots,
+    }));
+    this.imagePreviews.set([...slots]);
+  }
+
+  /** A picked or removed file always drops the URL saved in that slot. */
+  private setSlot(index: number, file: File | null, preview: string | null) {
+    this.aboutForm.update((form) => ({
+      ...form,
+      imageFiles: form.imageFiles.map((current, i) => (i === index ? file : current)),
+      existingImages: form.existingImages.map((url, i) => (i === index ? null : url)),
+    }));
+    this.imagePreviews.update((previews) => previews.map((p, i) => (i === index ? preview : p)));
   }
 
   saveAbout() {
@@ -165,11 +165,19 @@ export class AdminAbout implements OnInit {
     formData.append('email', form.email);
     formData.append('location', form.location);
 
-    form.imageFiles.forEach((file) => {
+    // Images the admin didn't touch, plus the slot each upload belongs to, so the
+    // API can rebuild the gallery instead of replacing it with this request's files.
+    const uploadSlots: number[] = [];
+
+    form.imageFiles.forEach((file, index) => {
       if (file) {
         formData.append('images', file);
+        uploadSlots.push(index);
       }
     });
+
+    formData.append('existingImages', JSON.stringify(form.existingImages));
+    formData.append('imageSlots', JSON.stringify(uploadSlots));
 
     this.saving.set(true);
     this.loaderService.showApi();
@@ -180,6 +188,7 @@ export class AdminAbout implements OnInit {
       .subscribe({
         next: (res) => {
           this.snackBarService.success(res.message);
+          this.setSavedImages(res.about?.images);
           this.originalAboutForm.set(this.aboutForm());
           this.saving.set(false);
         },

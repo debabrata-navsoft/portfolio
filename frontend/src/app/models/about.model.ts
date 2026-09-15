@@ -15,5 +15,5 @@ export interface AboutForm {
   email: string;
   location: string;
   imageFiles: (File | null)[]; // fixed length 4, one slot per image
-  existingImages: string[];
+  existingImages: (string | null)[]; // same 4 slots: the saved URL, or null when empty/replaced
 }
