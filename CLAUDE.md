@@ -250,9 +250,19 @@ pick list before a template can use it.**
   `articles/article-details-page`, `contact-page`.
 - **Shared widgets** — also in [app/shared/components/](frontend/src/app/shared/components/):
   `custom-button`, `custom-nav` (back/next nav), `gradient-text`, `list-toolbar`, `data-table`,
-  `date-picker`. Plus [shared/directives/reveal.directive.ts](frontend/src/app/shared/directives/reveal.directive.ts)
+  `date-picker`, `markdown-toolbar`, `markdown-preview`. Plus
+  [shared/directives/reveal.directive.ts](frontend/src/app/shared/directives/reveal.directive.ts)
   (IntersectionObserver scroll-reveal) and
   [shared/animation/page.animations.ts](frontend/src/app/shared/animation/page.animations.ts).
+- **[markdown-toolbar](frontend/src/app/shared/components/markdown-toolbar/) /
+  [markdown-preview](frontend/src/app/shared/components/markdown-preview/)** — the mini-markdown
+  editing pair used by the admin project form (overview + description), `admin-profile` (hero
+  description) and `admin-about` (bio). `<app-markdown-toolbar targetId="<textarea id>"
+  [value]="…" (valueChange)="updateField(…, $event)">` renders the B / I / `</>` buttons and
+  wraps the current selection (or inserts a selected placeholder) — it finds the field by
+  `document.getElementById`, so **the textarea needs that `id`**. `[showCode]="false"` drops the
+  code button. `<app-markdown-preview [value]="…" label="…">` renders the `formatText` output
+  under the field and hides itself when the value is empty.
 - **[data-table](frontend/src/app/shared/components/data-table/)** — the generic admin table
   (`<app-data-table>`), used by the projects / articles / faqs / contacts admin lists. It is
   **client-side**: it takes the full `rows` array and does its own search, filtering, sorting and
@@ -309,7 +319,8 @@ pick list before a template can use it.**
 - **Pipes** [app/pipes/](frontend/src/app/pipes/): `truncate`, `time-ago`, `SafeHtml`, and
   [format-text.pipe.ts](frontend/src/app/pipes/format-text.pipe.ts) (`formatText`) — turns the
   mini-markdown admins type into sanitized HTML (`**bold**`, `*italic*`, `` `code` ``, plus
-  existing `<b>`/`<strong>`), used by the project form preview and the project detail pages.
+  existing `<b>`/`<strong>`), used by `markdown-preview`, the project/article detail pages and the
+  public `hero` / `about` sections.
 - **Admin** [app/admin/](frontend/src/app/admin/): `auth/admin-login`,
   `layout/admin-layout` + `components/admin-header`;
   `pages/dashboard-admin`; `pages/profile-admin` which composes `components/admin-profile`,

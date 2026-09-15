@@ -3,45 +3,53 @@
 } @else {
   @if (project()) {
     <section>
-      <div class="container mx-auto px-5 pt-5 lg:px-30">
+      <div class="container mx-auto px-5 pt-5">
         <div
           appReveal
           revealAnimation="up"
-          class="mb-12 mt-10 flex flex-col justify-between gap-10 md:gap-4 lg:flex-row lg:items-start"
+          class="mb-12 mt-10 grid grid-cols-1 gap-10 md:gap-8 lg:grid-cols-2 lg:gap-16 items-start"
         >
-          <div class="flex-2 flex flex-col items-start">
-            <app-gradient-text
-              tagName="h6"
-              [text]="'Created At: ' + (project()!.createdAt | timeAgo)"
-              [gradient]="false"
-              className="mb-4 text-[10px] font-bold tracking-[2px] md:tracking-[4px] uppercase text-black dark:text-white"
-            />
+          <div class="flex flex-col items-start gap-4">
+            <div
+              class="flex flex-wrap items-center gap-2.5 text-xs md:text-sm font-semibold uppercase tracking-[3px]"
+            >
+              <app-gradient-text
+                tagName="span"
+                [text]="project()!.category | uppercase"
+                className="font-bold tracking-[3px]"
+              />
 
-            <app-gradient-text
-              tagName="h6"
-              [text]="project()!.category | uppercase"
-              className="text-xl font-bold tracking-[4px]"
-            />
+              @if (project()!.projectDate) {
+                <span class="text-gray-400 dark:text-gray-600 font-normal">•</span>
+                <span class="text-gray-500 dark:text-gray-400 tracking-[2px]">
+                  {{ project()!.projectDate | date: 'dd MMM yyyy' }}
+                </span>
+              }
 
-            <app-gradient-text
-              tagName="h6"
-              [text]="(project()!.projectDate | date: 'dd MMM yyyy') ?? ''"
-              className="mt-2 text-[10px] font-bold tracking-[2px] md:tracking-[4px] uppercase md:text-sm"
-            />
+              @if (project()!.createdAt) {
+                <span class="text-gray-400 dark:text-gray-600 font-normal">•</span>
+                <span
+                  class="text-[11px] font-medium tracking-[1.5px] text-gray-400 dark:text-gray-500"
+                >
+                  {{ project()!.createdAt | timeAgo }}
+                </span>
+              }
+            </div>
 
-            <h2 class="mt-3 text-[36px] font-bold leading-[120%] md:text-[50px] xl:text-[54px]">
+            <h1
+              class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[115%] text-gray-900 dark:text-white"
+            >
               {{ project()!.title }}
-            </h2>
+            </h1>
           </div>
 
-          <div class="flex-1">
+          <div class="w-full">
             <h3 class="mb-4 text-2xl font-bold md:text-3xl">Project Overview</h3>
 
-            <div
-              appCodeCopy
+            <p
               class="whitespace-pre-line text-base leading-8 text-gray-700 dark:text-gray-500 md:text-lg"
               [innerHTML]="project()!.overview | formatText"
-            ></div>
+            ></p>
           </div>
         </div>
 
@@ -50,44 +58,25 @@
           revealAnimation="scale"
           [revealDelay]="100"
           class="cursor-zoom-in overflow-hidden bg-neutral-500"
-          (click)="isModalOpen.set(true)"
+          (click)="isImageModalOpen.set(true)"
         >
           <img [src]="project()!.image" [alt]="project()!.title" class="w-full object-cover" />
         </div>
 
-        @if (isModalOpen()) {
-          <div
-            appReveal
-            revealAnimation="scale"
-            class="fixed inset-0 z-9999 flex items-center justify-center bg-black/80 p-4"
-            (click)="isModalOpen.set(false)"
-          >
-            <button
-              type="button"
-              class="absolute right-5 top-5 z-[10000] flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-white transition hover:bg-white/10"
-              (click)="isModalOpen.set(false)"
-            >
-              <lucide-icon name="x" [size]="32"></lucide-icon>
-            </button>
-
-            <img
-              [src]="project()!.image"
-              [alt]="project()!.title"
-              class="mt-10 md:max-h-[80vh] md:max-w-[80vh] xl:max-h-[90vh] xl:max-w-[95vw] object-contain"
-              (click)="$event.stopPropagation()"
-            />
-          </div>
-        }
+        <app-image-modal
+          [(isOpen)]="isImageModalOpen"
+          [src]="project()!.image"
+          [alt]="project()!.title"
+        />
 
         <div appReveal revealAnimation="up" [revealDelay]="150" class="pt-14 lg:pt-20">
           <div class="mb-12">
             <h3 class="mb-4 text-2xl font-bold md:text-3xl">Project Description</h3>
 
-            <div
-              appCodeCopy
+            <p
               class="whitespace-pre-line text-base leading-8 text-gray-700 dark:text-gray-500 md:text-lg"
               [innerHTML]="project()!.description | formatText"
-            ></div>
+            ></p>
           </div>
 
           <div appReveal revealAnimation="up" [revealDelay]="250">
@@ -137,20 +126,34 @@
           </div>
         </div>
 
+        <!-- Bottom Next Project Callout -->
         @if (nextProject()) {
-          <div appReveal revealAnimation="up" [revealDelay]="400" class="flex justify-center">
+          <div
+            appReveal
+            revealAnimation="up"
+            [revealDelay]="300"
+            class="my-20 flex flex-col items-center justify-center text-center"
+          >
+            <span
+              class="text-xs md:text-sm font-bold uppercase tracking-[4px] text-gray-500 dark:text-gray-400 mb-3"
+            >
+              UP NEXT
+            </span>
             <button
               type="button"
               (click)="goToNextProject()"
-              class="group mx-auto my-20 inline-flex cursor-pointer items-center justify-center gap-3 bg-gradient-to-r from-purple-400 via-red-500 to-orange-600 bg-clip-text pb-4 text-center text-[30px] font-bold leading-[110%] text-transparent md:text-[50px] xl:text-[54px]"
+              class="group inline-flex cursor-pointer items-center justify-center gap-3 md:gap-4 transition hover:scale-102 active:scale-98"
             >
-              <h2>Next Project</h2>
-
+              <span
+                class="bg-gradient-to-r from-purple-400 via-red-500 to-orange-600 bg-clip-text text-transparent text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight pb-1 leading-normal"
+              >
+                {{ nextProject()!.title }}
+              </span>
               <lucide-icon
                 name="chevrons-right"
-                [size]="28"
-                class="text-red-500 transition-transform duration-300 group-hover:translate-x-3"
-              ></lucide-icon>
+                [size]="36"
+                class="text-red-500 transition-transform duration-300 group-hover:translate-x-3 shrink-0"
+              />
             </button>
           </div>
         }

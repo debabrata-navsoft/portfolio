@@ -16,6 +16,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { ProjectService } from '../../../../core/services/project.service';
 import { SnackBarService } from '../../../../core/services/snack-bar.service';
 import { LoaderService } from '../../../../core/services/loader.service';
+import { ImageModal } from '../../../../shared/components/image-modal/image-modal';
 import { ProjectResponse } from '../../../../models/project.model';
 import { Error } from '../../../../shared/components/error/error';
 import { FormatTextPipe } from '../../../../pipes/format-text.pipe';
@@ -32,6 +33,7 @@ import { CodeCopyDirective } from '../../../../shared/directives/code-copy.direc
     Error,
     FormatTextPipe,
     CodeCopyDirective,
+    ImageModal,
   ],
   templateUrl: './admin-project-detail.html',
   styleUrl: './admin-project-detail.css',
@@ -48,8 +50,9 @@ export class AdminProjectDetail implements OnInit {
 
   project = signal<ProjectResponse | null>(null);
   isErrorMsg = signal(false);
-  activeImage = signal<string | null>(null);
   copiedSlug = signal(false);
+  activeImage = signal<string | null>(null);
+  isImageModalOpen = signal(false);
 
   ngOnInit(): void {
     this.route.paramMap
@@ -111,10 +114,9 @@ export class AdminProjectDetail implements OnInit {
   }
 
   openImage(url?: string | null): void {
-    if (url?.trim()) this.activeImage.set(url.trim());
-  }
-
-  closeImage(): void {
-    this.activeImage.set(null);
+    if (url?.trim()) {
+      this.activeImage.set(url.trim());
+      this.isImageModalOpen.set(true);
+    }
   }
 }

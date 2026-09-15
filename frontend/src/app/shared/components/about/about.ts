@@ -5,11 +5,12 @@ import { AboutResponse } from '../../../models/about.model';
 import { LucideAngularModule } from 'lucide-angular';
 import { GradientText } from '../gradient-text/gradient-text';
 import { RevealDirective } from '../../directives/reveal.directive';
+import { FormatTextPipe } from '../../../pipes/format-text.pipe';
 
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [LucideAngularModule, GradientText, RevealDirective],
+  imports: [LucideAngularModule, GradientText, RevealDirective, FormatTextPipe],
   templateUrl: './about.html',
   styleUrl: './about.css',
 })

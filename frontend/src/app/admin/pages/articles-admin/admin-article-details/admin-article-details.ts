@@ -17,6 +17,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { ArticleService } from '../../../../core/services/article.service';
 import { SnackBarService } from '../../../../core/services/snack-bar.service';
 import { LoaderService } from '../../../../core/services/loader.service';
+import { ImageModal } from '../../../../shared/components/image-modal/image-modal';
 import { ArticleResponse } from '../../../../models/article.model';
 import { Error } from '../../../../shared/components/error/error';
 import { FormatTextPipe } from '../../../../pipes/format-text.pipe';
@@ -33,6 +34,7 @@ import { CodeCopyDirective } from '../../../../shared/directives/code-copy.direc
     Error,
     FormatTextPipe,
     CodeCopyDirective,
+    ImageModal,
   ],
   templateUrl: './admin-article-details.html',
   styleUrl: './admin-article-details.css',
@@ -49,8 +51,9 @@ export class AdminArticleDetails implements OnInit {
 
   article = signal<ArticleResponse | null>(null);
   isErrorMsg = signal(false);
-  activeImage = signal<string | null>(null);
   copiedSlug = signal(false);
+  activeImage = signal<string | null>(null);
+  isImageModalOpen = signal(false);
 
   wordCount = computed(() => {
     const text = this.article()?.content || '';
@@ -117,10 +120,9 @@ export class AdminArticleDetails implements OnInit {
   }
 
   openImage(url?: string | null): void {
-    if (url?.trim()) this.activeImage.set(url.trim());
-  }
-
-  closeImage(): void {
-    this.activeImage.set(null);
+    if (url?.trim()) {
+      this.activeImage.set(url.trim());
+      this.isImageModalOpen.set(true);
+    }
   }
 }

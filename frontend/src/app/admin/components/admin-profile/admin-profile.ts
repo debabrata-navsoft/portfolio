@@ -13,13 +13,15 @@ import { ProfileService } from '../../../core/services/profile.service';
 import { SnackBarService } from '../../../core/services/snack-bar.service';
 import { LoaderService } from '../../../core/services/loader.service';
 import { Error } from '../../../shared/components/error/error';
+import { MarkdownToolbar } from '../../../shared/components/markdown-toolbar/markdown-toolbar';
+import { MarkdownPreview } from '../../../shared/components/markdown-preview/markdown-preview';
 import { ProfileForm } from '../../../models/profile.model';
 import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-admin-profile',
   standalone: true,
-  imports: [Error],
+  imports: [Error, MarkdownToolbar, MarkdownPreview],
   templateUrl: './admin-profile.html',
   styleUrl: './admin-profile.css',
 })

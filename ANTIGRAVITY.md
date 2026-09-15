@@ -32,7 +32,7 @@ portfolio-root/
 │   │   │   ├── models/       # TypeScript interfaces & API models
 │   │   │   ├── pages/        # Public pages (home, projects, articles, contact)
 │   │   │   ├── pipes/        # timeAgo, truncate, safeHtml
-│   │   │   ├── shared/       # Reusable UI (data-table, filter-drawer, buttons)
+│   │   │   ├── shared/       # Reusable UI (data-table, filter-drawer, buttons, markdown-toolbar/-preview)
 │   │   │   ├── app.config.ts # Providers, router, Lucide icon registry
 │   │   │   └── app.routes.ts # App routing definition
 │   │   ├── styles.css        # Tailwind v4 import & custom properties

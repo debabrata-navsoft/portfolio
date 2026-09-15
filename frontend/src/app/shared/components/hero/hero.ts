@@ -9,11 +9,19 @@ import { CustomButton } from '../custom-button/custom-button';
 import { GradientText } from '../gradient-text/gradient-text';
 import { CustomNav } from '../custom-nav/custom-nav';
 import { RevealDirective } from '../../directives/reveal.directive';
+import { FormatTextPipe } from '../../../pipes/format-text.pipe';
 
 @Component({
   selector: 'app-hero',
   standalone: true,
-  imports: [LucideAngularModule, CustomButton, GradientText, CustomNav, RevealDirective],
+  imports: [
+    LucideAngularModule,
+    CustomButton,
+    GradientText,
+    CustomNav,
+    RevealDirective,
+    FormatTextPipe,
+  ],
   templateUrl: './hero.html',
   styleUrl: './hero.css',
 })

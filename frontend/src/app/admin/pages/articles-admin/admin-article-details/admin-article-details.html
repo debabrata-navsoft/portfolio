@@ -356,31 +356,11 @@
       </div>
     </div>
   </div>
-}
 
-<!-- FULLSCREEN LIGHTBOX MODAL -->
-@if (activeImage()) {
-  <div
-    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4 backdrop-blur-md transition-all"
-    (click)="closeImage()"
-  >
-    <button
-      type="button"
-      (click)="closeImage()"
-      class="absolute right-5 top-5 z-[10000] flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition active:scale-95"
-      title="Close preview"
-    >
-      <lucide-icon name="x" [size]="22" />
-    </button>
-    <div
-      (click)="$event.stopPropagation()"
-      class="relative flex items-center justify-center max-h-[88vh] max-w-[92vw]"
-    >
-      <img
-        [src]="activeImage()!"
-        alt="Fullscreen Preview"
-        class="max-h-[88vh] max-w-[92vw] rounded-2xl object-contain shadow-2xl ring-1 ring-white/10"
-      />
-    </div>
-  </div>
+  <!-- Fullscreen Image Modal -->
+  <app-image-modal
+    [(isOpen)]="isImageModalOpen"
+    [src]="activeImage()"
+    [alt]="article()?.title || 'Article Cover'"
+  />
 }

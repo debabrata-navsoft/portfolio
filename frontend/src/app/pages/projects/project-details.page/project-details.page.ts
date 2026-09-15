@@ -7,9 +7,10 @@ import {
   inject,
   NgZone,
   OnInit,
+  PLATFORM_ID,
   signal,
 } from '@angular/core';
-import { CommonModule, DatePipe, NgClass, UpperCasePipe } from '@angular/common';
+import { CommonModule, DatePipe, isPlatformBrowser, NgClass, UpperCasePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { EMPTY, switchMap } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
@@ -24,7 +25,7 @@ import { fadeUpAnimation } from '../../../shared/animation/page.animations';
 import { RevealDirective } from '../../../shared/directives/reveal.directive';
 import { TimeAgoPipe } from '../../../pipes/time-ago.pipe';
 import { FormatTextPipe } from '../../../pipes/format-text.pipe';
-import { CodeCopyDirective } from '../../../shared/directives/code-copy.directive';
+import { ImageModal } from '../../../shared/components/image-modal/image-modal';
 
 @Component({
   selector: 'app-project-details.page',
@@ -39,7 +40,7 @@ import { CodeCopyDirective } from '../../../shared/directives/code-copy.directiv
     TimeAgoPipe,
     DatePipe,
     FormatTextPipe,
-    CodeCopyDirective,
+    ImageModal,
   ],
   templateUrl: './project-details.page.html',
   styleUrl: './project-details.page.css',
@@ -52,13 +53,14 @@ export class ProjectDetailsPage implements OnInit {
   private loaderService = inject(LoaderService);
   private snackBarService = inject(SnackBarService);
   private destroyRef = inject(DestroyRef);
+  private platformId = inject(PLATFORM_ID);
   private ngZone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
 
   project = signal<ProjectResponse | null>(null);
   projects = signal<ProjectResponse[]>([]);
   isErrorMsg = signal(false);
-  isModalOpen = signal(false);
+  isImageModalOpen = signal(false);
 
   nextProject = computed(() => {
     const currentProject = this.project();
@@ -74,6 +76,8 @@ export class ProjectDetailsPage implements OnInit {
   });
 
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     const projectSub = this.route.paramMap
       .pipe(
         switchMap((params) => {

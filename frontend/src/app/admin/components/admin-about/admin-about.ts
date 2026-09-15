@@ -5,6 +5,8 @@ import { AboutService } from '../../../core/services/about.service';
 import { SnackBarService } from '../../../core/services/snack-bar.service';
 import { LoaderService } from '../../../core/services/loader.service';
 import { Error } from '../../../shared/components/error/error';
+import { MarkdownToolbar } from '../../../shared/components/markdown-toolbar/markdown-toolbar';
+import { MarkdownPreview } from '../../../shared/components/markdown-preview/markdown-preview';
 import { AboutForm } from '../../../models/about.model';
 
 import { LucideAngularModule } from 'lucide-angular';
@@ -13,7 +15,7 @@ import { finalize } from 'rxjs';
 @Component({
   selector: 'app-admin-about',
   standalone: true,
-  imports: [FormsModule, LucideAngularModule, Error],
+  imports: [FormsModule, LucideAngularModule, Error, MarkdownToolbar, MarkdownPreview],
   templateUrl: './admin-about.html',
   styleUrl: './admin-about.css',
 })

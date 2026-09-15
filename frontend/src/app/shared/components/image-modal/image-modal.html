@@ -1,0 +1,28 @@
+@if (isOpen() && src()) {
+  <div
+    class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 p-4 sm:p-6 backdrop-blur-md transition-all animate-in fade-in duration-200"
+    (click)="close()"
+  >
+    <!-- Close Button -->
+    <button
+      type="button"
+      (click)="close()"
+      class="fixed top-5 right-5 z-[100000] flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm border border-white/20 shadow-lg hover:bg-white/30 hover:scale-105 active:scale-95 transition"
+      title="Close preview (Esc)"
+    >
+      <lucide-icon name="x" [size]="24" />
+    </button>
+
+    <!-- Modal Content -->
+    <div
+      (click)="$event.stopPropagation()"
+      class="relative flex items-center justify-center max-h-[88vh] max-w-[92vw]"
+    >
+      <img
+        [src]="src()!"
+        [alt]="alt() || 'Fullscreen Image Preview'"
+        class="max-h-[88vh] max-w-[92vw] object-contain shadow-2xl ring-1 ring-white/10"
+      />
+    </div>
+  </div>
+}

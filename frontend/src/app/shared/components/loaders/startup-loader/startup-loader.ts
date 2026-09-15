@@ -104,3 +104,33 @@ export class StartupLoader implements OnInit, OnDestroy {
     if (this.exitFallback) clearTimeout(this.exitFallback);
   }
 }
+
+// private startExit(): void {
+//   this.isExiting.set(true);
+
+//   const content = this.elRef.nativeElement.querySelector('.loader-content');
+//   const fallback = setTimeout(() => this.loaderService.hideStartup(), 1000);
+//   content?.addEventListener(
+//     'animationend',
+//     () => {
+//       clearTimeout(fallback);
+//       this.loaderService.hideStartup();
+//     },
+//     { once: true },
+//   );
+// }
+
+//////////////////////////
+// private startExit(): void {
+//   this.isExiting.set(true);
+
+//   const content = this.elRef.nativeElement.querySelector('.loader-content');
+//   content?.addEventListener(
+//     'animationend',
+//     () => {
+//       sessionStorage.setItem('hasVisited', 'true');
+//       this.loaderService.hideStartup();
+//     },
+//     { once: true },
+//   );
+// }

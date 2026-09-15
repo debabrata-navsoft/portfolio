@@ -9,13 +9,13 @@ import { LoaderService } from '../../../../core/services/loader.service';
 import { Error } from '../../../../shared/components/error/error';
 import { ProjectForm } from '../../../../models/project.model';
 import { DatePicker } from '../../../../shared/components/date-picker/date-picker';
-import { FormatTextPipe } from '../../../../pipes/format-text.pipe';
-import { CodeCopyDirective } from '../../../../shared/directives/code-copy.directive';
+import { MarkdownToolbar } from '../../../../shared/components/markdown-toolbar/markdown-toolbar';
+import { MarkdownPreview } from '../../../../shared/components/markdown-preview/markdown-preview';
 
 @Component({
   selector: 'app-admin-project-form',
   standalone: true,
-  imports: [LucideAngularModule, DatePicker, FormatTextPipe, CodeCopyDirective, Error],
+  imports: [LucideAngularModule, DatePicker, MarkdownToolbar, MarkdownPreview, Error],
   templateUrl: './admin-project-form.html',
   styleUrl: './admin-project-form.css',
 })
@@ -316,52 +316,6 @@ export class AdminProjectForm implements OnInit {
     this.destroyRef.onDestroy(() => {
       projectSub.unsubscribe();
     });
-  }
-
-  applyFormat(field: 'overview' | 'description', format: 'bold' | 'italic' | 'code') {
-    const inputId = field === 'overview' ? 'projectOverviewInput' : 'projectDescriptionInput';
-    const el = document.getElementById(inputId) as HTMLInputElement | HTMLTextAreaElement | null;
-    if (!el) return;
-
-    const start = el.selectionStart ?? 0;
-    const end = el.selectionEnd ?? 0;
-    const currentVal = this.projects()[field] || '';
-    const selectedText = currentVal.substring(start, end);
-
-    let prefix = '';
-    let suffix = '';
-    let fallbackText = '';
-
-    if (format === 'bold') {
-      prefix = '**';
-      suffix = '**';
-      fallbackText = 'bold text';
-    } else if (format === 'italic') {
-      prefix = '*';
-      suffix = '*';
-      fallbackText = 'italic text';
-    } else if (format === 'code') {
-      prefix = '`';
-      suffix = '`';
-      fallbackText = 'code';
-    }
-
-    const insertedContent = selectedText
-      ? `${prefix}${selectedText}${suffix}`
-      : `${prefix}${fallbackText}${suffix}`;
-
-    const updatedText =
-      currentVal.substring(0, start) + insertedContent + currentVal.substring(end);
-    this.updateField(field, updatedText);
-
-    setTimeout(() => {
-      el.focus();
-      if (selectedText) {
-        el.setSelectionRange(start, start + insertedContent.length);
-      } else {
-        el.setSelectionRange(start + prefix.length, start + prefix.length + fallbackText.length);
-      }
-    }, 10);
   }
 
   onCancel() {

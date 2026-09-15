@@ -96,3 +96,45 @@ export class HomeProjects implements OnInit {
     this.emblaApi?.scrollNext();
   }
 }
+
+// import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+// import { ProjectService } from '../../../core/services/project.service';
+// import { Router } from '@angular/router';
+// import { ProjectResponse } from '../../../models/project.model';
+// import { CustomButton } from '../custom-button/custom-button';
+// import { GradientText } from '../../animation/gradient-text/gradient-text';
+
+// @Component({
+//   selector: 'app-home-projects',
+//   standalone: true,
+//   imports: [CustomButton, GradientText],
+//   templateUrl: './home-projects.html',
+//   styleUrl: './home-projects.css',
+// })
+// export class HomeProjects implements OnInit {
+//   private projectService = inject(ProjectService);
+//   private destroyRef = inject(DestroyRef);
+//   private router = inject(Router);
+
+//   projects = signal<ProjectResponse[]>([]);
+
+//   ngOnInit(): void {
+//     const projectSub = this.projectService.getProjects().subscribe({
+//       next: (res) => {
+//         this.projects.set(res);
+//       },
+
+//       error: (err) => {
+//         console.log(err.message);
+//       },
+//     });
+
+//     this.destroyRef.onDestroy(() => {
+//       projectSub.unsubscribe();
+//     });
+//   }
+
+//   viewProject(slug: string) {
+//     this.router.navigate(['/projects', slug]);
+//   }
+// }

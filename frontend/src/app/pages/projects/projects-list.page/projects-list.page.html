@@ -57,28 +57,34 @@
               'xl:-left-100': i % 2 !== 0,
             }"
           >
-            <div class="flex flex-wrap items-center justify-between gap-2">
-              <app-gradient-text
-                tagName="h6"
-                [text]="project.category | uppercase"
-                className="text-[14px] font-bold tracking-[4px] md:text-lg"
-              />
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div
+                class="flex flex-wrap items-center gap-2.5 text-xs md:text-sm font-semibold uppercase tracking-[3px]"
+              >
+                <app-gradient-text
+                  tagName="span"
+                  [text]="project.category | uppercase"
+                  className="font-bold tracking-[3px]"
+                />
 
-              <app-gradient-text
-                tagName="h6"
-                [text]="'Created At: ' + (project.createdAt | timeAgo)"
-                [gradient]="false"
-                className="text-[10px] font-bold tracking-[2px] md:tracking-[4px] uppercase text-white"
-              />
+                @if (project.projectDate) {
+                  <span class="text-white/40 font-normal">•</span>
+                  <span class="text-xs font-semibold tracking-[2px] text-white/70">
+                    {{ project.projectDate | date: 'dd MMM yyyy' }}
+                  </span>
+                }
+              </div>
+
+              @if (project.createdAt) {
+                <span class="text-[11px] font-medium tracking-[1.5px] uppercase text-white/50">
+                  {{ project.createdAt | timeAgo }}
+                </span>
+              }
             </div>
 
-            <app-gradient-text
-              tagName="h6"
-              [text]="(project.projectDate | date: 'dd MMM yyyy') ?? ''"
-              className="mt-2 text-[10px] font-bold tracking-[2px] md:tracking-[4px] uppercase md:text-sm"
-            />
-
-            <h2 class="my-4 text-2xl font-bold leading-none text-white md:my-7 md:text-5xl">
+            <h2
+              class="my-4 text-2xl font-bold leading-tight text-white md:my-6 md:text-4xl lg:text-5xl"
+            >
               {{ project.title }}
             </h2>
 
@@ -142,4 +148,3 @@
     (cleared)="onClearFilters()"
   />
 }
-

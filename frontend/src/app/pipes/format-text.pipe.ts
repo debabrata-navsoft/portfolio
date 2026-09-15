@@ -29,7 +29,7 @@ const codeBlock = (code: string, lang: string): string =>
   [
     '<div class="code-block">',
     '<div class="code-block-bar">',
-    `<span class="code-block-lang">${escapeHtml(lang)}</span>`,
+    `<span class="code-block-lang">${escapeHtml(lang || 'code')}</span>`,
     '<button type="button" class="code-copy" title="Copy code">',
     COPY_ICON,
     '<span class="code-copy-label">Copy</span>',

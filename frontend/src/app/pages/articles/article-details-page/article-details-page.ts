@@ -14,6 +14,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { ArticleService } from '../../../core/services/article.service';
 import { LoaderService } from '../../../core/services/loader.service';
 import { SnackBarService } from '../../../core/services/snack-bar.service';
+import { ImageModal } from '../../../shared/components/image-modal/image-modal';
 import { ArticleResponse } from '../../../models/article.model';
 import { Error } from '../../../shared/components/error/error';
 import { TimeAgoPipe } from '../../../pipes/time-ago.pipe';
@@ -34,6 +35,7 @@ import { RevealDirective } from '../../../shared/directives/reveal.directive';
     GradientText,
     LucideAngularModule,
     RevealDirective,
+    ImageModal,
   ],
   templateUrl: './article-details-page.html',
   styleUrl: './article-details-page.css',
@@ -50,7 +52,7 @@ export class ArticleDetailsPage implements OnInit {
 
   articles = signal<ArticleResponse | null>(null);
   isErrorMsg = signal(false);
-  imagePopup = signal(false);
+  isImageModalOpen = signal(false);
 
   ngOnInit(): void {
     const articleSub = this.route.paramMap

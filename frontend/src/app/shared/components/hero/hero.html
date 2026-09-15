@@ -14,7 +14,10 @@
       <span class="font-semibold text-gray-700 dark:text-gray-400">
         {{ profileContent().introduction }}
       </span>
-      <span class="hero-content" [innerHTML]="' ' + profileContent().profileDescription"></span>
+      <span
+        class="hero-content"
+        [innerHTML]="' ' + profileContent().profileDescription | formatText"
+      ></span>
     </p>
 
     <!-- Buttons -->

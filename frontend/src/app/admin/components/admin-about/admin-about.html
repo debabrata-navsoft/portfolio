@@ -70,12 +70,20 @@
 
       <!-- Description -->
       <div class="mb-6">
-        <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-700">
-          Description / Bio <span class="text-red-500">*</span>
-        </label>
+        <div class="mb-1.5 flex flex-wrap items-center justify-between gap-2">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-gray-700">
+            Description / Bio <span class="text-red-500">*</span>
+          </label>
+          <app-markdown-toolbar
+            targetId="aboutDescriptionInput"
+            [value]="aboutForm().description"
+            (valueChange)="updateField('description', $event)"
+          />
+        </div>
         <textarea
+          id="aboutDescriptionInput"
           rows="8"
-          placeholder="Write about yourself, your skills, experience, and passions..."
+          placeholder="Hello! I'm **Debabrata Das**, a passionate developer..."
           [value]="aboutForm().description"
           (input)="updateField('description', $any($event.target).value)"
           (blur)="markTouched('description')"
@@ -85,6 +93,7 @@
         @if (isFieldInvalid('description')) {
           <p class="mt-1 text-xs font-medium text-red-500">Description / Bio is required</p>
         }
+        <app-markdown-preview [value]="aboutForm().description" label="Bio Preview" />
       </div>
 
       <!-- Email & Location Grid -->

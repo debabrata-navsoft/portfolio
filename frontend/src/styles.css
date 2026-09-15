@@ -459,7 +459,8 @@ app-admin-login {
   margin: 1.25rem 0;
   border: 1px solid #1f2937;
   border-radius: 0.75rem;
-  background-color: #0f172a;
+  background-color: #080c16;
+  /* background-color: #0f172a; */
   text-align: left;
 }
 
