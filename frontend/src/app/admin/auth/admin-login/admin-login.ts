@@ -1,12 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { LucideAngularModule } from 'lucide-angular';
 
 import { AdminService } from '../../../core/services/admin.service';
 
 @Component({
   selector: 'app-admin-login',
   standalone: true,
-  imports: [],
+  imports: [LucideAngularModule],
   templateUrl: './admin-login.html',
   styleUrl: './admin-login.css',
 })
@@ -16,6 +17,7 @@ export class AdminLogin {
 
   email = signal('');
   password = signal('');
+  showPassword = signal(false);
   isLoading = signal(false);
   errorMessage = signal('');
 
