@@ -10,8 +10,25 @@ export interface ArticleResponse {
   tags: string[];
   published: boolean;
   estimatedReadingTime: number;
+  views: number;
+  likes: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ArticleViewResponse {
+  views: number;
+}
+
+export interface ArticleLikeResponse {
+  likes: number;
+  liked: boolean;
+}
+
+export interface ArticleStatsResponse {
+  message: string;
+  views: number;
+  likes: number;
 }
 
 export interface ArticleListFilters {

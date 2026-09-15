@@ -62,6 +62,7 @@ Every resource is exactly three files with matching names; **follow this when ad
 | articles | `/api/articles` | [article.route.js](backend/routes/article.route.js) | [article.controller.js](backend/controllers/article.controller.js) | [article.model.js](backend/models/article.model.js) |
 | contacts | `/api/contacts` | [contact.route.js](backend/routes/contact.route.js) | [contact.controller.js](backend/controllers/contact.controller.js) | [contact.model.js](backend/models/contact.model.js) |
 | faqs | `/api/faqs` | [faq.routes.js](backend/routes/faq.routes.js) | [faq.controller.js](backend/controllers/faq.controller.js) | [faq.model.js](backend/models/faq.model.js) |
+| comments | `/api/comments` | [comment.route.js](backend/routes/comment.route.js) | [comment.controller.js](backend/controllers/comment.controller.js) | [comment.model.js](backend/models/comment.model.js) |
 
 [backend/routes/upload.route.js](backend/routes/upload.route.js) and
 [upload.controller.js](backend/controllers/upload.controller.js) are **fully commented out and
@@ -78,7 +79,10 @@ unmounted** — uploads happen inline on each resource route. Ignore them.
 - **Experience** `company, role, years` · **Education** `school, degree, years`
 - **Project** `title, slug, projectDate, overview, description, category, projectCardImage,
   image, technologies[], liveUrl, githubUrl`
-- **Article** `title, slug, excerpt, content, image, tags[], published, estimatedReadingTime`
+- **Article** `title, slug, excerpt, content, image, tags[], published, estimatedReadingTime,
+  views, likes` (the last two are counters, never edited in the article form)
+- **Comment** `article` (ref Article), `parent` (ref Comment, `null` for a top-level comment),
+  `name, email, message, isAuthor`
 - **Contact** `firstName, lastName, email, subject, message, isRead`
 - **FAQ** `question, answer, isActive, order`
 
@@ -114,6 +118,52 @@ use `.single("image")`.
 - Contact form: `createContact` is public and fires
   [sendContactMail](backend/utils/emails/sendMail.js) (nodemailer, templates in
   [emailTemplates.js](backend/utils/emails/emailTemplates.js)) to `EMAIL_USER`.
+
+### Article engagement (views, likes, comments)
+
+Readers have no accounts, so everything here is anonymous and public:
+
+- `POST /api/articles/:slug/view` (`registerArticleView`) `$inc`s `views` and answers
+  `{ views }`. The public page fires it **browser-only** (an SSR render must not count a read)
+  and only once per article per browser — the slugs already counted are kept in `localStorage`
+  under `viewedArticles`, otherwise every refresh inflates the number.
+- `POST /api/articles/:slug/like` (`toggleArticleLike`) takes `{ liked: boolean }`, `$inc`s by
+  ±1 and floors the counter at 0. "Who liked what" lives only in the visitor's `localStorage`
+  (`likedArticles`), so likes are per-browser, not per-person.
+- `POST /api/articles/:slug/reset-stats` (`resetArticleStats`, **`protectAdmin`**) zeroes both
+  counters — `{ views: false }` / `{ likes: false }` in the body keeps one of them. It backs the
+  "Clear" button on the admin article detail page. Visitors' `likedArticles` entries survive the
+  reset, so a reader who liked before can only unlike (floored at 0) afterwards.
+- Comments: `GET /api/comments?article=<id|slug>` returns `{ items, total }` where `items` is a
+  **thread** — top-level comments each carrying a `replies[]` array (`buildThread`). The query
+  sorts oldest-first so replies read in order, then `buildThread` reverses the top level so the
+  newest comment leads. Without the
+  param it returns every comment, newest first, with `article` populated — that is the
+  moderation view, so it **401s unless the request carries an admin token**. `POST /` is public;
+  `PUT /:id` (edit the message) and `DELETE /:id` are `protectAdmin`, and the delete removes the
+  comment **and its replies**. Replies are capped at one level: replying to a reply re-parents to
+  its parent.
+- The commenter's email is **stripped from the response** (`withoutEmail`) unless the caller is
+  the admin — the form promises it is never shown, so it must not reach a reader's browser at
+  all, not merely go unrendered.
+- The "Author" badge needs **both** `isAuthor: true` in the body (sent only by
+  `<app-article-comments [isAdmin]="true">`) **and** a valid admin token (`adminFromRequest`) —
+  the flag alone buys nothing. Posting from the public page while logged into admin is therefore
+  an ordinary comment, and an author comment is stored under the **admin's own `name`**, which
+  overrides whatever name the client sent.
+- Comments post immediately — there is no approval queue.
+- **Live updates (socket.io).** [config/socket.js](backend/config/socket.js) attaches socket.io to
+  the HTTP server — `server.js` therefore wraps the app in `createServer(app)` and calls
+  `server.listen`, **not** `app.listen`; the socket CORS list is the same `allowedOrigins` array.
+  Create / update / delete each call `emitCommentsChanged(articleId)`, which broadcasts
+  `comments:changed` with `{ articleId }` (a no-op when sockets aren't running, so scripts and
+  tests can import the controller).
+  [socket.service.ts](frontend/src/app/core/services/socket.service.ts) holds one lazy
+  connection — `on<T>(event)` returns an Observable and yields nothing on the server, so SSR
+  never opens a socket. The URL is `environment.apiUrl` minus the trailing `/api`.
+  ⚠️ `<app-article-comments>` must be given the article **`_id`**, not the slug, or the event
+  won't match and the thread won't live-refresh. Live refreshes call `load(true)`, which skips
+  the loading skeleton so the list updates in place.
 
 ### Searchable list endpoints (projects, articles)
 
@@ -186,7 +236,8 @@ pick list before a template can use it.**
 ### Core ([app/core/](frontend/src/app/core/))
 
 - [services/](frontend/src/app/core/services/) — one root-provided service per API resource
-  (`about, admin, article, contact, education, experience, faq, profile, project, skills`).
+  (`about, admin, article, comment, contact, education, experience, faq, profile, project,
+  skills`).
   Uniform shape: `inject(HttpClient)`, `private apiUrl = ${environment.apiUrl}/<resource>`, thin
   methods returning `Observable<T>` typed by `app/models/`. **Add API calls here, never in
   components.** The non-HTTP services alongside them are `loader`, `snack-bar` and `admin-tab`.
@@ -250,7 +301,7 @@ pick list before a template can use it.**
   `articles/article-details-page`, `contact-page`.
 - **Shared widgets** — also in [app/shared/components/](frontend/src/app/shared/components/):
   `custom-button`, `custom-nav` (back/next nav), `gradient-text`, `list-toolbar`, `data-table`,
-  `date-picker`, `markdown-toolbar`, `markdown-preview`. Plus
+  `date-picker`, `markdown-toolbar`, `markdown-preview`, `article-comments`. Plus
   [shared/directives/reveal.directive.ts](frontend/src/app/shared/directives/reveal.directive.ts)
   (IntersectionObserver scroll-reveal) and
   [shared/animation/page.animations.ts](frontend/src/app/shared/animation/page.animations.ts).
@@ -263,6 +314,18 @@ pick list before a template can use it.**
   `document.getElementById`, so **the textarea needs that `id`**. `[showCode]="false"` drops the
   code button. `<app-markdown-preview [value]="…" label="…">` renders the `formatText` output
   under the field and hides itself when the value is empty.
+- **[article-comments](frontend/src/app/shared/components/article-comments/)** — the whole
+  comment UI (post box, thread, one level of replies) behind
+  `<app-article-comments [article]="<slug|id>">`. `[isAdmin]="true"` swaps to the light admin
+  palette, hides the name/email fields (the API stamps the signed-in admin's own name, so the
+  `'Author'` the client sends is only a validation placeholder) and shows Edit / Delete;
+  `[bare]="true"` drops the card chrome when the host already draws it. It emits
+  `countChange` so the page can label its own counter.
+  - On the public article page it lives **inside a popup** opened by the comment chip. The
+    overlay stays in the DOM and is toggled with `[class.hidden]`, not `@if`, so the thread
+    loads with the page and the chip's count is right before anyone opens it.
+  - The chip is a `<button>` on purpose: a fragment link (`href="#comments"`) resolves against
+    `<base href="/">` and navigates to the home page.
 - **[data-table](frontend/src/app/shared/components/data-table/)** — the generic admin table
   (`<app-data-table>`), used by the projects / articles / faqs / contacts admin lists. It is
   **client-side**: it takes the full `rows` array and does its own search, filtering, sorting and
@@ -367,9 +430,11 @@ pick list before a template can use it.**
 - **z-index ladder** (all of it hand-rolled as Tailwind arbitrary/bare values in the templates,
   keep it in sync): admin header `40` (`admin-header.css`) → navbar `z-[999]`, its backdrop
   `z-[998]`, its mobile menu `z-[1000]` → filter-drawer backdrop `z-1300`, panel `z-1310` →
-  `.cdk-overlay-container` `1400` (raised in `styles.css` so datepicker popups and snack bars
-  clear the drawer) → api-loader `z-[9999]` / project-detail lightbox `z-[9999]`+`z-[10000]` /
-  startup-loader `z-[99999]`.
+  api-loader `z-[9999]` / article comments popup `z-[9999]` / project-detail lightbox
+  `z-[9999]`+`z-[10000]` → `.cdk-overlay-container` `20000` (raised in `styles.css` so snack bars
+  and datepicker popups clear the drawer **and** the full-screen overlays — a snack bar hidden
+  behind the comments popup is an error message the user never sees) → startup-loader
+  `z-[99999]`.
 
 ---
 
@@ -506,6 +571,10 @@ launch it once so it downloads SDK platform 36. `mobile:apk` writes
   server, `rm -rf frontend/.angular/cache`, start again.
 - Missing `protectAdmin` on the skills / experiences / educations / faqs / profile mutations
   (see §2).
+- The anonymous endpoints are **unthrottled**: `POST /api/comments` and the `view` / `like`
+  counters accept any number of calls from anyone, so a script can spam the thread or inflate
+  the numbers. There is no rate limit, captcha or approval queue — the admin can only delete
+  after the fact (and `reset-stats` zeroes the counters).
 - `data-table` renders no result counter — unlike the public `list-toolbar` there is no
   "Total N found" line, so the `label` input it used to carry was dead and has been removed.
 - `slider-view` is imported but commented out of `home.page.ts`'s `imports`, so it never renders.

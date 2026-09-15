@@ -45,7 +45,7 @@ export const getFAQById = async (req, res) => {
 export const updateFAQ = async (req, res) => {
   try {
     const faq = await FAQ.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+      returnDocument: "after",
     });
 
     res.status(200).json({

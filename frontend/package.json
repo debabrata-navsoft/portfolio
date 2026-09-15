@@ -53,6 +53,7 @@
     "lucide-angular": "^1.0.0",
     "postcss": "^8.5.16",
     "rxjs": "~7.8.0",
+    "socket.io-client": "^4.8.3",
     "tailwindcss": "^4.3.2",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

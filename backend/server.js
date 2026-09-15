@@ -1,7 +1,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { createServer } from "http";
 import { connectDB } from "./config/db.js";
+import { initSocket } from "./config/socket.js";
 import adminRoutes from "./routes/admin.route.js";
 import aboutRoutes from "./routes/about.route.js";
 import skillRoutes from "./routes/skills.route.js";
@@ -12,6 +14,7 @@ import projectRoutes from "./routes/project.route.js";
 import contactRoutes from "./routes/contact.route.js";
 import articleRoutes from "./routes/article.route.js";
 import faqRoutes from "./routes/faq.routes.js";
+import commentRoutes from "./routes/comment.route.js";
 
 dotenv.config();
 
@@ -59,12 +62,18 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/contacts", contactRoutes);
 app.use("/api/articles", articleRoutes);
 app.use("/api/faqs", faqRoutes);
+app.use("/api/comments", commentRoutes);
+
+// socket.io needs the raw HTTP server, so `app.listen` is replaced by this one.
+const server = createServer(app);
+
+initSocket(server, allowedOrigins);
 
 const startServer = async () => {
   try {
     await connectDB();
 
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   } catch (error) {

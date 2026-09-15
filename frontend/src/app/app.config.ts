@@ -77,6 +77,8 @@ import {
   ArrowUp,
   ArrowDown,
   ArrowUpDown,
+  Heart,
+  CornerDownRight,
 } from 'lucide-angular';
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -160,6 +162,8 @@ export const appConfig: ApplicationConfig = {
         ArrowUp,
         ArrowDown,
         ArrowUpDown,
+        Heart,
+        CornerDownRight,
       }),
     ),
   ],

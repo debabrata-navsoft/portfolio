@@ -22,6 +22,7 @@ import { ArticleResponse } from '../../../../models/article.model';
 import { Error } from '../../../../shared/components/error/error';
 import { FormatTextPipe } from '../../../../pipes/format-text.pipe';
 import { CodeCopyDirective } from '../../../../shared/directives/code-copy.directive';
+import { ArticleComments } from '../../../../shared/components/article-comments/article-comments';
 
 @Component({
   selector: 'app-admin-article-details',
@@ -35,6 +36,7 @@ import { CodeCopyDirective } from '../../../../shared/directives/code-copy.direc
     FormatTextPipe,
     CodeCopyDirective,
     ImageModal,
+    ArticleComments,
   ],
   templateUrl: './admin-article-details.html',
   styleUrl: './admin-article-details.css',
@@ -50,6 +52,8 @@ export class AdminArticleDetails implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   article = signal<ArticleResponse | null>(null);
+  commentCount = signal(0);
+  clearingStats = signal(false);
   isErrorMsg = signal(false);
   copiedSlug = signal(false);
   activeImage = signal<string | null>(null);
@@ -115,6 +119,36 @@ export class AdminArticleDetails implements OnInit {
         error: (err) => {
           this.loaderService.hideApi();
           this.snackBar.error(err.error?.message || 'Failed to delete article');
+        },
+      });
+  }
+
+  /** Wipes the view and like counters — there is no undo, so confirm first. */
+  clearStats(slug: string): void {
+    if (!confirm('Clear all views and likes for this article? This cannot be undone.')) return;
+
+    this.clearingStats.set(true);
+
+    this.articleService
+      .resetStats(slug)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.ngZone.run(() => {
+            this.article.update((current) =>
+              current ? { ...current, views: res.views, likes: res.likes } : current,
+            );
+            this.clearingStats.set(false);
+            this.snackBar.success(res.message);
+            this.cdr.detectChanges();
+          });
+        },
+        error: (err) => {
+          this.ngZone.run(() => {
+            this.clearingStats.set(false);
+            this.snackBar.error(err.error?.message || 'Failed to clear stats');
+            this.cdr.detectChanges();
+          });
         },
       });
   }

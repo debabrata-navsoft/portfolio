@@ -256,6 +256,45 @@
           </div>
 
           <div>
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400"
+                >Reader Engagement</span
+              >
+              @if (art.views || art.likes) {
+                <button
+                  type="button"
+                  (click)="clearStats(art.slug)"
+                  [disabled]="clearingStats()"
+                  class="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11px] font-bold text-red-600 transition hover:bg-red-50 hover:border-red-200 disabled:opacity-50 cursor-pointer"
+                  title="Reset views and likes to zero"
+                >
+                  <lucide-icon name="rotate-cw" [size]="11" />
+                  {{ clearingStats() ? 'Clearing...' : 'Clear' }}
+                </button>
+              }
+            </div>
+            <div class="mt-2 grid grid-cols-3 gap-2">
+              <div class="rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-center">
+                <lucide-icon name="eye" [size]="14" class="mx-auto mb-1 text-emerald-600" />
+                <p class="text-sm font-extrabold text-slate-900">{{ art.views || 0 }}</p>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Views</p>
+              </div>
+              <div class="rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-center">
+                <lucide-icon name="heart" [size]="14" class="mx-auto mb-1 text-rose-500" />
+                <p class="text-sm font-extrabold text-slate-900">{{ art.likes || 0 }}</p>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Likes</p>
+              </div>
+              <div class="rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-center">
+                <lucide-icon name="message-square" [size]="14" class="mx-auto mb-1 text-blue-600" />
+                <p class="text-sm font-extrabold text-slate-900">{{ commentCount() }}</p>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Comments
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div>
             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400"
               >Estimated Reading Time</span
             >
@@ -353,6 +392,13 @@
             <span>All Articles</span>
           </a>
         </div>
+
+        <!-- Reader Comments -->
+        <app-article-comments
+          [article]="art._id"
+          [isAdmin]="true"
+          (countChange)="commentCount.set($event)"
+        />
       </div>
     </div>
   </div>

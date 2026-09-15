@@ -244,8 +244,11 @@ body {
   opacity: 1;
 }
 
+/* Snack bars and datepicker popups must clear the filter drawer (1310), the
+   comments popup and the lightbox (9999 / 10000) — everything except the
+   startup loader (99999), which owns the screen on its own. */
 .cdk-overlay-container {
-  z-index: 1400 !important;
+  z-index: 20000 !important;
 }
 
 .dark-theme app-filter-drawer {

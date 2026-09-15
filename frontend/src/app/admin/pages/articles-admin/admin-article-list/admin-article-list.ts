@@ -41,6 +41,8 @@ export class AdminArticleList implements OnInit {
     { key: 'title', header: 'ARTICLE TITLE', cellClass: 'tbl-col-title' },
     { key: 'createdAt', header: 'DATE', type: 'date' },
     { key: 'tags', header: 'TAGS', type: 'tags' },
+    { key: 'views', header: 'VIEWS', align: 'center', value: (row) => `${row.views || 0}` },
+    { key: 'likes', header: 'LIKES', align: 'center', value: (row) => `${row.likes || 0}` },
     {
       key: 'published',
       header: 'STATUS',

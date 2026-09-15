@@ -158,7 +158,7 @@ export const updateSkill = async (req, res) => {
     }
 
     const skill = await Skill.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     });
 

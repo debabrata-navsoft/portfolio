@@ -5,11 +5,14 @@ import { map, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   ArticleApiResponse,
+  ArticleLikeResponse,
   ArticleListFilters,
   ArticleListResponse,
   ArticleQuery,
   ArticleResponse,
   ArticleSaveResponse,
+  ArticleStatsResponse,
+  ArticleViewResponse,
 } from '../../models/article.model';
 import { normalizeListResponse, toHttpParams } from '../../shared/filters/filter.utils';
 
@@ -47,6 +50,18 @@ export class ArticleService {
 
   getArticleBySlug(slug: string): Observable<ArticleResponse> {
     return this.http.get<ArticleResponse>(`${this.apiUrl}/${slug}`);
+  }
+
+  registerView(slug: string): Observable<ArticleViewResponse> {
+    return this.http.post<ArticleViewResponse>(`${this.apiUrl}/${slug}/view`, {});
+  }
+
+  toggleLike(slug: string, liked: boolean): Observable<ArticleLikeResponse> {
+    return this.http.post<ArticleLikeResponse>(`${this.apiUrl}/${slug}/like`, { liked });
+  }
+
+  resetStats(slug: string): Observable<ArticleStatsResponse> {
+    return this.http.post<ArticleStatsResponse>(`${this.apiUrl}/${slug}/reset-stats`, {});
   }
 
   updateArticle(id: string, formData: FormData): Observable<ArticleSaveResponse> {

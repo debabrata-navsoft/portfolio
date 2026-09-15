@@ -216,6 +216,59 @@ export const getArticles = async (req, res) => {
 //   }
 // };
 
+/** One place for the three counter endpoints: update by slug, 404 or answer. */
+const updateStats = async (req, res, update, reply) => {
+  try {
+    const article = await Article.findOneAndUpdate({ slug: req.params.slug }, update, {
+      returnDocument: "after",
+      // Mongoose 9 refuses an aggregation-pipeline update without this opt-in.
+      ...(Array.isArray(update) && { updatePipeline: true }),
+    }).select("views likes");
+
+    if (!article) {
+      return res.status(404).json({ message: "Article not found" });
+    }
+
+    res.json(reply(article));
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+/** Called once per reader when the article page opens. */
+export const registerArticleView = (req, res) =>
+  updateStats(req, res, { $inc: { views: 1 } }, (article) => ({ views: article.views }));
+
+/** `{ liked: true }` adds a like, `{ liked: false }` takes it back. */
+export const toggleArticleLike = (req, res) => {
+  const liked = req.body?.liked !== false;
+
+  // Pipeline update so a stale "unlike" is floored at 0 in the same atomic write.
+  return updateStats(
+    req,
+    res,
+    [{ $set: { likes: { $max: [0, { $add: [{ $ifNull: ["$likes", 0] }, liked ? 1 : -1] }] } } }],
+    (article) => ({ likes: article.likes, liked }),
+  );
+};
+
+/**
+ * Admin-only: wipe the engagement counters. `{ views: false }` / `{ likes: false }`
+ * keeps one of them; the default clears both.
+ */
+export const resetArticleStats = (req, res) => {
+  const reset = {};
+
+  if (req.body?.views !== false) reset.views = 0;
+  if (req.body?.likes !== false) reset.likes = 0;
+
+  return updateStats(req, res, reset, (article) => ({
+    message: "Article stats cleared successfully",
+    views: article.views,
+    likes: article.likes,
+  }));
+};
+
 export const getArticleBySlug = async (req, res) => {
   try {
     const article = await Article.findOne({

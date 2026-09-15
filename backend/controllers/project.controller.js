@@ -324,7 +324,7 @@ export const updateProject = async (req, res) => {
     }
 
     const project = await Project.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     });
 

@@ -101,6 +101,7 @@ Every API resource strictly follows a uniform 3-file pattern:
 | **Articles**         | `/api/articles`    | `backend/routes/article.route.js`    | `backend/controllers/article.controller.js`    | `backend/models/article.model.js`                    |
 | **Contacts**         | `/api/contacts`    | `backend/routes/contact.route.js`    | `backend/controllers/contact.controller.js`    | `backend/models/contact.model.js`                    |
 | **FAQs**             | `/api/faqs`        | `backend/routes/faq.routes.js`       | `backend/controllers/faq.controller.js`        | `backend/models/faq.model.js`                        |
+| **Comments**         | `/api/comments`    | `backend/routes/comment.route.js`    | `backend/controllers/comment.controller.js`    | `backend/models/comment.model.js`                    |
 
 ### Controller & Response Rules
 
@@ -109,6 +110,16 @@ Every API resource strictly follows a uniform 3-file pattern:
 - Singletons (`profile`, `about`): Single document retrieved with `findOne()`.
 - Search & Pagination Envelopes: `/api/projects` and `/api/articles` return `{ items: [...], total, page, limit, totalPages, filters: { ... } }`.
 - Multer Cloudinary storage writes to `portfolio/<resource>` folders.
+- Article engagement: `POST /api/articles/:slug/view` and `/like` bump the `views` / `likes`
+  counters (likes are remembered per browser in `localStorage`, not per user). Comments are
+  anonymous, publish immediately, and nest one level deep — `GET /api/comments?article=<id|slug>`
+  returns the thread (emails stripped for non-admin callers), `GET /api/comments` with no
+  article is the admin-only moderation list, and `PUT` / `DELETE /api/comments/:id` are
+  admin-only — the delete removes the comment's replies too.
+- Realtime: socket.io is attached to the HTTP server (`backend/config/socket.js`), so `server.js`
+  uses `createServer(app)` + `server.listen`. Comment writes broadcast `comments:changed`
+  `{ articleId }`; the Angular `SocketService` listens browser-only and the comments component
+  refetches when the id matches its own article.
 
 ---
 
