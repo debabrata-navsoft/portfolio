@@ -56,6 +56,7 @@ const COLUMN_CLASS: Partial<Record<TableColumnType, string>> = {
   index: 'tbl-col-index',
   image: 'tbl-col-image',
   date: 'tbl-col-date',
+  tags: 'tbl-col-tags',
 };
 
 const BADGE_VARIANTS: [RegExp, string][] = [

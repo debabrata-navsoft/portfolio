@@ -8,6 +8,8 @@ import { LoaderService } from '../../../../core/services/loader.service';
 import { Error } from '../../../../shared/components/error/error';
 import { DataTable } from '../../../../shared/components/data-table/data-table';
 import {
+  activeStatusColumn,
+  activeStatusFilter,
   deleteAction,
   editAction,
   TableAction,
@@ -48,11 +50,13 @@ export class AdminProjectList implements OnInit {
       value: (row) => row.category?.toUpperCase() || 'GENERAL',
     },
     { key: 'technologies', header: 'TECHNOLOGIES', type: 'tags' },
+    activeStatusColumn(),
   ];
 
   readonly filters: TableFilter<ProjectResponse>[] = [
     { key: 'category', label: 'Category' },
     { key: 'technologies', label: 'Technology' },
+    activeStatusFilter(),
     { key: 'projectDate', label: 'Project Date', type: 'date' },
     { key: 'createdAt', label: 'Created Date', type: 'date' },
   ];

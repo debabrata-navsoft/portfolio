@@ -1,4 +1,7 @@
 .admin-layout {
+  /* Contains absolutely positioned descendants (e.g. `sr-only` inputs) inside this 100vh box,
+     so they can never stretch the page and add a second scrollbar next to .admin-content's. */
+  position: relative;
   margin: 0;
   display: flex;
   flex-direction: column;

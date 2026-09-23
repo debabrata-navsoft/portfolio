@@ -79,7 +79,7 @@ unmounted** — uploads happen inline on each resource route. Ignore them.
   skills form, but **not displayed on the public site** — see §7)
 - **Experience** `company, role, years` · **Education** `school, degree, years`
 - **Project** `title, slug, projectDate, overview, description, category, projectCardImage,
-  image, technologies[], liveUrl, githubUrl`
+  image, technologies[], liveUrl, githubUrl, isActive` (missing on old docs = active)
 - **Article** `title, slug, excerpt, content, image, tags[], published, estimatedReadingTime,
   views, likes` (the last two are counters, never edited in the article form)
 - **Comment** `article` (ref Article), `parent` (ref Comment, `null` for a top-level comment),
@@ -228,6 +228,11 @@ and answer with an envelope, **not a bare array**:
   `getArticleBySlug(slug, true)` on the detail page — `?published=true` wins over the token, so
   SSR and the browser agree). The public detail page renders a 404 as an "Article not found"
   state, not the generic error; drafts are previewed from the admin article detail page.
+- **Inactive projects are admin-only**, the same way: `visibleScope` in
+  [project.controller.js](backend/controllers/project.controller.js) (both controllers wrap the
+  shared `visibilityScope(req, param, visible, hidden)` from `auth.middleware.js`) forces
+  `isActive: { $ne: false }` without an admin token or with `?active=true` (sent by home,
+  the list page and the detail page), so projects saved before the field existed stay visible.
 - **No `limit` means no pagination** (all rows), which is what the un-paged callers rely on.
   `countOnly=true` skips the documents and facets and returns just `total` — it backs the
   "Total Results" preview in the filter drawer.
@@ -378,7 +383,8 @@ pick list before a template can use it.**
     as the reference.
   - [data-table.model.ts](frontend/src/app/shared/components/data-table/data-table.model.ts) holds
     the types plus the `viewAction()` / `editAction()` / `deleteAction()` factories every list
-    reuses. Built-in column `type`s: `index, text, image, date, timeAgo, badge, tags, progress`.
+    reuses, and `activeStatusColumn()` / `activeStatusFilter()` for any row with an `isActive`
+    flag (FAQs, projects). Built-in column `type`s: `index, text, image, date, timeAgo, badge, tags, progress`.
   - The template iterates `viewColumns()`, **not** `columns()` — a `computed()` that resolves each
     column's `type`, `sortable` flag and `<th>`/`<td>` class strings once. The app runs on zone
     change detection, so keep per-cell work out of the template and put it there instead.

@@ -43,9 +43,16 @@ th.cursor-pointer {
   min-width: 10rem;
 }
 
+/* Wide enough that a full answer reads in a few lines; on a phone the table scrolls sideways */
 .tbl-col-answer {
-  min-width: 20rem;
+  min-width: 38rem;
   color: #4b5563;
+}
+
+/* Tag lists (project technologies, article tags): enough room for a few tags per line,
+   so a squeezed table doesn't stack them one per row */
+.tbl-col-tags {
+  min-width: 14rem;
 }
 
 .tbl-col-status {
@@ -103,6 +110,7 @@ th.cursor-pointer {
 
 /* Table Tag Styles */
 .tbl-tag {
+  white-space: nowrap;
   border-radius: 0.375rem;
   padding: 0.125rem 0.5rem;
   font-size: 0.75rem;

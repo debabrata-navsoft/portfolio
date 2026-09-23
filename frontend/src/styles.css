@@ -81,6 +81,75 @@ body {
   scrollbar-width: thin;
 }
 
+/* On/off field: "Label [switch]" with the label and track turning green when on.
+   Markup: <label class="toggle-field"><span class="toggle-label">…</span>
+   <input type="checkbox" class="sr-only" /><span class="toggle-switch"></span></label> —
+   one <label>, so clicking the text toggles it and keyboard focus still works. */
+.toggle-field {
+  /* Anchors the `sr-only` (position: absolute) checkbox. Without it the checkbox is placed
+     against the page itself, at its spot deep inside the admin's scroll area, which stretches
+     the document and adds a second, outer scrollbar. */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-label {
+  font-size: 0.875rem;
+  color: #4b5563;
+  transition: color 150ms;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 1.375rem;
+  border-radius: 9999px;
+  background-color: #e5e7eb;
+  transition: background-color 150ms;
+}
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 0.125rem;
+  left: 0.125rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 1px solid #d1d5db;
+  border-radius: 9999px;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+  transition: transform 150ms;
+}
+
+input:checked + .toggle-switch {
+  background-color: #15803d;
+}
+
+input:checked + .toggle-switch::after {
+  transform: translateX(1.125rem);
+}
+
+input:focus-visible + .toggle-switch {
+  box-shadow: 0 0 0 3px rgb(21 128 61 / 0.25);
+}
+
+.toggle-field:has(input:checked) .toggle-label {
+  color: #15803d;
+}
+
+.toggle-help {
+  margin-top: 0.375rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
 /* input,
 textarea,
 select {

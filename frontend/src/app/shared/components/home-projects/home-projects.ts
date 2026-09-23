@@ -66,7 +66,7 @@ export class HomeProjects implements OnInit {
 
   ngOnInit(): void {
     this.loaderService.trackRequest();
-    const projectSub = this.projectService.getProjects().subscribe({
+    const projectSub = this.projectService.getProjects(true).subscribe({
       next: (res) => {
         this.projects.set(res);
         this.loaderService.completeRequest();

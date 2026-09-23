@@ -61,6 +61,13 @@ const projectSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+
+    // Inactive projects are hidden from the public site. Docs saved before this field existed
+    // have no value, so the visibility filter treats "missing" as active ($ne: false).
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true },
 );

@@ -13,6 +13,7 @@ export interface ProjectResponse {
   liveUrl?: string;
   githubUrl?: string;
   projectDate: string;
+  isActive?: boolean; // missing on projects saved before the field existed = active
   createdAt?: string;
   updatedAt?: string;
 }
@@ -31,6 +32,7 @@ export interface ProjectQuery extends ListQuery {
   technology?: string[];
   dateFrom?: string;
   dateTo?: string;
+  active?: boolean;
 }
 
 export interface ProjectSaveResponse {
@@ -52,6 +54,7 @@ export interface ProjectForm {
   technologies: string[];
   liveUrl: string;
   githubUrl: string;
+  isActive: boolean;
   projectCardImageFile: File | null;
   imageFile: File | null;
 }

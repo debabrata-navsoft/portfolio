@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import Admin from "../models/admin.model.js";
+import { isTrue } from "../utils/queryFilters.js";
 
 const protectAdmin = async (req, res, next) => {
   try {
@@ -56,6 +57,20 @@ export const adminFromToken = async (token) => {
   } catch {
     return null;
   }
+};
+
+/**
+ * Mongo filter for which docs a public read may return — drafts / inactive items are admin-only.
+ * `?<param>=true` wins even for the admin (the public pages send it, so SSR — which has no
+ * token — and the browser agree) and is checked first so those calls skip the token lookup.
+ * The admin may also ask for `?<param>=false` to get only the hidden ones.
+ */
+export const visibilityScope = async (req, param, visible, hidden) => {
+  const flag = req.query[param];
+
+  if (isTrue(flag) || !(await adminFromRequest(req))) return visible;
+
+  return flag === undefined ? {} : hidden;
 };
 
 export default protectAdmin;

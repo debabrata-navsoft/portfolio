@@ -376,28 +376,51 @@
         <app-markdown-preview [value]="projects().description" label="Description Preview" />
       </div>
 
-      <!-- Form Footer Buttons -->
-      <div class="flex items-center justify-end gap-3 border-t border-gray-100 pt-5">
-        <button
-          type="button"
-          (click)="onCancel()"
-          class="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-2xs hover:bg-gray-50 transition cursor-pointer"
-        >
-          Cancel
-        </button>
+      <!-- Form Footer: one right-hand column, status toggle above the actions, both
+           starting at the same left edge -->
+      <div class="flex justify-end border-t border-gray-200 pt-5">
+        <div class="flex flex-col gap-4">
+          <div>
+            <label class="toggle-field">
+              <span class="toggle-label">Active</span>
+              <input
+                type="checkbox"
+                role="switch"
+                class="sr-only"
+                [checked]="projects().isActive"
+                (change)="updateField('isActive', $any($event.target).checked)"
+              />
+              <span class="toggle-switch"></span>
+            </label>
+            <p class="toggle-help">
+              Active projects are shown on the website;<br />
+              inactive ones stay hidden.
+            </p>
+          </div>
 
-        <button
-          type="submit"
-          [disabled]="loading()"
-          class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
-        >
-          @if (loading()) {
-            <div
-              class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
-            ></div>
-          }
-          {{ loading() ? 'Saving...' : editingId() ? 'Update Project' : 'Create Project' }}
-        </button>
+          <div class="flex items-center justify-end gap-3">
+            <button
+              type="button"
+              (click)="onCancel()"
+              class="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-2xs hover:bg-gray-50 transition cursor-pointer"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              [disabled]="loading()"
+              class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+            >
+              @if (loading()) {
+                <div
+                  class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+                ></div>
+              }
+              {{ loading() ? 'Saving...' : editingId() ? 'Update Project' : 'Create Project' }}
+            </button>
+          </div>
+        </div>
       </div>
     </form>
   </div>

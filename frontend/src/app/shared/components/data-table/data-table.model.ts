@@ -1,12 +1,5 @@
 export type TableColumnType =
-  | 'index'
-  | 'text'
-  | 'image'
-  | 'date'
-  | 'timeAgo'
-  | 'badge'
-  | 'tags'
-  | 'progress';
+  'index' | 'text' | 'image' | 'date' | 'timeAgo' | 'badge' | 'tags' | 'progress';
 
 export type TableAlign = 'left' | 'center' | 'right';
 
@@ -79,6 +72,32 @@ export const deleteAction = (noun: string): TableAction => ({
   icon: 'trash-2',
   label: `Delete ${noun}`,
   class: 'bg-red-100 text-red-600 hover:bg-red-200',
+});
+
+type ActiveRow = { isActive?: boolean };
+
+// A missing flag counts as active (docs saved before the field existed).
+const isActiveRow = (row: ActiveRow) => row.isActive !== false;
+
+/** STATUS badge column (Active / Inactive) for rows with an `isActive` flag. */
+export const activeStatusColumn = <T extends ActiveRow>(): TableColumn<T> => ({
+  key: 'isActive',
+  header: 'STATUS',
+  type: 'badge',
+  align: 'center',
+  cellClass: 'tbl-col-status',
+  value: (row) => (isActiveRow(row) ? 'Active' : 'Inactive'),
+});
+
+/** The matching Status filter for the drawer. */
+export const activeStatusFilter = <T extends ActiveRow>(): TableFilter<T> => ({
+  key: 'isActive',
+  label: 'Status',
+  value: (row) => (isActiveRow(row) ? 'active' : 'inactive'),
+  options: [
+    { value: 'active', label: 'Active' },
+    { value: 'inactive', label: 'Inactive' },
+  ],
 });
 
 export interface TableFilterOption {

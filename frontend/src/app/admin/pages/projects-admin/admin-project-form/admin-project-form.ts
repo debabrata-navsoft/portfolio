@@ -66,6 +66,7 @@ export class AdminProjectForm implements OnInit {
     technologies: [],
     liveUrl: '',
     githubUrl: '',
+    isActive: true,
   });
 
   ngOnInit(): void {
@@ -100,6 +101,7 @@ export class AdminProjectForm implements OnInit {
             technologies: project.technologies || [],
             liveUrl: project.liveUrl || '',
             githubUrl: project.githubUrl || '',
+            isActive: project.isActive !== false,
           });
 
           this.imagePreview.set(project.image);
@@ -285,6 +287,7 @@ export class AdminProjectForm implements OnInit {
     formData.append('technologies', JSON.stringify(form.technologies));
     formData.append('liveUrl', form.liveUrl);
     formData.append('githubUrl', form.githubUrl);
+    formData.append('isActive', String(form.isActive));
 
     if (form.imageFile) {
       formData.append('image', form.imageFile);

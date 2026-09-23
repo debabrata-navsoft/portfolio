@@ -1,5 +1,5 @@
 import Article from "../models/article.model.js";
-import { adminFromRequest } from "../middleware/auth.middleware.js";
+import { visibilityScope } from "../middleware/auth.middleware.js";
 import { notify, unnotify } from "./notification.controller.js";
 import {
   anyOfRegex,
@@ -105,18 +105,8 @@ const buildArticleFilter = (query) => {
   return filter;
 };
 
-/**
- * Which articles the caller may read. Drafts are admin-only, and `?published=true` wins even
- * for the admin (the public pages send it, so SSR — which has no token — and the browser agree).
- * Checked first so those public calls skip the token lookup.
- */
-const visibleScope = async (req) => {
-  const { published } = req.query;
-
-  if (isTrue(published) || !(await adminFromRequest(req))) return { published: true };
-
-  return published === undefined ? {} : { published: false };
-};
+const visibleScope = (req) =>
+  visibilityScope(req, "published", { published: true }, { published: false });
 
 // `scope` (from visibleScope) keeps drafts out of a visitor's facet counts.
 const tagFacet = async (scope) => {

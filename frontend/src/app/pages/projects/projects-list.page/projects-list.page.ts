@@ -167,6 +167,7 @@ export class ProjectsListPage implements OnInit {
       dateTo: dateBound(selection, 'projectDate', 'to'),
       createdFrom: dateBound(selection, 'createdAt', 'from'),
       createdTo: dateBound(selection, 'createdAt', 'to'),
+      active: true, // hide inactive projects from a signed-in admin too
       page: this.pageIndex() + 1,
       limit: this.pageSize(),
     };

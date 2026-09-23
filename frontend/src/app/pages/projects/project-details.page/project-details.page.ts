@@ -87,7 +87,7 @@ export class ProjectDetailsPage implements OnInit {
           this.loaderService.showApi();
           this.project.set(null);
 
-          return this.projectService.getProjectBySlug(projectSlug);
+          return this.projectService.getProjectBySlug(projectSlug, true);
         }),
       )
       .subscribe({
@@ -108,7 +108,7 @@ export class ProjectDetailsPage implements OnInit {
         },
       });
 
-    const projectsSub = this.projectService.getProjects().subscribe({
+    const projectsSub = this.projectService.getProjects(true).subscribe({
       next: (res) => {
         this.ngZone.run(() => {
           this.projects.set(res);

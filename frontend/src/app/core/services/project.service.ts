@@ -25,8 +25,16 @@ export class ProjectService {
   }
 
   /** Every project, for callers that don't search / filter / paginate. */
-  getProjects(): Observable<ProjectResponse[]> {
-    return this.http.get<unknown>(this.apiUrl).pipe(map((res) => this.toListResponse(res).items));
+  /**
+   * Public callers pass `activeOnly` so inactive projects stay hidden even from the signed-in
+   * admin (the API hides them from everyone else regardless).
+   */
+  private activeParams = (activeOnly: boolean) => (activeOnly ? { active: 'true' } : undefined);
+
+  getProjects(activeOnly = false): Observable<ProjectResponse[]> {
+    return this.http
+      .get<unknown>(this.apiUrl, { params: this.activeParams(activeOnly) })
+      .pipe(map((res) => this.toListResponse(res).items));
   }
 
   /** Server-side search, filter, count and pagination + the filter facets. */
@@ -45,8 +53,10 @@ export class ProjectService {
     );
   }
 
-  getProjectBySlug(slug: string): Observable<ProjectResponse> {
-    return this.http.get<ProjectResponse>(`${this.apiUrl}/${slug}`);
+  getProjectBySlug(slug: string, activeOnly = false): Observable<ProjectResponse> {
+    return this.http.get<ProjectResponse>(`${this.apiUrl}/${slug}`, {
+      params: this.activeParams(activeOnly),
+    });
   }
 
   updateProject(id: string, formData: FormData): Observable<ProjectSaveResponse> {

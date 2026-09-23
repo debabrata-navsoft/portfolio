@@ -1,4 +1,5 @@
 import Project from "../models/project.model.js";
+import { visibilityScope } from "../middleware/auth.middleware.js";
 import {
   anyOfRegex,
   buildDateRange,
@@ -107,6 +108,8 @@ export const createProject = async (req, res) => {
       technologies: parsedTechnologies,
       liveUrl,
       githubUrl,
+      // FormData sends strings; anything but an explicit "false" keeps the default (active).
+      isActive: req.body.isActive !== "false",
     });
 
     res.status(201).json({
@@ -181,12 +184,18 @@ const buildProjectFilter = (query) => {
   return filter;
 };
 
+// `$ne: false` also matches projects saved before `isActive` existed.
+const visibleScope = (req) =>
+  visibilityScope(req, "active", { isActive: { $ne: false } }, { isActive: false });
+
 // Distinct values with counts, so the client can render the filter drawer
 // without holding the whole collection in memory.
-const distinctFacet = async (field, unwind = false) => {
+// `scope` (from visibleScope) keeps inactive projects out of a visitor's facet counts.
+const distinctFacet = async (field, scope, unwind = false) => {
   const trimmed = { $trim: { input: `$${field}` } };
 
   const rows = await Project.aggregate([
+    { $match: scope },
     ...(unwind ? [{ $unwind: `$${field}` }] : []),
     { $match: { [field]: { $nin: [null, ""] } } },
     {
@@ -204,7 +213,8 @@ const distinctFacet = async (field, unwind = false) => {
 
 export const getProjects = async (req, res) => {
   try {
-    const filter = buildProjectFilter(req.query);
+    const scope = await visibleScope(req);
+    const filter = { ...buildProjectFilter(req.query), ...scope };
     const { page, limit, skip } = parsePagination(req.query);
     const sort = parseSort(req.query, "createdAt", "desc");
 
@@ -228,8 +238,8 @@ export const getProjects = async (req, res) => {
     const [items, total, categories, technologies] = await Promise.all([
       projectQuery.exec(),
       Project.countDocuments(filter),
-      distinctFacet("category"),
-      distinctFacet("technologies", true),
+      distinctFacet("category", scope),
+      distinctFacet("technologies", scope, true),
     ]);
 
     res.json({
@@ -247,7 +257,7 @@ export const getProjects = async (req, res) => {
 
 export const getProjectBySlug = async (req, res) => {
   try {
-    const project = await Project.findOne({ slug: req.params.slug });
+    const project = await Project.findOne({ slug: req.params.slug, ...(await visibleScope(req)) });
 
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
@@ -295,6 +305,8 @@ export const updateProject = async (req, res) => {
       liveUrl,
       githubUrl,
     };
+
+    if (req.body.isActive !== undefined) updateData.isActive = isTrue(req.body.isActive);
 
     if (title) {
       updateData.slug = await createUniqueSlug(title, req.params.id);

@@ -8,6 +8,8 @@ import { SnackBarService } from '../../../../core/services/snack-bar.service';
 import { Error } from '../../../../shared/components/error/error';
 import { DataTable } from '../../../../shared/components/data-table/data-table';
 import {
+  activeStatusColumn,
+  activeStatusFilter,
   deleteAction,
   editAction,
   TableAction,
@@ -38,27 +40,10 @@ export class AdminFaqList implements OnInit {
     { key: 'id', header: 'ID', type: 'index', align: 'center' },
     { key: 'question', header: 'QUESTION', cellClass: 'tbl-col-title tbl-col-question' },
     { key: 'answer', header: 'ANSWER', cellClass: 'tbl-col-answer' },
-    {
-      key: 'isActive',
-      header: 'STATUS',
-      type: 'badge',
-      align: 'center',
-      cellClass: 'tbl-col-status',
-      value: (row) => (row.isActive ? 'Active' : 'Inactive'),
-    },
+    activeStatusColumn(),
   ];
 
-  readonly filters: TableFilter<FAQResponse>[] = [
-    {
-      key: 'isActive',
-      label: 'Status',
-      value: (row) => (row.isActive ? 'active' : 'inactive'),
-      options: [
-        { value: 'active', label: 'Active' },
-        { value: 'inactive', label: 'Inactive' },
-      ],
-    },
-  ];
+  readonly filters: TableFilter<FAQResponse>[] = [activeStatusFilter()];
 
   readonly actions: TableAction<FAQResponse>[] = [editAction('FAQ'), deleteAction('FAQ')];
 
