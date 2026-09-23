@@ -1,4 +1,13 @@
-@if (isErrorMsg()) {
+@if (isNotFound()) {
+  <section class="mx-auto max-w-3xl px-5 py-16">
+    <app-error
+      title="Article not found"
+      message="This article doesn't exist or hasn't been published yet."
+      [showRetry]="false"
+      [showHome]="true"
+    />
+  </section>
+} @else if (isErrorMsg()) {
   <app-error />
 } @else if (articles()) {
   <section class="py-10 md:py-16">

@@ -28,7 +28,7 @@ export class HomeArticles {
 
   ngOnInit(): void {
     this.loaderService.trackRequest();
-    const articleSub = this.articleService.getArticles().subscribe({
+    const articleSub = this.articleService.getArticles(true).subscribe({
       next: (res) => {
         this.articles.set(
           [...res]

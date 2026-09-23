@@ -36,4 +36,21 @@ const protectAdmin = async (req, res, next) => {
   }
 };
 
+/**
+ * Soft version of protectAdmin for public routes: resolves to the admin when the request
+ * carries a valid token, otherwise null — it never rejects the request.
+ */
+export const adminFromRequest = async (req) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader?.startsWith("Bearer ")) return null;
+
+  try {
+    const decoded = jwt.verify(authHeader.split(" ")[1], process.env.JWT_SECRET);
+    return await Admin.findById(decoded.id).select("_id name");
+  } catch {
+    return null;
+  }
+};
+
 export default protectAdmin;

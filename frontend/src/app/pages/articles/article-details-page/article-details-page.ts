@@ -61,6 +61,7 @@ export class ArticleDetailsPage implements OnInit {
 
   articles = signal<ArticleResponse | null>(null);
   isErrorMsg = signal(false);
+  isNotFound = signal(false);
   isImageModalOpen = signal(false);
   isCommentsOpen = signal(false);
 
@@ -79,7 +80,7 @@ export class ArticleDetailsPage implements OnInit {
 
           this.articles.set(null);
           this.loaderService.showApi();
-          return this.articleService.getArticleBySlug(blogSlug);
+          return this.articleService.getArticleBySlug(blogSlug, true);
         }),
       )
       .subscribe({
@@ -100,8 +101,15 @@ export class ArticleDetailsPage implements OnInit {
 
         error: (err) => {
           this.inZone(() => {
-            this.isErrorMsg.set(true);
             this.loaderService.hideApi();
+
+            // A 404 is a missing or unpublished article, not a failure — the page says so itself.
+            if (err.status === 404) {
+              this.isNotFound.set(true);
+              return;
+            }
+
+            this.isErrorMsg.set(true);
             this.snackBarService.error(err.error?.message || 'Blog not Found');
           });
         },

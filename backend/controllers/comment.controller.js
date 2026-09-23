@@ -1,9 +1,8 @@
 import mongoose from "mongoose";
-import jwt from "jsonwebtoken";
 
 import Comment from "../models/comment.model.js";
 import Article from "../models/article.model.js";
-import Admin from "../models/admin.model.js";
+import { adminFromRequest } from "../middleware/auth.middleware.js";
 import { emitCommentsChanged } from "../config/socket.js";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -44,19 +43,6 @@ const buildThread = (comments) => {
 
 // The form promises the email is never shown, so it must not even reach a reader's browser.
 const withoutEmail = ({ email, ...comment }) => comment;
-
-const adminFromRequest = async (req) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader?.startsWith("Bearer ")) return null;
-
-  try {
-    const decoded = jwt.verify(authHeader.split(" ")[1], process.env.JWT_SECRET);
-    return await Admin.findById(decoded.id).select("_id name");
-  } catch {
-    return null;
-  }
-};
 
 export const getComments = async (req, res) => {
   try {

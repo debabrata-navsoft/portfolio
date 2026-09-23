@@ -190,6 +190,14 @@ and answer with an envelope, **not a bare array**:
 - Reading-time buckets (`under-3` / `3-6` / `over-6`) are the `READING_TIME_BUCKETS` constant at
   the top of [article.controller.js](backend/controllers/article.controller.js); the bucket
   `$or` is wrapped in `$and` so it cannot clash with the search `$or`.
+- **Drafts are admin-only.** Without an admin token (`adminFromRequest`, exported from
+  [auth.middleware.js](backend/middleware/auth.middleware.js)) `GET /api/articles` forces
+  `published: true` and `GET /api/articles/:slug` 404s on a draft; view/like don't count on
+  drafts. The public pages also send `published=true` themselves, so a signed-in admin browsing
+  the site doesn't see drafts either (`getArticles(true)` on home, `buildQuery` on the list,
+  `getArticleBySlug(slug, true)` on the detail page — `?published=true` wins over the token, so
+  SSR and the browser agree). The public detail page renders a 404 as an "Article not found"
+  state, not the generic error; drafts are previewed from the admin article detail page.
 - **No `limit` means no pagination** (all rows), which is what the un-paged callers rely on.
   `countOnly=true` skips the documents and facets and returns just `total` — it backs the
   "Total Results" preview in the filter drawer.

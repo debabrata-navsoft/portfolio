@@ -27,9 +27,18 @@ export class ArticleService {
     return this.http.post<ArticleSaveResponse>(this.apiUrl, formData);
   }
 
+  /**
+   * Public callers pass `publishedOnly` so drafts stay hidden even from the signed-in admin
+   * (the API hides them from everyone else regardless).
+   */
+  private publishedParams = (publishedOnly: boolean) =>
+    publishedOnly ? { published: 'true' } : undefined;
+
   /** Every article, for callers that don't search / filter / paginate. */
-  getArticles(): Observable<ArticleResponse[]> {
-    return this.http.get<unknown>(this.apiUrl).pipe(map((res) => this.toListResponse(res).items));
+  getArticles(publishedOnly = false): Observable<ArticleResponse[]> {
+    return this.http
+      .get<unknown>(this.apiUrl, { params: this.publishedParams(publishedOnly) })
+      .pipe(map((res) => this.toListResponse(res).items));
   }
 
   /** Server-side search, filter, count and pagination + the filter facets. */
@@ -48,8 +57,10 @@ export class ArticleService {
     );
   }
 
-  getArticleBySlug(slug: string): Observable<ArticleResponse> {
-    return this.http.get<ArticleResponse>(`${this.apiUrl}/${slug}`);
+  getArticleBySlug(slug: string, publishedOnly = false): Observable<ArticleResponse> {
+    return this.http.get<ArticleResponse>(`${this.apiUrl}/${slug}`, {
+      params: this.publishedParams(publishedOnly),
+    });
   }
 
   registerView(slug: string): Observable<ArticleViewResponse> {

@@ -1,4 +1,5 @@
 import Article from "../models/article.model.js";
+import { adminFromRequest } from "../middleware/auth.middleware.js";
 import {
   anyOfRegex,
   buildDateRange,
@@ -100,15 +101,28 @@ const buildArticleFilter = (query) => {
   const createdAt = buildDateRange(query.createdFrom, query.createdTo);
   if (createdAt) filter.createdAt = createdAt;
 
-  if (query.published !== undefined) filter.published = isTrue(query.published);
-
   return filter;
 };
 
-const tagFacet = async () => {
+/**
+ * Which articles the caller may read. Drafts are admin-only, and `?published=true` wins even
+ * for the admin (the public pages send it, so SSR — which has no token — and the browser agree).
+ * Checked first so those public calls skip the token lookup.
+ */
+const visibleScope = async (req) => {
+  const { published } = req.query;
+
+  if (isTrue(published) || !(await adminFromRequest(req))) return { published: true };
+
+  return published === undefined ? {} : { published: false };
+};
+
+// `scope` (from visibleScope) keeps drafts out of a visitor's facet counts.
+const tagFacet = async (scope) => {
   const trimmed = { $trim: { input: "$tags" } };
 
   const rows = await Article.aggregate([
+    { $match: scope },
     { $unwind: "$tags" },
     { $match: { tags: { $nin: [null, ""] } } },
     {
@@ -124,8 +138,9 @@ const tagFacet = async () => {
   return rows.map((row) => ({ value: row._id, label: row.label, count: row.count }));
 };
 
-const readingTimeFacet = async () => {
+const readingTimeFacet = async (scope) => {
   const rows = await Article.aggregate([
+    { $match: scope },
     {
       $group: {
         _id: {
@@ -153,7 +168,8 @@ const readingTimeFacet = async () => {
 
 export const getArticles = async (req, res) => {
   try {
-    const filter = buildArticleFilter(req.query);
+    const scope = await visibleScope(req);
+    const filter = { ...buildArticleFilter(req.query), ...scope };
     const { page, limit, skip } = parsePagination(req.query);
     const sort = parseSort(req.query, "createdAt", "desc");
 
@@ -177,8 +193,8 @@ export const getArticles = async (req, res) => {
     const [items, total, tags, readingTimes] = await Promise.all([
       articleQuery.exec(),
       Article.countDocuments(filter),
-      tagFacet(),
-      readingTimeFacet(),
+      tagFacet(scope),
+      readingTimeFacet(scope),
     ]);
 
     res.status(200).json({
@@ -219,7 +235,9 @@ export const getArticles = async (req, res) => {
 /** One place for the three counter endpoints: update by slug, 404 or answer. */
 const updateStats = async (req, res, update, reply) => {
   try {
-    const article = await Article.findOneAndUpdate({ slug: req.params.slug }, update, {
+    // Views / likes only count on published articles; the admin-only reset may touch drafts.
+    const match = { slug: req.params.slug, ...(!req.admin && { published: true }) };
+    const article = await Article.findOneAndUpdate(match, update, {
       returnDocument: "after",
       // Mongoose 9 refuses an aggregation-pipeline update without this opt-in.
       ...(Array.isArray(update) && { updatePipeline: true }),
@@ -271,9 +289,7 @@ export const resetArticleStats = (req, res) => {
 
 export const getArticleBySlug = async (req, res) => {
   try {
-    const article = await Article.findOne({
-      slug: req.params.slug,
-    });
+    const article = await Article.findOne({ slug: req.params.slug, ...(await visibleScope(req)) });
 
     if (!article) {
       return res.status(404).json({

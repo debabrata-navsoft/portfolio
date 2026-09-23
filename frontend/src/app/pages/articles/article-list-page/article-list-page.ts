@@ -159,6 +159,7 @@ export class ArticleListPage implements OnInit {
       readingTime: selectedValues(selection, 'readingTime'),
       createdFrom: dateBound(selection, 'createdAt', 'from'),
       createdTo: dateBound(selection, 'createdAt', 'to'),
+      published: true, // hide drafts from a signed-in admin too
       page: this.pageIndex() + 1,
       limit: this.pageSize(),
     };
