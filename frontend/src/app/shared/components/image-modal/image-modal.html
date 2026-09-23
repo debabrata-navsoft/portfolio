@@ -1,13 +1,14 @@
 @if (isOpen() && src()) {
   <div
-    class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 p-4 sm:p-6 backdrop-blur-md transition-all animate-in fade-in duration-200"
+    class="fixed inset-0 z-[99999] flex items-center justify-center overflow-hidden bg-black/90 p-4 sm:p-6 backdrop-blur-md transition-all animate-in fade-in duration-200"
     (click)="close()"
+    (wheel)="onWheel($event)"
   >
     <!-- Close Button -->
     <button
       type="button"
       (click)="close()"
-      class="fixed top-5 right-5 z-[100000] flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm border border-white/20 shadow-lg hover:bg-white/30 hover:scale-105 active:scale-95 transition"
+      class="modal-btn fixed top-5 right-5 z-[100000] h-11 w-11"
       title="Close preview (Esc)"
     >
       <lucide-icon name="x" [size]="24" />
@@ -15,14 +16,65 @@
 
     <!-- Modal Content -->
     <div
+      #frame
       (click)="$event.stopPropagation()"
       class="relative flex items-center justify-center max-h-[88vh] max-w-[92vw]"
     >
       <img
         [src]="src()!"
         [alt]="alt() || 'Fullscreen Image Preview'"
-        class="max-h-[88vh] max-w-[92vw] object-contain shadow-2xl ring-1 ring-white/10"
+        [style.transform]="transform()"
+        [class.is-max]="zoom() >= maxZoom"
+        [class.is-dragging]="isDragging()"
+        (dblclick)="toggleZoom($event)"
+        (pointerdown)="startDrag($event)"
+        (pointermove)="drag($event)"
+        (pointerup)="endDrag()"
+        (pointercancel)="endDrag()"
+        draggable="false"
+        class="modal-image max-h-[88vh] max-w-[92vw] object-contain shadow-2xl ring-1 ring-white/10"
       />
+    </div>
+
+    <!-- Zoom Controls -->
+    <div
+      (click)="$event.stopPropagation()"
+      class="fixed top-5 left-1/2 z-[100000] flex -translate-x-1/2 items-center gap-1 rounded-full border border-white/20 bg-white/15 p-1 shadow-lg backdrop-blur-sm"
+    >
+      <button
+        type="button"
+        (click)="zoomBy(-step)"
+        [disabled]="!isZoomed()"
+        class="modal-btn h-9 w-9"
+        title="Zoom out (-)"
+      >
+        <lucide-icon name="zoom-out" [size]="18" />
+      </button>
+
+      <!-- Steps are quarters, so this is always a whole percentage -->
+      <span class="w-14 select-none text-center text-xs font-semibold text-white">
+        {{ zoom() * 100 }}%
+      </span>
+
+      <button
+        type="button"
+        (click)="zoomBy(step)"
+        [disabled]="zoom() >= maxZoom"
+        class="modal-btn h-9 w-9"
+        title="Zoom in (+)"
+      >
+        <lucide-icon name="zoom-in" [size]="18" />
+      </button>
+
+      <button
+        type="button"
+        (click)="reset()"
+        [disabled]="!isZoomed()"
+        class="modal-btn h-9 w-9"
+        title="Reset zoom (0)"
+      >
+        <lucide-icon name="rotate-ccw" [size]="16" />
+      </button>
     </div>
   </div>
 }

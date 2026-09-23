@@ -1,3 +1,55 @@
 :host {
   display: contents;
 }
+
+/* Round glass buttons: close and the zoom controls */
+.modal-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  color: #fff;
+  cursor: pointer;
+  transition:
+    background-color 150ms,
+    transform 150ms,
+    opacity 150ms;
+}
+
+.modal-btn:hover:not(:disabled) {
+  background: rgb(255 255 255 / 0.25);
+}
+
+.modal-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.modal-btn:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+/* Close button carries its own glass background */
+.modal-btn.fixed {
+  border: 1px solid rgb(255 255 255 / 0.2);
+  background: rgb(255 255 255 / 0.15);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+}
+
+.modal-image {
+  cursor: zoom-in;
+  touch-action: none;
+  user-select: none;
+  transition: transform 200ms ease-out;
+}
+
+/* Magnifier stays on while zooming; at the max it flips to "zoom out" */
+.modal-image.is-max {
+  cursor: zoom-out;
+}
+
+/* No easing while dragging, or the image lags behind the pointer */
+.modal-image.is-dragging {
+  transition: none;
+}
