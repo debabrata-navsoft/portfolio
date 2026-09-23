@@ -460,11 +460,12 @@ app-admin-login {
    block has to render inside a `whitespace-pre-wrap`, transform-animated container. */
 .code-block {
   margin: 1.25rem 0;
-  border: 1px solid #1f2937;
-  border-radius: 0.75rem;
-  background-color: #080c16;
-  /* background-color: #0f172a; */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  /* border-radius: 0.75rem; */
+  background-color: #242831;
   text-align: left;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 .code-block-bar {
@@ -473,7 +474,8 @@ app-admin-login {
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.5rem 1rem;
-  border-bottom: 1px solid #1f2937;
+  background-color: rgba(18, 21, 28, 0.65);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .code-block-lang {
@@ -490,36 +492,94 @@ app-admin-login {
   align-items: center;
   gap: 0.375rem;
   padding: 0.25rem 0.5rem;
-  border: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0.375rem;
-  background-color: transparent;
+  background-color: rgba(255, 255, 255, 0.05);
   font-size: 11px;
   font-weight: 600;
   color: #cbd5e1;
   cursor: pointer;
   transition:
     background-color 0.2s,
+    border-color 0.2s,
     color 0.2s;
 }
 
 .code-copy:hover {
-  background-color: #1e293b;
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
   color: #f8fafc;
 }
 
 .code-block pre {
   margin: 0;
-  padding: 1rem;
-  overflow-x: auto;
+  padding: 1rem 1.25rem;
+  max-height: 30rem;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.35) transparent;
+}
+
+.code-block pre::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.code-block pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.code-block pre::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.35);
+  border-radius: 9999px;
+}
+
+.code-block pre::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.65);
 }
 
 .code-block code {
   display: block;
   white-space: pre;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
   font-size: 0.875rem;
-  line-height: 1.65;
-  color: #e5e7eb;
+  line-height: 1.7;
+  color: #abb2bf;
+}
+
+/* Syntax Highlighting */
+.code-block .hl-comment {
+  color: #e5a87b;
+  font-style: italic;
+}
+
+.code-block .hl-keyword {
+  color: #c678dd;
+  font-weight: 500;
+}
+
+.code-block .hl-directive {
+  color: #38bdf8;
+}
+
+.code-block .hl-function {
+  color: #61afef;
+}
+
+.code-block .hl-type {
+  color: #e5c07b;
+}
+
+.code-block .hl-string {
+  color: #98c379;
+}
+
+.code-block .hl-number {
+  color: #d19a66;
+}
+
+.code-block .hl-decorator {
+  color: #38bdf8;
 }
 
 /* Wrap instead of scrolling on phones: a nested scroll container is what WebKit

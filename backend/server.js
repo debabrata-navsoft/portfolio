@@ -27,14 +27,6 @@ app.use(express.json());
 const allowedOrigins = [
   process.env.CLIENT_URL,
   "http://localhost:4200",
-  // Capacitor packages the app with its own origin: Android serves it from
-  // https://localhost (androidScheme in frontend/capacitor.config.ts) and iOS
-  // from capacitor://localhost. Without these the mobile build gets CORS errors
-  // on every request.
-  "https://localhost",
-  "capacitor://localhost",
-  // Only needed if androidScheme is switched back to "http".
-  "http://localhost",
 ];
 
 app.use(
@@ -64,7 +56,6 @@ app.use("/api/articles", articleRoutes);
 app.use("/api/faqs", faqRoutes);
 app.use("/api/comments", commentRoutes);
 
-// socket.io needs the raw HTTP server, so `app.listen` is replaced by this one.
 const server = createServer(app);
 
 initSocket(server, allowedOrigins);
@@ -73,7 +64,7 @@ const startServer = async () => {
   try {
     await connectDB();
 
-    server.listen(PORT, () => {
+    app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   } catch (error) {

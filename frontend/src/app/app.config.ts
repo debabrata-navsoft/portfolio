@@ -11,7 +11,7 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth-interceptor';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { provideIonicAngular } from '@ionic/angular';
+// import { provideIonicAngular } from '@ionic/angular';
 
 import {
   LucideAngularModule,
@@ -95,7 +95,7 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(withEventReplay()),
     provideAnimationsAsync(),
 
-    provideIonicAngular(),
+    // provideIonicAngular(),
 
     provideHttpClient(withInterceptors([authInterceptor])),
 

@@ -25,6 +25,143 @@ const COPY_ICON =
 const escapeHtml = (value: string): string =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+const KEYWORDS = new Set([
+  'abstract',
+  'arguments',
+  'as',
+  'async',
+  'await',
+  'boolean',
+  'bool',
+  'break',
+  'byte',
+  'case',
+  'catch',
+  'char',
+  'class',
+  'const',
+  'continue',
+  'debugger',
+  'default',
+  'delete',
+  'do',
+  'double',
+  'else',
+  'enum',
+  'eval',
+  'export',
+  'extends',
+  'false',
+  'final',
+  'finally',
+  'float',
+  'for',
+  'from',
+  'function',
+  'goto',
+  'if',
+  'implements',
+  'import',
+  'in',
+  'instanceof',
+  'int',
+  'interface',
+  'let',
+  'long',
+  'native',
+  'new',
+  'null',
+  'number',
+  'package',
+  'private',
+  'protected',
+  'public',
+  'return',
+  'short',
+  'signed',
+  'sizeof',
+  'static',
+  'strictfp',
+  'string',
+  'struct',
+  'super',
+  'switch',
+  'synchronized',
+  'this',
+  'throw',
+  'throws',
+  'transient',
+  'true',
+  'try',
+  'typeof',
+  'typedef',
+  'typename',
+  'undefined',
+  'union',
+  'unsigned',
+  'using',
+  'var',
+  'void',
+  'volatile',
+  'while',
+  'with',
+  'yield',
+  'namespace',
+  'template',
+  'operator',
+  'nullptr',
+  'auto',
+  'override',
+  'virtual',
+  'val',
+  'fun',
+  'def',
+  'none',
+  'self',
+  'lambda',
+  'select',
+  'insert',
+  'update',
+  'where',
+  'table',
+  'into',
+  'values',
+  'create',
+  'drop',
+  'type',
+]);
+
+const highlightCode = (code: string): string => {
+  const pattern =
+    /(\/\*[\s\S]*?\*\/|\/\/[^\n]*)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)|(#(?:include|define|undef|ifdef|ifndef|endif|if|elif|else|pragma)\b[^\n]*)|(@[a-zA-Z_$][a-zA-Z0-9_$]*)|(\b\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b)|(\b[a-zA-Z_$][a-zA-Z0-9_$]*\b)|([<>&]+)/g;
+
+  return code.replace(
+    pattern,
+    (match, comment, str, directive, decorator, num, word, entity, offset, fullStr) => {
+      if (comment) return `<span class="hl-comment">${escapeHtml(comment)}</span>`;
+      if (str) return `<span class="hl-string">${escapeHtml(str)}</span>`;
+      if (directive) return `<span class="hl-directive">${escapeHtml(directive)}</span>`;
+      if (decorator) return `<span class="hl-decorator">${escapeHtml(decorator)}</span>`;
+      if (num) return `<span class="hl-number">${escapeHtml(num)}</span>`;
+      if (word) {
+        if (KEYWORDS.has(word.toLowerCase())) {
+          return `<span class="hl-keyword">${escapeHtml(word)}</span>`;
+        }
+        const rest = fullStr.slice(offset + match.length);
+        if (/^\s*\(/.test(rest)) {
+          return `<span class="hl-function">${escapeHtml(word)}</span>`;
+        }
+        if (/^[A-Z][a-zA-Z0-9_$]*$/.test(word)) {
+          return `<span class="hl-type">${escapeHtml(word)}</span>`;
+        }
+        return escapeHtml(word);
+      }
+      if (entity) return escapeHtml(entity);
+      return escapeHtml(match);
+    },
+  );
+};
+
 const codeBlock = (code: string, lang: string): string =>
   [
     '<div class="code-block">',
@@ -35,7 +172,7 @@ const codeBlock = (code: string, lang: string): string =>
     '<span class="code-copy-label">Copy</span>',
     '</button>',
     '</div>',
-    `<pre><code>${escapeHtml(code)}</code></pre>`,
+    `<pre><code>${highlightCode(code)}</code></pre>`,
     '</div>',
   ].join('');
 
