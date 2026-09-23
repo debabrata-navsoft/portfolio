@@ -69,7 +69,9 @@ export class FilterDrawer {
 
   draft = signal<FilterSelection>(emptyFilterSelection());
   datePresets = DATE_PRESETS;
-  private expanded = signal<Record<string, boolean>>({});
+  // Accordion: one group open at a time. `undefined` = untouched, so the first group starts open;
+  // `null` = the user closed every group.
+  private openGroup = signal<string | null | undefined>(undefined);
   private optionSearch = signal<Record<string, string>>({});
 
   constructor() {
@@ -101,12 +103,12 @@ export class FilterDrawer {
   }
 
   isExpanded(groupId: string): boolean {
-    return this.expanded()[groupId] ?? this.groups()[0]?.id === groupId;
+    const open = this.openGroup();
+    return (open === undefined ? this.groups()[0]?.id : open) === groupId;
   }
 
   toggleGroup(groupId: string): void {
-    const current = this.isExpanded(groupId);
-    this.expanded.update((state) => ({ ...state, [groupId]: !current }));
+    this.openGroup.set(this.isExpanded(groupId) ? null : groupId);
   }
 
   optionSearchTerm(groupId: string): string {
