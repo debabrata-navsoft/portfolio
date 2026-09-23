@@ -37,6 +37,22 @@ th.cursor-pointer {
   color: #111827;
 }
 
+/* Long-text column pair: a wide heading-style column next to a flexible body column */
+.tbl-col-question {
+  width: 25%;
+  min-width: 10rem;
+}
+
+.tbl-col-answer {
+  min-width: 20rem;
+  color: #4b5563;
+}
+
+.tbl-col-status {
+  width: 7rem;
+  white-space: nowrap;
+}
+
 /* Table Badge Styles */
 .tbl-badge {
   display: inline-block;

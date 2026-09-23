@@ -36,13 +36,14 @@ export class AdminFaqList implements OnInit {
 
   readonly columns: TableColumn<FAQResponse>[] = [
     { key: 'id', header: 'ID', type: 'index', align: 'center' },
-    { key: 'question', header: 'QUESTION', cellClass: 'tbl-col-title' },
-    { key: 'answer', header: 'ANSWER' },
+    { key: 'question', header: 'QUESTION', cellClass: 'tbl-col-title tbl-col-question' },
+    { key: 'answer', header: 'ANSWER', cellClass: 'tbl-col-answer' },
     {
       key: 'isActive',
       header: 'STATUS',
       type: 'badge',
       align: 'center',
+      cellClass: 'tbl-col-status',
       value: (row) => (row.isActive ? 'Active' : 'Inactive'),
     },
   ];
@@ -64,7 +65,7 @@ export class AdminFaqList implements OnInit {
   ngOnInit(): void {
     this.loaderService.showApi();
 
-    const faqSub = this.faqService.getFAQs().subscribe({
+    const faqSub = this.faqService.getFAQs(true).subscribe({
       next: (res) => {
         this.faqs.set([...res].sort((a, b) => (b.order ?? 0) - (a.order ?? 0)));
 

@@ -15,8 +15,10 @@ export class FaqService {
     return this.http.post<FAQSaveResponse>(this.apiUrl, data);
   }
 
-  getFAQs(): Observable<FAQResponse[]> {
-    return this.http.get<FAQResponse[]>(this.apiUrl);
+  // The API hides inactive FAQs unless `all=true` — admin screens need them too.
+  getFAQs(includeInactive = false): Observable<FAQResponse[]> {
+    const params = includeInactive ? { all: 'true' } : undefined;
+    return this.http.get<FAQResponse[]>(this.apiUrl, { params });
   }
 
   getFAQById(id: string): Observable<FAQResponse> {

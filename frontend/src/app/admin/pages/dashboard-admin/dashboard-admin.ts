@@ -230,7 +230,7 @@ export class DashboardAdmin implements OnInit {
       skills: this.guard(this.skillsService.getSkills(), []),
       experiences: this.guard(this.experienceService.getExperiences(), []),
       education: this.guard(this.educationService.getEducation(), []),
-      faqs: this.guard(this.faqService.getFAQs(), []),
+      faqs: this.guard(this.faqService.getFAQs(true), []),
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
