@@ -18,6 +18,7 @@ import {
   TableFilter,
   viewAction,
 } from '../../../../shared/components/data-table/data-table.model';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-admin-project-list',
@@ -29,6 +30,7 @@ import {
 })
 export class AdminProjectList implements OnInit {
   private projectService = inject(ProjectService);
+  private confirmDialog = inject(ConfirmDialogService);
   private router = inject(Router);
   private loaderService = inject(LoaderService);
   private snackBarService = inject(SnackBarService);
@@ -120,8 +122,13 @@ export class AdminProjectList implements OnInit {
     this.router.navigate(['/admin/projects/edit', slug]);
   }
 
-  deleteProject(id: string) {
-    if (confirm('Are you sure you want to delete this project?')) {
+  async deleteProject(id: string) {
+    if (
+      await this.confirmDialog.confirm({
+        title: 'Delete project?',
+        message: 'This project will be permanently deleted.',
+      })
+    ) {
       this.loaderService.showApi();
       const deleteSub = this.projectService.deleteProject(id).subscribe({
         next: () => {

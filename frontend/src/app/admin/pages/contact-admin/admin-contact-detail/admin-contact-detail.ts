@@ -19,6 +19,7 @@ import { LoaderService } from '../../../../core/services/loader.service';
 import { ContactResponse } from '../../../../models/contact.model';
 import { TimeAgoPipe } from '../../../../pipes/time-ago.pipe';
 import { Error } from '../../../../shared/components/error/error';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-admin-contact-detail',
@@ -29,6 +30,7 @@ import { Error } from '../../../../shared/components/error/error';
 })
 export class AdminContactDetail implements OnInit {
   private route = inject(ActivatedRoute);
+  private confirmDialog = inject(ConfirmDialogService);
   private router = inject(Router);
   private contactService = inject(ContactService);
   private snackBar = inject(SnackBarService);
@@ -105,15 +107,15 @@ export class AdminContactDetail implements OnInit {
     setTimeout(() => this.copiedMessage.set(false), 2000);
   }
 
-  deleteContact(): void {
+  async deleteContact(): Promise<void> {
     const current = this.contact();
-    if (
-      !current ||
-      !confirm(
-        `Are you sure you want to delete inquiry from "${current.firstName} ${current.lastName}"?`,
-      )
-    )
-      return;
+    if (!current) return;
+
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Delete inquiry?',
+      message: `The message from ${current.firstName} ${current.lastName} will be permanently deleted.`,
+    });
+    if (!confirmed) return;
 
     this.loaderService.showApi();
     this.contactService

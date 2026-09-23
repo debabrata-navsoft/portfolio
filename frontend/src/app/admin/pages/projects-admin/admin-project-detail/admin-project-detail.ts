@@ -21,6 +21,7 @@ import { ProjectResponse } from '../../../../models/project.model';
 import { Error } from '../../../../shared/components/error/error';
 import { FormatTextPipe } from '../../../../pipes/format-text.pipe';
 import { CodeCopyDirective } from '../../../../shared/directives/code-copy.directive';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-admin-project-detail',
@@ -40,6 +41,7 @@ import { CodeCopyDirective } from '../../../../shared/directives/code-copy.direc
 })
 export class AdminProjectDetail implements OnInit {
   private route = inject(ActivatedRoute);
+  private confirmDialog = inject(ConfirmDialogService);
   private router = inject(Router);
   private projectService = inject(ProjectService);
   private loaderService = inject(LoaderService);
@@ -92,9 +94,15 @@ export class AdminProjectDetail implements OnInit {
     setTimeout(() => this.copiedSlug.set(false), 2000);
   }
 
-  deleteProject(): void {
+  async deleteProject(): Promise<void> {
     const current = this.project();
-    if (!current || !confirm(`Are you sure you want to delete "${current.title}"?`)) return;
+    if (!current) return;
+
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Delete project?',
+      message: `"${current.title}" will be permanently deleted.`,
+    });
+    if (!confirmed) return;
 
     this.loaderService.showApi();
     this.projectService

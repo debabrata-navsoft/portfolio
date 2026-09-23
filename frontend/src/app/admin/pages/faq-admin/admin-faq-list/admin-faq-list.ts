@@ -17,6 +17,7 @@ import {
   TableColumn,
   TableFilter,
 } from '../../../../shared/components/data-table/data-table.model';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-admin-faq-list',
@@ -28,6 +29,7 @@ import {
 })
 export class AdminFaqList implements OnInit {
   private router = inject(Router);
+  private confirmDialog = inject(ConfirmDialogService);
   private faqService = inject(FaqService);
   private loaderService = inject(LoaderService);
   private snackBarService = inject(SnackBarService);
@@ -87,10 +89,14 @@ export class AdminFaqList implements OnInit {
     this.router.navigate(['/admin/faqs/edit', id]);
   }
 
-  deleteFAQ(id: string) {
-    const confirmed = confirm('Are you sure you want to delete this FAQ?');
-
-    if (!confirmed) return;
+  async deleteFAQ(id: string) {
+    if (
+      !(await this.confirmDialog.confirm({
+        title: 'Delete FAQ?',
+        message: 'This question and answer will be permanently deleted.',
+      }))
+    )
+      return;
 
     const sub = this.faqService.deleteFAQ(id).subscribe({
       next: (res) => {

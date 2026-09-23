@@ -9,11 +9,12 @@ import { LoaderService } from './core/services/loader.service';
 import { filter } from 'rxjs';
 import { ApiLoader } from './shared/components/loaders/api-loader/api-loader';
 import { StartupLoader } from './shared/components/loaders/startup-loader/startup-loader';
+import { ConfirmDialog } from './shared/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, Navbar, Footer, NgClass, ApiLoader, StartupLoader],
+  imports: [RouterOutlet, Navbar, Footer, NgClass, ApiLoader, StartupLoader, ConfirmDialog],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

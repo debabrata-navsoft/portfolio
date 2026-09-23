@@ -16,6 +16,7 @@ import {
   TableFilter,
   viewAction,
 } from '../../../../shared/components/data-table/data-table.model';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-admin-article-list',
@@ -27,6 +28,7 @@ import {
 })
 export class AdminArticleList implements OnInit {
   private router = inject(Router);
+  private confirmDialog = inject(ConfirmDialogService);
   private articleService = inject(ArticleService);
   private loaderService = inject(LoaderService);
   private snackBarService = inject(SnackBarService);
@@ -113,10 +115,14 @@ export class AdminArticleList implements OnInit {
     }
   }
 
-  deleteArticle(id: string) {
-    const confirmed = confirm('Are you sure you want to delete this Article?');
-
-    if (!confirmed) return;
+  async deleteArticle(id: string) {
+    if (
+      !(await this.confirmDialog.confirm({
+        title: 'Delete article?',
+        message: 'This article will be permanently deleted.',
+      }))
+    )
+      return;
 
     const deleteSub = this.articleService.deleteArticle(id).subscribe({
       next: (res) => {

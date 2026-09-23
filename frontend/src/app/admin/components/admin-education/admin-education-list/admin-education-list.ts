@@ -6,6 +6,7 @@ import { EducationResponse } from '../../../../models/education.model';
 import { AdminEducationForm } from '../admin-education-form/admin-education-form';
 import { AdminCard, AdminCardList } from '../../admin-card-list/admin-card-list';
 import { finalize } from 'rxjs';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-admin-education-list',
@@ -15,6 +16,7 @@ import { finalize } from 'rxjs';
 })
 export class AdminEducationList implements OnInit {
   private educationService = inject(EducationService);
+  private confirmDialog = inject(ConfirmDialogService);
   private snackBarService = inject(SnackBarService);
   private loaderService = inject(LoaderService);
   private destroyRef = inject(DestroyRef);
@@ -58,12 +60,14 @@ export class AdminEducationList implements OnInit {
     });
   }
 
-  deleteEducation(id: string) {
-    const confirmed = confirm('Are you sure delete this Education');
-
-    if (!confirmed) {
+  async deleteEducation(id: string) {
+    if (
+      !(await this.confirmDialog.confirm({
+        title: 'Delete education?',
+        message: 'This education entry will be removed from your profile.',
+      }))
+    )
       return;
-    }
 
     this.loaderService.showApi();
 

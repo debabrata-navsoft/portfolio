@@ -15,6 +15,7 @@ import {
   TableFilter,
   viewAction,
 } from '../../../../shared/components/data-table/data-table.model';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-admin-contact-list',
@@ -26,6 +27,7 @@ import {
 })
 export class AdminContactList implements OnInit {
   private contactService = inject(ContactService);
+  private confirmDialog = inject(ConfirmDialogService);
   private router = inject(Router);
   private loaderService = inject(LoaderService);
   private snackBarService = inject(SnackBarService);
@@ -107,10 +109,14 @@ export class AdminContactList implements OnInit {
     }
   }
 
-  deleteContact(id: string) {
-    const confirmed = confirm('Are you sure you want to delete this contact?');
-
-    if (!confirmed) return;
+  async deleteContact(id: string) {
+    if (
+      !(await this.confirmDialog.confirm({
+        title: 'Delete inquiry?',
+        message: 'This message will be permanently deleted.',
+      }))
+    )
+      return;
 
     const sub = this.contactService.deleteContact(id).subscribe({
       next: (res) => {

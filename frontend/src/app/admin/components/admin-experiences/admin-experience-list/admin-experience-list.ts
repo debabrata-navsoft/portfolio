@@ -6,6 +6,7 @@ import { ExperienceResponse } from '../../../../models/experience.model';
 import { AdminExperienceForm } from '../admin-experience-form/admin-experience-form';
 import { AdminCard, AdminCardList } from '../../admin-card-list/admin-card-list';
 import { finalize } from 'rxjs';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-admin-experience-list',
@@ -15,6 +16,7 @@ import { finalize } from 'rxjs';
 })
 export class AdminExperienceList implements OnInit {
   private experienceService = inject(ExperienceService);
+  private confirmDialog = inject(ConfirmDialogService);
   private destroyRef = inject(DestroyRef);
   private snackBarService = inject(SnackBarService);
   private loaderService = inject(LoaderService);
@@ -58,12 +60,14 @@ export class AdminExperienceList implements OnInit {
     });
   }
 
-  deleteExperience(id: string) {
-    const confirmed = confirm('Are you sure delete this Experience?');
-
-    if (!confirmed) {
+  async deleteExperience(id: string) {
+    if (
+      !(await this.confirmDialog.confirm({
+        title: 'Delete experience?',
+        message: 'This work experience will be removed from your profile.',
+      }))
+    )
       return;
-    }
 
     this.loaderService.showApi();
 

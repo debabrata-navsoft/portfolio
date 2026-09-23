@@ -1,0 +1,48 @@
+@if (service.dialog(); as dialog) {
+  <div
+    class="confirm-backdrop fixed inset-0 z-[19000] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+    (click)="service.close(false)"
+  >
+    <div
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="confirm-title"
+      aria-describedby="confirm-message"
+      (click)="$event.stopPropagation()"
+      class="confirm-panel w-full max-w-sm rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl"
+    >
+      <div class="flex items-start gap-4">
+        <span
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-100 text-rose-600"
+        >
+          <lucide-icon name="trash-2" [size]="18" />
+        </span>
+
+        <div class="min-w-0">
+          <h3 id="confirm-title" class="text-base font-bold text-gray-900">{{ dialog.title }}</h3>
+          <p id="confirm-message" class="mt-1 text-sm text-gray-500">{{ dialog.message }}</p>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end gap-3">
+        <button
+          type="button"
+          (click)="service.close(false)"
+          class="confirm-btn border border-gray-300 bg-white font-medium text-gray-700 hover:bg-gray-50"
+        >
+          Cancel
+        </button>
+
+        <!-- Focused on open (see the component) so Enter confirms; Esc cancels -->
+        <button
+          #confirmButton
+          type="button"
+          (click)="service.close(true)"
+          class="confirm-btn bg-rose-600 font-semibold text-white shadow-sm hover:bg-rose-700"
+        >
+          {{ dialog.confirmText }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

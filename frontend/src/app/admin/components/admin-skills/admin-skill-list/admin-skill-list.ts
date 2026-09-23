@@ -8,6 +8,7 @@ import { LoaderService } from '../../../../core/services/loader.service';
 import { SkillResponse } from '../../../../models/skills.model';
 import { Error } from '../../../../shared/components/error/error';
 import { finalize } from 'rxjs';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-admin-skill-list',
@@ -17,6 +18,7 @@ import { finalize } from 'rxjs';
 })
 export class AdminSkillList implements OnInit {
   private skillsService = inject(SkillsService);
+  private confirmDialog = inject(ConfirmDialogService);
 
   private destroyRef = inject(DestroyRef);
   private snackBarService = inject(SnackBarService);
@@ -77,12 +79,14 @@ export class AdminSkillList implements OnInit {
     });
   }
 
-  deleteSkill(id: string) {
-    const confirmed = confirm('Are you sure delete this skill?');
-
-    if (!confirmed) {
+  async deleteSkill(id: string) {
+    if (
+      !(await this.confirmDialog.confirm({
+        title: 'Delete skill?',
+        message: 'This skill will be removed from your profile.',
+      }))
+    )
       return;
-    }
 
     this.loaderService.showApi();
 

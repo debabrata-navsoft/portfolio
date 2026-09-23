@@ -17,6 +17,7 @@ import { SnackBarService } from '../../../core/services/snack-bar.service';
 import { SocketService } from '../../../core/services/socket.service';
 import { CommentResponse } from '../../../models/comment.model';
 import { TimeAgoPipe } from '../../../pipes/time-ago.pipe';
+import { ConfirmDialogService } from '../../../core/services/confirm-dialog.service';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -49,6 +50,7 @@ const ADMIN_STYLES = {
 })
 export class ArticleComments implements OnInit {
   private commentService = inject(CommentService);
+  private confirmDialog = inject(ConfirmDialogService);
   private snackBarService = inject(SnackBarService);
   private socketService = inject(SocketService);
   private destroyRef = inject(DestroyRef);
@@ -142,9 +144,17 @@ export class ArticleComments implements OnInit {
     );
   }
 
-  remove(id: string) {
+  async remove(comment: CommentResponse) {
+    // The API deletes a comment together with its replies, so say so before it happens.
+    const replies = comment.replies?.length ?? 0;
+    const warning = replies
+      ? `This comment and its ${replies} ${replies === 1 ? 'reply' : 'replies'} will be permanently deleted.`
+      : 'This comment will be permanently deleted.';
+
+    if (!(await this.confirmDialog.confirm({ title: 'Delete comment?', message: warning }))) return;
+
     this.track(
-      this.commentService.deleteComment(id),
+      this.commentService.deleteComment(comment._id),
       (res) => {
         this.snackBarService.success(res.message);
         this.load(true);

@@ -6,6 +6,9 @@
 @if (loaderService.apiLoading()) {
   <app-api-loader />
 }
+
+<!-- Shared delete / confirm dialog, opened via ConfirmDialogService -->
+<app-confirm-dialog />
 <div class="overflow-x-clip">
   <!-- [class.invisible]="loaderService.startupLoading()" -->
 

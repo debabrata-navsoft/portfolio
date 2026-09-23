@@ -15,6 +15,7 @@ import {
   TableFilter,
   viewAction,
 } from '../../../../shared/components/data-table/data-table.model';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-admin-notification-list',
@@ -25,6 +26,7 @@ import {
 })
 export class AdminNotificationList implements OnInit {
   private router = inject(Router);
+  private confirmDialog = inject(ConfirmDialogService);
   private loaderService = inject(LoaderService);
   private destroyRef = inject(DestroyRef);
   store = inject(NotificationService);
@@ -97,7 +99,7 @@ export class AdminNotificationList implements OnInit {
     this.destroyRef.onDestroy(() => sub.unsubscribe());
   }
 
-  onAction({ id, row }: TableActionEvent<NotificationResponse>) {
+  async onAction({ id, row }: TableActionEvent<NotificationResponse>) {
     switch (id) {
       case 'view':
         this.store.markRead(row);
@@ -107,7 +109,14 @@ export class AdminNotificationList implements OnInit {
         this.store.markRead(row);
         break;
       case 'delete':
-        if (confirm('Delete this notification?')) this.store.remove(row);
+        if (
+          await this.confirmDialog.confirm({
+            title: 'Delete notification?',
+            message: 'This notification will be removed.',
+          })
+        ) {
+          this.store.remove(row);
+        }
         break;
     }
   }

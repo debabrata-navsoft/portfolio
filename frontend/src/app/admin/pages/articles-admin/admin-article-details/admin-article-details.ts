@@ -23,6 +23,7 @@ import { Error } from '../../../../shared/components/error/error';
 import { FormatTextPipe } from '../../../../pipes/format-text.pipe';
 import { CodeCopyDirective } from '../../../../shared/directives/code-copy.directive';
 import { ArticleComments } from '../../../../shared/components/article-comments/article-comments';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 
 @Component({
   selector: 'app-admin-article-details',
@@ -43,6 +44,7 @@ import { ArticleComments } from '../../../../shared/components/article-comments/
 })
 export class AdminArticleDetails implements OnInit {
   private route = inject(ActivatedRoute);
+  private confirmDialog = inject(ConfirmDialogService);
   private router = inject(Router);
   private articleService = inject(ArticleService);
   private loaderService = inject(LoaderService);
@@ -102,9 +104,15 @@ export class AdminArticleDetails implements OnInit {
     setTimeout(() => this.copiedSlug.set(false), 2000);
   }
 
-  deleteArticle(): void {
+  async deleteArticle(): Promise<void> {
     const current = this.article();
-    if (!current || !confirm(`Are you sure you want to delete "${current.title}"?`)) return;
+    if (!current) return;
+
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Delete article?',
+      message: `"${current.title}" will be permanently deleted.`,
+    });
+    if (!confirmed) return;
 
     this.loaderService.showApi();
     this.articleService
@@ -124,8 +132,13 @@ export class AdminArticleDetails implements OnInit {
   }
 
   /** Wipes the view and like counters — there is no undo, so confirm first. */
-  clearStats(slug: string): void {
-    if (!confirm('Clear all views and likes for this article? This cannot be undone.')) return;
+  async clearStats(slug: string): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Clear views and likes?',
+      message: 'Both counters go back to 0. This cannot be undone.',
+      confirmText: 'Clear',
+    });
+    if (!confirmed) return;
 
     this.clearingStats.set(true);
 

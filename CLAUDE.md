@@ -283,7 +283,14 @@ pick list before a template can use it.**
   skills`).
   Uniform shape: `inject(HttpClient)`, `private apiUrl = ${environment.apiUrl}/<resource>`, thin
   methods returning `Observable<T>` typed by `app/models/`. **Add API calls here, never in
-  components.** The non-HTTP services alongside them are `loader`, `snack-bar` and `admin-tab`.
+  components.** The non-HTTP services alongside them are `loader`, `snack-bar`, `admin-tab` and
+  `confirm-dialog`.
+- [confirm-dialog.service.ts](frontend/src/app/core/services/confirm-dialog.service.ts) —
+  **use it instead of the browser `confirm()`** (none are left):
+  `if (!(await this.confirmDialog.confirm({ title?, message, confirmText? }))) return;`.
+  It resolves a `Promise<boolean>`, so the calling method becomes `async`. The one
+  [`<app-confirm-dialog />`](frontend/src/app/shared/components/confirm-dialog/) in `app.html`
+  renders it for public and admin pages alike; Enter confirms, Esc / backdrop cancels.
 - [admin.service.ts](frontend/src/app/core/services/admin.service.ts) is the exception — it also
   owns the `adminToken` in `localStorage` (`saveToken/getToken/isLoggedIn`) and
   `scheduleAutoLogout()` driven by the JWT `exp`.
@@ -480,7 +487,7 @@ pick list before a template can use it.**
   keep it in sync): admin header `40` (`admin-header.css`) → navbar `z-[999]`, its backdrop
   `z-[998]`, its mobile menu `z-[1000]` → filter-drawer backdrop `z-1300`, panel `z-1310` →
   api-loader `z-[9999]` / article comments popup `z-[9999]` / project-detail lightbox
-  `z-[9999]`+`z-[10000]` → `.cdk-overlay-container` `20000` (raised in `styles.css` so snack bars
+  `z-[9999]`+`z-[10000]` → confirm dialog `z-[19000]` → `.cdk-overlay-container` `20000` (raised in `styles.css` so snack bars
   and datepicker popups clear the drawer **and** the full-screen overlays — a snack bar hidden
   behind the comments popup is an error message the user never sees) → startup-loader
   `z-[99999]`.
