@@ -15,6 +15,7 @@ import contactRoutes from "./routes/contact.route.js";
 import articleRoutes from "./routes/article.route.js";
 import faqRoutes from "./routes/faq.routes.js";
 import commentRoutes from "./routes/comment.route.js";
+import notificationRoutes from "./routes/notification.route.js";
 
 dotenv.config();
 
@@ -55,6 +56,7 @@ app.use("/api/contacts", contactRoutes);
 app.use("/api/articles", articleRoutes);
 app.use("/api/faqs", faqRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 const server = createServer(app);
 

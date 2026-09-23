@@ -128,6 +128,14 @@ export const ADMIN_ROUTES: Routes = [
       },
 
       {
+        path: 'notifications',
+        loadComponent: () =>
+          import('./pages/notifications-admin/admin-notification-list/admin-notification-list').then(
+            (m) => m.AdminNotificationList,
+          ),
+      },
+
+      {
         path: 'contacts',
         children: [
           {

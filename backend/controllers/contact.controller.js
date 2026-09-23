@@ -1,6 +1,7 @@
 import Contact from "../models/contact.model.js";
 import { sendContactMail } from "../utils/emails/sendMail.js";
 import { parseSort } from "../utils/queryFilters.js";
+import { notify } from "./notification.controller.js";
 
 export const createContact = async (req, res) => {
   try {
@@ -18,6 +19,13 @@ export const createContact = async (req, res) => {
       email,
       subject,
       message,
+    });
+
+    notify({
+      type: "contact",
+      title: `New message from ${firstName} ${lastName}`,
+      message: subject,
+      link: `/admin/contacts/${contact._id}`,
     });
 
     try {

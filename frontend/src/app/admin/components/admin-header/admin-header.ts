@@ -20,6 +20,8 @@ import { AdminService } from '../../../core/services/admin.service';
 import { AdminTabService } from '../../../core/services/admin-tab.service';
 import { ProfileService } from '../../../core/services/profile.service';
 import { SnackBarService } from '../../../core/services/snack-bar.service';
+import { SocketService } from '../../../core/services/socket.service';
+import { AdminNotifications } from '../admin-notifications/admin-notifications';
 
 export interface AdminServiceItem {
   id: string;
@@ -32,7 +34,7 @@ export interface AdminServiceItem {
 @Component({
   selector: 'app-admin-header',
   standalone: true,
-  imports: [CommonModule, RouterLink, LucideAngularModule],
+  imports: [CommonModule, RouterLink, LucideAngularModule, AdminNotifications],
   templateUrl: './admin-header.html',
   styleUrl: './admin-header.css',
 })
@@ -40,6 +42,7 @@ export class AdminHeader implements OnInit {
   private adminService = inject(AdminService);
   private profileService = inject(ProfileService);
   private snackBar = inject(SnackBarService);
+  private socketService = inject(SocketService);
   private router = inject(Router);
   tabService = inject(AdminTabService);
   private destroyRef = inject(DestroyRef);
@@ -99,6 +102,13 @@ export class AdminHeader implements OnInit {
       route: '/admin/faqs',
       icon: 'clipboard-list',
       bgColor: 'bg-amber-600',
+    },
+    {
+      id: 'notifications',
+      title: 'Notifications',
+      route: '/admin/notifications',
+      icon: 'bell',
+      bgColor: 'bg-rose-600',
     },
   ];
 
@@ -242,6 +252,7 @@ export class AdminHeader implements OnInit {
 
   logout(): void {
     this.closeAllMenus();
+    this.socketService.leaveAdmin();
     this.adminService.logout();
     this.router.navigate(['/admin/login']);
     this.snackBar.success('Admin Logout successful');

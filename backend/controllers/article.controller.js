@@ -1,5 +1,6 @@
 import Article from "../models/article.model.js";
 import { adminFromRequest } from "../middleware/auth.middleware.js";
+import { notify } from "./notification.controller.js";
 import {
   anyOfRegex,
   buildDateRange,
@@ -241,7 +242,7 @@ const updateStats = async (req, res, update, reply) => {
       returnDocument: "after",
       // Mongoose 9 refuses an aggregation-pipeline update without this opt-in.
       ...(Array.isArray(update) && { updatePipeline: true }),
-    }).select("views likes");
+    }).select("views likes title slug");
 
     if (!article) {
       return res.status(404).json({ message: "Article not found" });
@@ -266,7 +267,19 @@ export const toggleArticleLike = (req, res) => {
     req,
     res,
     [{ $set: { likes: { $max: [0, { $add: [{ $ifNull: ["$likes", 0] }, liked ? 1 : -1] }] } } }],
-    (article) => ({ likes: article.likes, liked }),
+    (article) => {
+      // Only a new like is news; an unlike stays silent.
+      if (liked) {
+        notify({
+          type: "like",
+          title: "New like on your article",
+          message: article.title,
+          link: `/admin/articles/${article.slug}`,
+        });
+      }
+
+      return { likes: article.likes, liked };
+    },
   );
 };
 

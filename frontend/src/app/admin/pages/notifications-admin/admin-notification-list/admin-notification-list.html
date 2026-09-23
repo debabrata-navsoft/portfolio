@@ -1,0 +1,19 @@
+<div class="flex min-h-0 min-w-0 flex-1 flex-col h-full">
+  @if (isErrorMsg()) {
+    <app-error />
+  } @else {
+    <app-data-table
+      [rows]="store.notifications()"
+      [columns]="columns"
+      [filters]="filters"
+      [actions]="actions"
+      primaryButtonText="Mark all read"
+      primaryButtonIcon="check-check"
+      searchPlaceholder="Search"
+      emptyMessage="No notifications yet."
+      tableClass="w-full min-w-[760px]"
+      (primaryAction)="store.markAllRead()"
+      (action)="onAction($event)"
+    />
+  }
+</div>

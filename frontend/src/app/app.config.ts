@@ -25,6 +25,8 @@ import {
   LogOut,
   Link2,
   ArrowLeft,
+  Bell,
+  CheckCheck,
   ExternalLink,
   Github,
   Linkedin,
@@ -103,6 +105,8 @@ export const appConfig: ApplicationConfig = {
       LucideAngularModule.pick({
         Sun,
         Moon,
+        Bell,
+        CheckCheck,
         Menu,
         Eye,
         EyeOff,

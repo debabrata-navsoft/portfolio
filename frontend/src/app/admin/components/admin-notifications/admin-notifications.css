@@ -1,0 +1,46 @@
+:host {
+  position: relative;
+  display: block;
+}
+
+/* Same entrance as the header's profile dropdown */
+.notifications-panel {
+  animation: panelEnter 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top right;
+}
+
+@keyframes panelEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Short swing when a live notification arrives */
+.bell-ring {
+  display: inline-flex;
+  animation: bellRing 0.9s ease-in-out;
+  transform-origin: top center;
+}
+
+@keyframes bellRing {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  15%,
+  45% {
+    transform: rotate(14deg);
+  }
+  30%,
+  60% {
+    transform: rotate(-14deg);
+  }
+  75% {
+    transform: rotate(6deg);
+  }
+}

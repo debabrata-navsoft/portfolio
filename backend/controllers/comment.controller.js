@@ -4,6 +4,7 @@ import Comment from "../models/comment.model.js";
 import Article from "../models/article.model.js";
 import { adminFromRequest } from "../middleware/auth.middleware.js";
 import { emitCommentsChanged } from "../config/socket.js";
+import { notify } from "./notification.controller.js";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -124,6 +125,16 @@ export const createComment = async (req, res) => {
     });
 
     emitCommentsChanged(article._id);
+
+    // The admin's own replies aren't news to the admin.
+    if (!comment.isAuthor) {
+      notify({
+        type: "comment",
+        title: `${comment.name} ${parentId ? "replied" : "commented"} on "${article.title}"`,
+        message: comment.message,
+        link: `/admin/articles/${article.slug}`,
+      });
+    }
 
     res.status(201).json({
       message: "Comment posted successfully",

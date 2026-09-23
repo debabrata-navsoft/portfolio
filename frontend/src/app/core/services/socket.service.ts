@@ -13,6 +13,7 @@ const SOCKET_URL = environment.apiUrl.replace(/\/api\/?$/, '');
 export class SocketService {
   private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private socket?: Socket;
+  private adminToken: string | null = null;
 
   on<T>(event: string): Observable<T> {
     return new Observable<T>((subscriber) => {
@@ -27,8 +28,32 @@ export class SocketService {
     });
   }
 
+  /**
+   * Proves the admin token so this connection joins the server's admin room (notifications).
+   * Re-sent on every reconnect, since a new connection starts outside the room.
+   */
+  joinAdmin(token: string): void {
+    if (!this.isBrowser) return;
+
+    this.adminToken = token;
+
+    const socket = this.connect();
+    if (socket.connected) socket.emit('admin:join', token);
+  }
+
+  leaveAdmin(): void {
+    this.adminToken = null;
+    this.socket?.emit('admin:leave');
+  }
+
   private connect(): Socket {
-    this.socket ??= io(SOCKET_URL, { transports: ['websocket', 'polling'] });
+    if (!this.socket) {
+      this.socket = io(SOCKET_URL, { transports: ['websocket', 'polling'] });
+      this.socket.on('connect', () => {
+        if (this.adminToken) this.socket!.emit('admin:join', this.adminToken);
+      });
+    }
+
     return this.socket;
   }
 }

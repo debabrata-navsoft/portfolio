@@ -40,13 +40,18 @@ const protectAdmin = async (req, res, next) => {
  * Soft version of protectAdmin for public routes: resolves to the admin when the request
  * carries a valid token, otherwise null — it never rejects the request.
  */
-export const adminFromRequest = async (req) => {
+export const adminFromRequest = (req) => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader?.startsWith("Bearer ")) return null;
+  return authHeader?.startsWith("Bearer ") ? adminFromToken(authHeader.split(" ")[1]) : null;
+};
+
+/** Same check for a bare token — the socket `admin:join` handshake uses it. */
+export const adminFromToken = async (token) => {
+  if (typeof token !== "string" || !token) return null;
 
   try {
-    const decoded = jwt.verify(authHeader.split(" ")[1], process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     return await Admin.findById(decoded.id).select("_id name");
   } catch {
     return null;

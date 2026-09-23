@@ -63,6 +63,7 @@ Every resource is exactly three files with matching names; **follow this when ad
 | contacts | `/api/contacts` | [contact.route.js](backend/routes/contact.route.js) | [contact.controller.js](backend/controllers/contact.controller.js) | [contact.model.js](backend/models/contact.model.js) |
 | faqs | `/api/faqs` | [faq.routes.js](backend/routes/faq.routes.js) | [faq.controller.js](backend/controllers/faq.controller.js) | [faq.model.js](backend/models/faq.model.js) |
 | comments | `/api/comments` | [comment.route.js](backend/routes/comment.route.js) | [comment.controller.js](backend/controllers/comment.controller.js) | [comment.model.js](backend/models/comment.model.js) |
+| notifications | `/api/notifications` | [notification.route.js](backend/routes/notification.route.js) | [notification.controller.js](backend/controllers/notification.controller.js) | [notification.model.js](backend/models/notification.model.js) |
 
 [backend/routes/upload.route.js](backend/routes/upload.route.js) and
 [upload.controller.js](backend/controllers/upload.controller.js) are **fully commented out and
@@ -85,6 +86,7 @@ unmounted** — uploads happen inline on each resource route. Ignore them.
   `name, email, message, isAuthor`
 - **Contact** `firstName, lastName, email, subject, message, isRead`
 - **FAQ** `question, answer, isActive, order`
+- **Notification** `type` (`like`/`comment`/`contact`), `title, message, link` (admin route to open), `isRead`
 
 ### Auth
 
@@ -165,6 +167,33 @@ Readers have no accounts, so everything here is anonymous and public:
   won't match and the thread won't live-refresh. Live refreshes call `load(true)`, which skips
   the loading skeleton so the list updates in place.
 
+### Admin notifications (bell)
+
+- `notify({ type, title, message, link })` in
+  [notification.controller.js](backend/controllers/notification.controller.js) is called by
+  `toggleArticleLike` (likes only, not unlikes), `createComment` (skipped for author comments)
+  and `createContact`. It never throws, so a failed notification can't fail the visitor's request.
+- It saves the doc and pushes `notification:new` with `emitToAdmin` — to the socket.io
+  **`admins` room only**, never a broadcast, because the payload carries visitors' names and
+  messages. A socket joins by emitting `admin:join` with its JWT (checked by `adminFromToken`);
+  [socket.service.ts](frontend/src/app/core/services/socket.service.ts) `joinAdmin()` re-sends it
+  on every reconnect, and `leaveAdmin()` runs on logout.
+- All REST routes are `protectAdmin`: `GET /` → `{ items (latest 30), unreadCount }`,
+  `?all=true` drops the limit (the notifications page), `PATCH /:id/read`, `PATCH /read-all`,
+  `DELETE /:id`, `DELETE /` (clear all).
+- UI state lives in **one store**, [notification.service.ts](frontend/src/app/core/services/notification.service.ts)
+  (an exception to "services are thin HTTP"): `notifications` / `unreadCount` / `latest` signals,
+  `connect(token)` (joins the admin room and starts the live feed once), `load(all?)` and
+  optimistic `markRead` / `markAllRead` / `remove` / `clearAll`. The badge is adjusted, never
+  recounted (the bell loads only 30), and a late 30-row load never trims an `all` load.
+  Type labels/icons/badges are `NOTIFICATION_TYPES` in `notification.model.ts`.
+- Both views just read the store: [admin-notifications](frontend/src/app/admin/components/admin-notifications/)
+  (bell left of the avatar in `admin-header`, shows the first 30, "See all notifications" →
+  `/admin/notifications`) and
+  [admin-notification-list](frontend/src/app/admin/pages/notifications-admin/admin-notification-list/)
+  (`app-data-table` with type/status/date filters, view / mark-read / delete actions, "Mark all
+  read" primary button). Neither subscribes to the socket itself.
+
 ### Searchable list endpoints (projects, articles)
 
 `GET /api/projects` and `GET /api/articles` do search / filter / count / pagination server-side
@@ -230,7 +259,7 @@ pick list before a template can use it.**
 - [admin/admin.routes.ts](frontend/src/app/admin/admin.routes.ts) — `login`, then `AdminLayout`
   shell (both `canActivate: [adminGuard]`) with children `dashboard`, `profile`,
   `projects{,/add,/edit/:slug,/:slug}`, `articles{...same}`, `faqs{,/add,/edit/:id}`,
-  `contacts{,/:id}`.
+  `notifications`, `contacts{,/:id}`.
 - [app.routes.server.ts](frontend/src/app/app.routes.server.ts) — `admin/**` is
   `RenderMode.Client`, everything else `RenderMode.Server`.
   ⚠️ **Do not "fix" the blank View Source on `/admin` by switching it to `RenderMode.Server`.**
