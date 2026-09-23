@@ -64,8 +64,9 @@ const startServer = async () => {
   try {
     await connectDB();
 
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
+      console.log("Socket.io ready for live comments");
     });
   } catch (error) {
     console.log(error);

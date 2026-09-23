@@ -11,6 +11,14 @@ export const initSocket = (server, allowedOrigins) => {
     },
   });
 
+  io.on("connection", (socket) => {
+    console.log(`Socket connected: ${socket.id} (${io.engine.clientsCount} online)`);
+
+    socket.on("disconnect", (reason) => {
+      console.log(`Socket disconnected: ${socket.id} (${reason})`);
+    });
+  });
+
   return io;
 };
 
