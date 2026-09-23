@@ -63,6 +63,7 @@ export class AdminNotificationList implements OnInit {
     {
       key: 'isRead',
       label: 'Status',
+      single: true,
       value: (row) => (row.isRead ? 'read' : 'unread'),
       options: [
         { value: 'unread', label: 'Unread' },

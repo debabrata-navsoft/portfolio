@@ -132,10 +132,13 @@ export class FilterDrawer {
 
   toggleOption(groupId: string, optionId: string): void {
     const current = this.draft().checkboxes[groupId] ?? [];
+    const single = this.groups().find((group) => group.id === groupId)?.single;
 
     const next = current.includes(optionId)
       ? current.filter((id) => id !== optionId)
-      : [...current, optionId];
+      : single
+        ? [optionId]
+        : [...current, optionId];
 
     this.draft.update((draft) => ({
       ...draft,

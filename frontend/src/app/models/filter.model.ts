@@ -9,6 +9,8 @@ export interface FilterGroup {
   label: string;
   type: 'checkbox' | 'date';
   searchable?: boolean;
+  // Mutually exclusive options (e.g. Status): picking one unticks the rest.
+  single?: boolean;
   options?: FilterOption[];
 }
 

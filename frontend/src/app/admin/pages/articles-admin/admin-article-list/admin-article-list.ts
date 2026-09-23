@@ -57,6 +57,7 @@ export class AdminArticleList implements OnInit {
     {
       key: 'published',
       label: 'Status',
+      single: true,
       value: (row) => (row.published ? 'published' : 'draft'),
       options: [
         { value: 'published', label: 'Published' },

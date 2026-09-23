@@ -188,6 +188,7 @@ export class DataTable<T> {
         id: filter.key,
         label: filter.label,
         type: 'checkbox' as const,
+        single: filter.single,
         searchable: options.length > SEARCHABLE_GROUP_SIZE,
         options,
       };

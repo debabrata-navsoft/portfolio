@@ -58,6 +58,7 @@ export class AdminContactList implements OnInit {
     {
       key: 'isRead',
       label: 'Status',
+      single: true,
       value: (row) => (row.isRead ? 'read' : 'new'),
       options: [
         { value: 'new', label: 'New' },

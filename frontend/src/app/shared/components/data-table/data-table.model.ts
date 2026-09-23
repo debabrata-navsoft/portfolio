@@ -93,6 +93,7 @@ export const activeStatusColumn = <T extends ActiveRow>(): TableColumn<T> => ({
 export const activeStatusFilter = <T extends ActiveRow>(): TableFilter<T> => ({
   key: 'isActive',
   label: 'Status',
+  single: true,
   value: (row) => (isActiveRow(row) ? 'active' : 'inactive'),
   options: [
     { value: 'active', label: 'Active' },
@@ -108,6 +109,7 @@ export interface TableFilterOption {
 export interface TableFilter<T = any> extends ValueSource<T> {
   label: string;
   type?: 'checkbox' | 'date';
+  single?: boolean; // only one option at a time (see FilterGroup.single)
   options?: TableFilterOption[];
 }
 

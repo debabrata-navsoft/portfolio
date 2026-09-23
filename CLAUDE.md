@@ -416,8 +416,9 @@ pick list before a template can use it.**
     `total/label/search/placeholder/activeFilterCount/chips`, outputs
     `searchChange/openFilters/removeChip`.
   - [filters/filter-drawer](frontend/src/app/shared/filters/filter-drawer/) — the right-hand
-    panel, rendered entirely from `FilterGroup[]`: collapsible groups, per-group option search,
-    checkbox lists with counts, and for `type: 'date'` groups the quick ranges
+    panel, rendered entirely from `FilterGroup[]`: collapsible groups (accordion — one open at a
+    time), per-group option search, checkbox lists with counts (`single: true` on a group /
+    `TableFilter` makes its options mutually exclusive — every Status filter uses it), and for `type: 'date'` groups the quick ranges
     (Today / Last 7 / Last 30 / All) plus two From/To `<app-date-picker>`s. It edits a
     **draft** copy and emits `draftChange` on every change (so the page can preview the count),
     committing only on `applied`. Inputs `open/groups/selection/totalResults`, outputs
