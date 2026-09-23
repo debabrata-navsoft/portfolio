@@ -171,7 +171,8 @@ Readers have no accounts, so everything here is anonymous and public:
 
 - `notify({ type, title, message, link })` in
   [notification.controller.js](backend/controllers/notification.controller.js) is called by
-  `toggleArticleLike` (likes only, not unlikes), `createComment` (skipped for author comments)
+  `toggleArticleLike` (an unlike calls `unnotify`, which deletes that article's newest like
+  notification and pushes `notification:removed` so the bell drops it live), `createComment` (skipped for author comments)
   and `createContact`. It never throws, so a failed notification can't fail the visitor's request.
 - It saves the doc and pushes `notification:new` with `emitToAdmin` — to the socket.io
   **`admins` room only**, never a broadcast, because the payload carries visitors' names and

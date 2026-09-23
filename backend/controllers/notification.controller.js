@@ -24,6 +24,23 @@ export const notify = async ({ type, title, message = "", link = "" }) => {
 };
 
 // The bell gets the latest LIST_LIMIT; `?all=true` (the notifications page) gets everything.
+/**
+ * Takes back one notification — e.g. an unlike cancels a like. Likes are anonymous, so it removes
+ * the newest matching one (unread first). Never throws, same as `notify`.
+ */
+export const unnotify = async ({ type, link }) => {
+  try {
+    const notification = await Notification.findOneAndDelete(
+      { type, link },
+      { sort: { isRead: 1, createdAt: -1 } },
+    );
+
+    if (notification) emitToAdmin("notification:removed", notification);
+  } catch (error) {
+    console.log("Notification removal failed:", error.message);
+  }
+};
+
 export const getNotifications = async (req, res) => {
   try {
     const query = Notification.find().sort({ createdAt: -1 });

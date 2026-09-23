@@ -41,6 +41,11 @@ export class NotificationService {
       this.unreadCount.update((count) => count + 1);
       this.latest.set(notification);
     });
+
+    // e.g. an unlike takes back its like — drop it without a reload.
+    this.socketService
+      .on<NotificationResponse>('notification:removed')
+      .subscribe((notification) => this.drop(notification));
   }
 
   /** Latest 30 for the bell; `all` for the notifications page. A late 30 never trims `all`. */
@@ -75,9 +80,14 @@ export class NotificationService {
   }
 
   remove(notification: NotificationResponse): void {
+    this.drop(notification);
+    this.persist(this.http.delete(`${this.apiUrl}/${notification._id}`));
+  }
+
+  /** Local removal only — shared by `remove` and the server's `notification:removed` push. */
+  private drop(notification: NotificationResponse): void {
     this.notifications.update((list) => list.filter((n) => n._id !== notification._id));
     if (!notification.isRead) this.unreadCount.update((count) => Math.max(0, count - 1));
-    this.persist(this.http.delete(`${this.apiUrl}/${notification._id}`));
   }
 
   clearAll(): void {

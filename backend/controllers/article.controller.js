@@ -1,6 +1,6 @@
 import Article from "../models/article.model.js";
 import { adminFromRequest } from "../middleware/auth.middleware.js";
-import { notify } from "./notification.controller.js";
+import { notify, unnotify } from "./notification.controller.js";
 import {
   anyOfRegex,
   buildDateRange,
@@ -268,14 +268,13 @@ export const toggleArticleLike = (req, res) => {
     res,
     [{ $set: { likes: { $max: [0, { $add: [{ $ifNull: ["$likes", 0] }, liked ? 1 : -1] }] } } }],
     (article) => {
-      // Only a new like is news; an unlike stays silent.
+      const link = `/admin/articles/${article.slug}`;
+
+      // An unlike takes back the like's notification instead of adding one.
       if (liked) {
-        notify({
-          type: "like",
-          title: "New like on your article",
-          message: article.title,
-          link: `/admin/articles/${article.slug}`,
-        });
+        notify({ type: "like", title: "New like on your article", message: article.title, link });
+      } else {
+        unnotify({ type: "like", link });
       }
 
       return { likes: article.likes, liked };
