@@ -294,6 +294,10 @@ pick list before a template can use it.**
   until the API answers — see §5. Anything added to the home page should register too.
 - [snack-bar.service.ts](frontend/src/app/core/services/snack-bar.service.ts) — `success()` /
   `error()` wrappers over Angular Material `MatSnackBar`; use these for user feedback.
+  `httpError(err, fallback?)` turns a failed request into a readable line (the API's own
+  `message`, "can't reach the server" for status 0, or the fallback) instead of Angular's raw
+  "Http failure response for … 0 Unknown Error". Only the public contact page uses it; the admin
+  profile sub-lists still pass `err.message` on purpose.
 - [admin-tab.service.ts](frontend/src/app/core/services/admin-tab.service.ts) — signal-held
   `tabs` / `activeTab`. A page publishes its tab strip with `setTabs()` in `ngOnInit` and
   `clear()` in `ngOnDestroy`; [admin-header](frontend/src/app/admin/components/admin-header/)

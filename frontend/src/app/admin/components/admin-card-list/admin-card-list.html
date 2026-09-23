@@ -7,14 +7,17 @@
       <p class="text-xs text-gray-500 mt-0.5">{{ description() }}</p>
     </div>
 
-    <button
-      type="button"
-      (click)="add.emit()"
-      class="inline-flex h-9 w-full shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-blue-600 px-3.5 text-xs font-semibold text-white shadow-sm hover:bg-blue-700 active:scale-95 transition cursor-pointer sm:h-10 sm:w-auto sm:gap-2 sm:px-5 sm:text-sm"
-    >
-      <lucide-icon name="plus" [size]="16" />
-      <span>Add {{ noun() }}</span>
-    </button>
+    <!-- Nothing to add to while the list failed to load -->
+    @if (!error()) {
+      <button
+        type="button"
+        (click)="add.emit()"
+        class="inline-flex h-9 w-full shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-blue-600 px-3.5 text-xs font-semibold text-white shadow-sm hover:bg-blue-700 active:scale-95 transition cursor-pointer sm:h-10 sm:w-auto sm:gap-2 sm:px-5 sm:text-sm"
+      >
+        <lucide-icon name="plus" [size]="16" />
+        <span>Add {{ noun() }}</span>
+      </button>
+    }
   </div>
 
   @if (error()) {

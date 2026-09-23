@@ -117,7 +117,7 @@ export class ContactPage {
 
       error: (err) => {
         this.isSending.set(false);
-        this.snackBarService.error(err.message || 'Something went wrong');
+        this.snackBarService.httpError(err, "Couldn't send your message. Please try again.");
         this.scrollToTop();
       },
     });
