@@ -13,7 +13,7 @@ import { CustomNav } from '../../../shared/components/custom-nav/custom-nav';
 import { TimeAgoPipe } from '../../../pipes/time-ago.pipe';
 import { ListToolbar } from '../../../shared/components/list-toolbar/list-toolbar';
 import { FilterDrawer } from '../../../shared/filters/filter-drawer/filter-drawer';
-import { ServerListPage } from '../../../shared/filters/server-list-page';
+import { ListPageBase } from '../../../shared/filters/list-page-base';
 import { dateBound, facetToOption, selectedValues } from '../../../utils/filter.utils';
 
 @Component({
@@ -34,7 +34,7 @@ import { dateBound, facetToOption, selectedValues } from '../../../utils/filter.
   ],
   templateUrl: './projects-list.page.html',
 })
-export class ProjectsListPage extends ServerListPage<
+export class ProjectsListPage extends ListPageBase<
   ProjectResponse,
   ProjectListFilters,
   ProjectQuery

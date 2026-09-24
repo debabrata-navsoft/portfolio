@@ -432,7 +432,7 @@ pick list before a template can use it.**
     **draft** copy and emits `draftChange` on every change (so the page can preview the count),
     committing only on `applied`. Inputs `open/groups/selection/totalResults`, outputs
     `closed/draftChange/applied/cleared`.
-  - [filters/server-list-page.ts](frontend/src/app/shared/filters/server-list-page.ts) — the
+  - [filters/list-page-base.ts](frontend/src/app/shared/filters/list-page-base.ts) — the
     abstract base both list pages extend. It owns the search / drawer / paging signals and the
     debounced `switchMap` streams; a page only supplies `filterGroups`, `emptyFacets()`,
     `fetch(query)` and `filterQuery(selection)`, and its template reads `items()`.

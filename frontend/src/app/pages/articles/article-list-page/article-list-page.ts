@@ -12,7 +12,7 @@ import { RevealDirective } from '../../../shared/directives/reveal.directive';
 import { CustomNav } from '../../../shared/components/custom-nav/custom-nav';
 import { ListToolbar } from '../../../shared/components/list-toolbar/list-toolbar';
 import { FilterDrawer } from '../../../shared/filters/filter-drawer/filter-drawer';
-import { ServerListPage } from '../../../shared/filters/server-list-page';
+import { ListPageBase } from '../../../shared/filters/list-page-base';
 import { dateBound, facetToOption, selectedValues } from '../../../utils/filter.utils';
 
 @Component({
@@ -30,7 +30,7 @@ import { dateBound, facetToOption, selectedValues } from '../../../utils/filter.
   ],
   templateUrl: './article-list-page.html',
 })
-export class ArticleListPage extends ServerListPage<
+export class ArticleListPage extends ListPageBase<
   ArticleResponse,
   ArticleListFilters,
   ArticleQuery

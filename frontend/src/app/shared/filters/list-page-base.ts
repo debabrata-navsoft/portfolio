@@ -24,7 +24,7 @@ import {
  * query mapping; switchMap drops the response of a superseded query.
  */
 @Directive()
-export abstract class ServerListPage<TItem, TFilters, TQuery extends ListQuery>
+export abstract class ListPageBase<TItem, TFilters, TQuery extends ListQuery>
   implements OnInit
 {
   private loaderService = inject(LoaderService);
