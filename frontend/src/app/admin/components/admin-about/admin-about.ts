@@ -25,7 +25,6 @@ const emptySlots = <T>(): (T | null)[] => Array.from({ length: IMAGE_SLOTS }, ()
   standalone: true,
   imports: [FormsModule, LucideAngularModule, Error, MarkdownToolbar, MarkdownPreview],
   templateUrl: './admin-about.html',
-  styleUrl: './admin-about.css',
 })
 export class AdminAbout implements OnInit {
   private aboutService = inject(AboutService);
@@ -202,30 +201,4 @@ export class AdminAbout implements OnInit {
       saveAboutSub.unsubscribe();
     });
   }
-
-  // saveAbout() {
-  //   if (!this.description() || !this.email() || !this.location()) {
-  //     this.snacBarService.error('All fields are required');
-  //     return;
-  //   }
-
-  //   this.saving.set(true);
-
-  //   this.aboutService
-  //     .saveAbout({
-  //       description: this.description(),
-  //       email: this.email(),
-  //       location: this.location(),
-  //     })
-  //     .subscribe({
-  //       next: () => {
-  //         this.snacBarService.success('About saved successfully!');
-  //         this.saving.set(false);
-  //       },
-  //       error: () => {
-  //         this.snacBarService.error('About save failed!');
-  //         this.saving.set(false);
-  //       },
-  //     });
-  // }
 }

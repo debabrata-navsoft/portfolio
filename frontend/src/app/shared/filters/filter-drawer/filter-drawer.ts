@@ -17,7 +17,7 @@ import {
   FilterOption,
   FilterSelection,
 } from '../../../models/filter.model';
-import { cloneFilterSelection, emptyFilterSelection } from '../filter.utils';
+import { cloneFilterSelection, emptyFilterSelection } from '../../../utils/filter.utils';
 import { CustomButton } from '../../components/custom-button/custom-button';
 import { DatePicker } from '../../components/date-picker/date-picker';
 

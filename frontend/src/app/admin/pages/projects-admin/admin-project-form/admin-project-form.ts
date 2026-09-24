@@ -11,13 +11,13 @@ import { ProjectForm } from '../../../../models/project.model';
 import { DatePicker } from '../../../../shared/components/date-picker/date-picker';
 import { MarkdownToolbar } from '../../../../shared/components/markdown-toolbar/markdown-toolbar';
 import { MarkdownPreview } from '../../../../shared/components/markdown-preview/markdown-preview';
+import { generateSlug } from '../../../../utils/slug.utils';
 
 @Component({
   selector: 'app-admin-project-form',
   standalone: true,
   imports: [LucideAngularModule, DatePicker, MarkdownToolbar, MarkdownPreview, Error],
   templateUrl: './admin-project-form.html',
-  styleUrl: './admin-project-form.css',
 })
 export class AdminProjectForm implements OnInit {
   private projectService = inject(ProjectService);
@@ -169,20 +169,11 @@ export class AdminProjectForm implements OnInit {
     }));
   }
 
-  generateSlug(title: string): string {
-    return title
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-');
-  }
-
   updateTitle(title: string) {
     this.projects.update((form) => ({
       ...form,
       title,
-      slug: this.generateSlug(title),
+      slug: generateSlug(title),
     }));
   }
 

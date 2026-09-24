@@ -21,7 +21,7 @@ portfolio-root/
 │   ├── middleware/           # auth.middleware.js, upload.js
 │   ├── models/               # Mongoose schemas & models
 │   ├── routes/               # Express route definitions
-│   ├── utils/                # queryFilters.js, emails/
+│   ├── utils/                # queryFilters.js, slug.js, emails/
 │   └── server.js             # Entry point (:5000)
 ├── frontend/                 # Angular 20 Standalone SSR Application
 │   ├── src/
@@ -33,6 +33,7 @@ portfolio-root/
 │   │   │   ├── pages/        # Public pages (home, projects, articles, contact)
 │   │   │   ├── pipes/        # timeAgo, truncate, safeHtml
 │   │   │   ├── shared/       # Reusable UI (data-table, filter-drawer, buttons, markdown-toolbar/-preview)
+│   │   │   ├── utils/        # Pure helpers: filter, code-highlight, slug, jwt (*.utils.ts)
 │   │   │   ├── app.config.ts # Providers, router, Lucide icon registry
 │   │   │   └── app.routes.ts # App routing definition
 │   │   ├── styles.css        # Tailwind v4 import & custom properties

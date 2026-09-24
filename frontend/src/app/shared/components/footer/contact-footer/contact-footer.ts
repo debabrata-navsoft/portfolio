@@ -12,7 +12,6 @@ import { RevealDirective } from '../../../directives/reveal.directive';
   standalone: true,
   imports: [RouterLink, GradientText, LucideAngularModule, RevealDirective],
   templateUrl: './contact-footer.html',
-  styleUrl: './contact-footer.css',
 })
 export class ContactFooter {
   private router = inject(Router);

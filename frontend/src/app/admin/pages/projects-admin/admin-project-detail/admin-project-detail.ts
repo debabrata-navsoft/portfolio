@@ -37,7 +37,6 @@ import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.s
     ImageModal,
   ],
   templateUrl: './admin-project-detail.html',
-  styleUrl: './admin-project-detail.css',
 })
 export class AdminProjectDetail implements OnInit {
   private route = inject(ActivatedRoute);

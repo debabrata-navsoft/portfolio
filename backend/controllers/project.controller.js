@@ -3,6 +3,7 @@ import { visibilityScope } from "../middleware/auth.middleware.js";
 import {
   anyOfRegex,
   buildDateRange,
+  distinctFacet,
   escapeRegex,
   isTrue,
   parseList,
@@ -10,33 +11,7 @@ import {
   parseSort,
   totalPages,
 } from "../utils/queryFilters.js";
-
-const generateSlug = (title) => {
-  return title
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
-};
-
-const createUniqueSlug = async (title, projectId = null) => {
-  let slug = generateSlug(title);
-  let uniqueSlug = slug;
-  let count = 1;
-
-  while (
-    await Project.findOne({
-      slug: uniqueSlug,
-      ...(projectId && { _id: { $ne: projectId } }),
-    })
-  ) {
-    uniqueSlug = `${slug}-${count}`;
-    count++;
-  }
-
-  return uniqueSlug;
-};
+import { createUniqueSlug } from "../utils/slug.js";
 
 export const createProject = async (req, res) => {
   try {
@@ -56,15 +31,6 @@ export const createProject = async (req, res) => {
         message: "Title, overview, description and category are required",
       });
     }
-
-    // if (!title || !description || !category) {
-    //   return res
-    //     .status(400)
-    //     .json({ message: "All required fields are missing" });
-    //   // return res.status(400).json({
-    //   //   message: "Title, description and category are required",
-    //   // });
-    // }
 
     // Get both uploaded images
     const projectCardImage = req.files?.projectCardImage?.[0];
@@ -94,7 +60,7 @@ export const createProject = async (req, res) => {
       }
     }
 
-    const slug = await createUniqueSlug(title);
+    const slug = await createUniqueSlug(Project, title);
 
     const project = await Project.create({
       title,
@@ -123,34 +89,6 @@ export const createProject = async (req, res) => {
     });
   }
 };
-
-// export const createProject = async (req, res) => {
-//   try {
-//     const { title, description, category, technologies, liveUrl, githubUrl } =
-//       req.body;
-
-//     if (!req.file) {
-//       return res.status(400).json({ message: "Project image is required" });
-//     }
-
-//     const project = await Project.create({
-//       title,
-//       description,
-//       category,
-//       image: req.file.path,
-//       technologies: technologies ? JSON.parse(technologies) : [],
-//       liveUrl,
-//       githubUrl,
-//     });
-
-//     res.status(201).json({
-//       message: "Project created successfully",
-//       project,
-//     });
-//   } catch (error) {
-//     res.status(500).json({ message: "Server error", error });
-//   }
-// };
 
 // Query params: search, category, technology, dateFrom, dateTo, createdFrom,
 // createdTo, page, limit, sort, countOnly. Lists accept "a,b" or repeated keys.
@@ -188,29 +126,6 @@ const buildProjectFilter = (query) => {
 const visibleScope = (req) =>
   visibilityScope(req, "active", { isActive: { $ne: false } }, { isActive: false });
 
-// Distinct values with counts, so the client can render the filter drawer
-// without holding the whole collection in memory.
-// `scope` (from visibleScope) keeps inactive projects out of a visitor's facet counts.
-const distinctFacet = async (field, scope, unwind = false) => {
-  const trimmed = { $trim: { input: `$${field}` } };
-
-  const rows = await Project.aggregate([
-    { $match: scope },
-    ...(unwind ? [{ $unwind: `$${field}` }] : []),
-    { $match: { [field]: { $nin: [null, ""] } } },
-    {
-      $group: {
-        _id: { $toLower: trimmed },
-        label: { $first: trimmed },
-        count: { $sum: 1 },
-      },
-    },
-    { $sort: { _id: 1 } },
-  ]);
-
-  return rows.map((row) => ({ value: row._id, label: row.label, count: row.count }));
-};
-
 export const getProjects = async (req, res) => {
   try {
     const scope = await visibleScope(req);
@@ -238,8 +153,8 @@ export const getProjects = async (req, res) => {
     const [items, total, categories, technologies] = await Promise.all([
       projectQuery.exec(),
       Project.countDocuments(filter),
-      distinctFacet("category", scope),
-      distinctFacet("technologies", scope, true),
+      distinctFacet(Project, "category", scope),
+      distinctFacet(Project, "technologies", scope, true),
     ]);
 
     res.json({
@@ -269,20 +184,6 @@ export const getProjectBySlug = async (req, res) => {
   }
 };
 
-// export const getProjectById = async (req, res) => {
-//   try {
-//     const project = await Project.findById(req.params.id);
-
-//     if (!project) {
-//       return res.status(404).json({ message: "Project not found" });
-//     }
-
-//     res.json(project);
-//   } catch (error) {
-//     res.status(500).json({ message: "Server error", error });
-//   }
-// };
-
 export const updateProject = async (req, res) => {
   try {
     const {
@@ -309,7 +210,7 @@ export const updateProject = async (req, res) => {
     if (req.body.isActive !== undefined) updateData.isActive = isTrue(req.body.isActive);
 
     if (title) {
-      updateData.slug = await createUniqueSlug(title, req.params.id);
+      updateData.slug = await createUniqueSlug(Project, title, req.params.id);
     }
 
     if (technologies) {
@@ -319,10 +220,6 @@ export const updateProject = async (req, res) => {
         return res.status(400).json({ message: "Invalid technologies format" });
       }
     }
-
-    // if (technologies) {
-    //   updateData.technologies = JSON.parse(technologies);
-    // }
 
     // Update project card image if new image uploaded
     if (req.files?.projectCardImage?.[0]) {
@@ -339,11 +236,6 @@ export const updateProject = async (req, res) => {
       returnDocument: "after",
       runValidators: true,
     });
-
-    // const project = await Project.findByIdAndUpdate(req.params.id, updateData, {
-    //   // new: true,
-    //   returnDocument: "after",
-    // });
 
     if (!project) {
       return res.status(404).json({ message: "Project not found" });

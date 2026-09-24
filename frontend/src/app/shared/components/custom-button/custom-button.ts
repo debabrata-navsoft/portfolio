@@ -7,7 +7,6 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [RouterLink, CommonModule],
   templateUrl: './custom-button.html',
-  styleUrl: './custom-button.css',
 })
 export class CustomButton {
   text = input.required<string>();

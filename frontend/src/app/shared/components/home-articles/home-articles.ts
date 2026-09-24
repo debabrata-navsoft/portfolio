@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 
 import { GradientText } from '../gradient-text/gradient-text';
@@ -16,7 +16,6 @@ import { RevealDirective } from '../../directives/reveal.directive';
   standalone: true,
   imports: [GradientText, LucideAngularModule, CustomNav, TimeAgoPipe, RevealDirective],
   templateUrl: './home-articles.html',
-  styleUrl: './home-articles.css',
 })
 export class HomeArticles {
   private router = inject(Router);
@@ -37,9 +36,6 @@ export class HomeArticles {
         );
         this.loaderService.completeRequest();
       },
-      // next: (res) => {
-      //   this.articles.set(res);
-      // },
 
       error: (err) => {
         this.loaderService.reportContentError();

@@ -28,17 +28,5 @@ export const sendContactMail = async ({
       subject,
       message,
     }),
-
-    // html: `
-    //   <h2>New Contact Message</h2>
-
-    //   <p><strong>Name:</strong> ${firstName} ${lastName}</p>
-    //   <p><strong>Email:</strong> ${email}</p>
-    //   <p><strong>Subject:</strong> ${subject}</p>
-
-    //   <hr />
-
-    //   <p>${message}</p>
-    // `,
   });
 };

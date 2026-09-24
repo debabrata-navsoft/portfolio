@@ -1,7 +1,7 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-import { highlightCode } from './code-highlight';
+import { highlightCode } from '../utils/code-highlight.utils';
 
 const FENCE = /```[ \t]*([\w+#.-]*)[ \t]*\r?\n?([\s\S]*?)```/g;
 const BLOCK_TOKEN = /[ \t\r\n]*@@CODEBLOCK(\d+)@@[ \t\r\n]*/g;

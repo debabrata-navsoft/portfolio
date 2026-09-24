@@ -1,4 +1,4 @@
-import { Component, inject, input, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
 import { LucideAngularModule, MoveRight } from 'lucide-angular';
 
@@ -7,7 +7,6 @@ import { LucideAngularModule, MoveRight } from 'lucide-angular';
   standalone: true,
   imports: [LucideAngularModule],
   templateUrl: './custom-nav.html',
-  styleUrl: './custom-nav.css',
 })
 export class CustomNav {
   private router = inject(Router);
@@ -30,10 +29,4 @@ export class CustomNav {
       this.router.navigate([this.to()]);
     }
   }
-
-  // navigate() {
-  //   if (this.to?.length) {
-  //     this.router.navigate([this.to]);
-  //   }
-  // }
 }

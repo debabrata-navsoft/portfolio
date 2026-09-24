@@ -8,7 +8,7 @@ import {
   FilterOption,
   FilterSelection,
   PagedResponse,
-} from '../../models/filter.model';
+} from '../models/filter.model';
 
 export function emptyFilterSelection(): FilterSelection {
   return { checkboxes: {}, dates: {} };

@@ -24,7 +24,6 @@ import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.s
   standalone: true,
   imports: [Error, DataTable],
   templateUrl: './admin-faq-list.html',
-  styleUrl: './admin-faq-list.css',
   host: { class: 'flex min-h-0 min-w-0 flex-1 flex-col h-full' },
 })
 export class AdminFaqList implements OnInit {

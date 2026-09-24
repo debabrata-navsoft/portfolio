@@ -26,7 +26,6 @@ import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.s
   standalone: true,
   imports: [CommonModule, RouterLink, DatePipe, TimeAgoPipe, LucideAngularModule, Error],
   templateUrl: './admin-contact-detail.html',
-  styleUrl: './admin-contact-detail.css',
 })
 export class AdminContactDetail implements OnInit {
   private route = inject(ActivatedRoute);

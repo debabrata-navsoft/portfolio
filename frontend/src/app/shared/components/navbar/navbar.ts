@@ -1,5 +1,5 @@
 import { Component, DestroyRef, HostListener, inject, OnInit, PLATFORM_ID } from '@angular/core';
-import { NavigationEnd, Router, RouterLink } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { filter } from 'rxjs';
@@ -13,7 +13,6 @@ import { LoaderService } from '../../../core/services/loader.service';
   standalone: true,
   imports: [LucideAngularModule],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.css',
 })
 export class Navbar implements OnInit {
   private router = inject(Router);
@@ -103,52 +102,6 @@ export class Navbar implements OnInit {
     // Normal route navigation
     this.router.navigateByUrl(item.link);
   }
-
-  // handleNavigation(item: NavbarMenu) {
-  //   this.isOpen = false;
-
-  //   const [path, fragment] = item.link.split('#');
-  //   const targetPath = path || '/';
-
-  //   if (!fragment) {
-  //     this.router.navigateByUrl(item.link);
-  //     return;
-  //   }
-
-  //   const currentPath = this.router.url.split('#')[0];
-
-  //   if (currentPath === targetPath) {
-  //     this.scrollToFragment(fragment);
-  //     return;
-  //   }
-
-  //   this.router.navigateByUrl(targetPath).then(() => {
-  //     this.scrollToFragment(fragment);
-  //   });
-  // }
-
-  // private scrollToFragment(fragment: string, attempt = 0) {
-  //   if (!isPlatformBrowser(this.platformId)) return;
-
-  //   const el = document.getElementById(fragment);
-
-  //   if (el) {
-  //     const navbarHeight = 130;
-
-  //     const y = el.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
-
-  //     window.scrollTo({
-  //       top: y,
-  //       behavior: 'smooth',
-  //     });
-
-  //     return;
-  //   }
-
-  //   if (attempt < 20) {
-  //     setTimeout(() => this.scrollToFragment(fragment, attempt + 1), 50);
-  //   }
-  // }
 
   private scrollToFragment(fragment: string, attempt = 0) {
     if (!isPlatformBrowser(this.platformId)) return;

@@ -12,7 +12,6 @@ import { Error } from '../../error/error';
   standalone: true,
   imports: [LucideAngularModule, RevealDirective, Error],
   templateUrl: './faq.html',
-  styleUrl: './faq.css',
   animations: [faqAnimation],
 })
 export class FAQ implements OnInit {

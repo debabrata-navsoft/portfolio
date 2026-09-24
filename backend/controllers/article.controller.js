@@ -4,6 +4,7 @@ import { notify, unnotify } from "./notification.controller.js";
 import {
   anyOfRegex,
   buildDateRange,
+  distinctFacet,
   escapeRegex,
   isTrue,
   parseList,
@@ -50,22 +51,6 @@ export const createArticle = async (req, res) => {
   }
 };
 
-// export const createBlog = async (req, res) => {
-//   try {
-//     const blog = await Blog.create(req.body);
-
-//     res.status(201).json({
-//       message: "Blog created successfully",
-//       blog,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Server error",
-//       error: error.message,
-//     });
-//   }
-// };
-
 // Query params: search, tag, readingTime, createdFrom, createdTo, published,
 // page, limit, sort, countOnly. Lists accept "a,b" or repeated keys.
 const buildArticleFilter = (query) => {
@@ -107,27 +92,6 @@ const buildArticleFilter = (query) => {
 
 const visibleScope = (req) =>
   visibilityScope(req, "published", { published: true }, { published: false });
-
-// `scope` (from visibleScope) keeps drafts out of a visitor's facet counts.
-const tagFacet = async (scope) => {
-  const trimmed = { $trim: { input: "$tags" } };
-
-  const rows = await Article.aggregate([
-    { $match: scope },
-    { $unwind: "$tags" },
-    { $match: { tags: { $nin: [null, ""] } } },
-    {
-      $group: {
-        _id: { $toLower: trimmed },
-        label: { $first: trimmed },
-        count: { $sum: 1 },
-      },
-    },
-    { $sort: { _id: 1 } },
-  ]);
-
-  return rows.map((row) => ({ value: row._id, label: row.label, count: row.count }));
-};
 
 const readingTimeFacet = async (scope) => {
   const rows = await Article.aggregate([
@@ -184,7 +148,7 @@ export const getArticles = async (req, res) => {
     const [items, total, tags, readingTimes] = await Promise.all([
       articleQuery.exec(),
       Article.countDocuments(filter),
-      tagFacet(scope),
+      distinctFacet(Article, "tags", scope, true),
       readingTimeFacet(scope),
     ]);
 
@@ -203,25 +167,6 @@ export const getArticles = async (req, res) => {
     });
   }
 };
-
-// export const getBlogById = async (req, res) => {
-//   try {
-//     const blog = await Blog.findById(req.params.id);
-
-//     if (!blog) {
-//       return res.status(404).json({
-//         message: "Blog not found",
-//       });
-//     }
-
-//     res.status(200).json(blog);
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Server error",
-//       error: error.message,
-//     });
-//   }
-// };
 
 /** One place for the three counter endpoints: update by slug, 404 or answer. */
 const updateStats = async (req, res, update, reply) => {
@@ -345,30 +290,6 @@ export const updateArticle = async (req, res) => {
     });
   }
 };
-
-// export const updateBlog = async (req, res) => {
-//   try {
-//     const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
-//       new: true,
-//     });
-
-//     if (!blog) {
-//       return res.status(404).json({
-//         message: "Blog not found",
-//       });
-//     }
-
-//     res.status(200).json({
-//       message: "Blog updated successfully",
-//       blog,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Server error",
-//       error: error.message,
-//     });
-//   }
-// };
 
 export const deleteArticle = async (req, res) => {
   try {

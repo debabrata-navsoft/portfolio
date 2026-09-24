@@ -1,4 +1,3 @@
-<!-- <div class="overflow-x-clip"> -->
 @if (loaderService.startupLoading() && !isAdminPage()) {
   <app-startup-loader />
 }
@@ -10,7 +9,6 @@
 <!-- Shared delete / confirm dialog, opened via ConfirmDialogService -->
 <app-confirm-dialog />
 <div class="overflow-x-clip">
-  <!-- [class.invisible]="loaderService.startupLoading()" -->
 
   <div
     [ngClass]="{
@@ -21,7 +19,6 @@
       <app-navbar />
     }
 
-    <!-- <div [class.page-content]="!isAdminPage()"> -->
     <div
       [class]="
         !isAdminPage()
@@ -37,6 +34,3 @@
     <app-footer />
   }
 </div>
-<!-- </div> -->
-
-<!-- <div [class.app-main]="!isAdminPage()" class="mx-5 md:mx-[15vw]"  > -->

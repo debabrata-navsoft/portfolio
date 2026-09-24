@@ -7,7 +7,6 @@
   "
 >
   <div class="mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-10 xl:px-0">
-    <!-- <div class="relative flex items-center py-8"> -->
     <div
       class="relative flex items-center transition-all duration-300"
       [class]="isScrolled ? 'py-4' : 'py-8'"
@@ -30,7 +29,6 @@
       </a>
 
       <!-- Desktop Nav Links -->
-      <!-- <ul class="flex items-center justify-center list-none md:mx-10 p-0 max-[768px]:hidden"> -->
       <ul class="hidden items-center justify-center list-none md:flex md:mx-10 p-0">
         @for (item of navbarMenu; track item.id) {
           <li
@@ -50,7 +48,6 @@
                 ></lucide-icon>
               }
             </button>
-            <!-- </button> -->
           </li>
         }
       </ul>
@@ -70,7 +67,6 @@
       </div>
 
       <!-- Mobile Actions -->
-      <!-- <div class="hidden items-center gap-3.5 ml-auto max-[768px]:flex"> -->
       <div class="flex items-center gap-3.5 ml-auto md:hidden">
         <button
           (click)="toggleTheme()"

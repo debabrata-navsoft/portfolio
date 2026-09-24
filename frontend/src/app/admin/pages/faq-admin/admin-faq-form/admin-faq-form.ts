@@ -14,7 +14,6 @@ import { LucideAngularModule } from 'lucide-angular';
   standalone: true,
   imports: [LucideAngularModule, Error],
   templateUrl: './admin-faq-form.html',
-  styleUrl: './admin-faq-form.css',
 })
 export class AdminFaqForm {
   private faqService = inject(FaqService);

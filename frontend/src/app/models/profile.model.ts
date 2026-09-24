@@ -6,11 +6,6 @@ export interface ProfileResponse {
   heroHeading: string;
   introduction: string;
   profileDescription: string;
-  // greeting: string;
-  // firstName: string;
-  // lastName: string;
-  // role: string;
-  // profileDescription: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -35,10 +30,4 @@ export type ProfileForm = {
   heroHeading: string;
   introduction: string;
   profileDescription: string;
-
-  // greeting: string;
-  // firstName: string;
-  // lastName: string;
-  // role: string;
-  // profileDescription: string;
 };

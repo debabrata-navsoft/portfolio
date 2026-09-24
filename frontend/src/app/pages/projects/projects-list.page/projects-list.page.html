@@ -2,7 +2,6 @@
   <app-error />
 } @else {
   <section class="overflow-hidden py-12 md:py-20">
-    <!-- [@listAnimation]="paginatedProjects().length" -->
 
     <div class="mx-auto mb-10 max-w-7xl px-5 md:mb-14">
       <app-list-toolbar
@@ -18,12 +17,10 @@
       />
     </div>
 
-    <!-- <div class="mx-auto flex max-w-7xl flex-col gap-32 px-5 xl:gap-20"> -->
     <div
       class="mx-auto flex max-w-7xl flex-col items-center gap-32 px-5 xl:items-stretch xl:gap-20"
     >
-      <!-- @for (project of filteredProjects(); track project._id; let i = $index) { -->
-      @for (project of projects(); track project._id; let i = $index) {
+      @for (project of items(); track project._id; let i = $index) {
         <article
           appReveal
           revealAnimation="up"
@@ -35,10 +32,6 @@
           }"
           (click)="viewProject(project.slug)"
         >
-          <!-- [ngClass]="{
-            'mr-auto xl:ml-30': i % 2 === 0,
-            'ml-auto xl:mr-30': i % 2 !== 0,
-          }" -->
 
           <div
             class="h-60 w-full md:h-80 overflow-hidden bg-neutral-500 dark:border dark:border-gray-900 xl:h-110"

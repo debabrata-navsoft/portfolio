@@ -9,7 +9,6 @@ import { AdminService } from '../../../core/services/admin.service';
   standalone: true,
   imports: [LucideAngularModule],
   templateUrl: './admin-login.html',
-  styleUrl: './admin-login.css',
 })
 export class AdminLogin {
   private adminService = inject(AdminService);

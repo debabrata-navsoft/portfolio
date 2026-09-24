@@ -13,7 +13,6 @@ import { RevealDirective } from '../../directives/reveal.directive';
   standalone: true,
   imports: [LucideAngularModule, GradientText, RevealDirective],
   templateUrl: './education-experience.html',
-  styleUrl: './education-experience.css',
 })
 export class EducationExperience {
   private experienceService = inject(ExperienceService);

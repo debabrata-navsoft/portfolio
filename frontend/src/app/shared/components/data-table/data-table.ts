@@ -26,7 +26,7 @@ import {
   countActiveFilters,
   emptyFilterSelection,
   removeFilterChip,
-} from '../../filters/filter.utils';
+} from '../../../utils/filter.utils';
 import { TableCell } from './table-cell.directive';
 import {
   SortDirection,

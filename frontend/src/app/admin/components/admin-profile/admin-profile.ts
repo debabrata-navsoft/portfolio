@@ -23,7 +23,6 @@ import { finalize } from 'rxjs';
   standalone: true,
   imports: [Error, MarkdownToolbar, MarkdownPreview],
   templateUrl: './admin-profile.html',
-  styleUrl: './admin-profile.css',
 })
 export class AdminProfile {
   private profileService = inject(ProfileService);

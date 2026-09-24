@@ -40,7 +40,6 @@ import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.s
     ArticleComments,
   ],
   templateUrl: './admin-article-details.html',
-  styleUrl: './admin-article-details.css',
 })
 export class AdminArticleDetails implements OnInit {
   private route = inject(ActivatedRoute);

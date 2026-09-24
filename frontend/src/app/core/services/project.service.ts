@@ -11,7 +11,7 @@ import {
   ProjectResponse,
   ProjectSaveResponse,
 } from '../../models/project.model';
-import { normalizeListResponse, toHttpParams } from '../../shared/filters/filter.utils';
+import { normalizeListResponse, toHttpParams } from '../../utils/filter.utils';
 
 @Injectable({
   providedIn: 'root',

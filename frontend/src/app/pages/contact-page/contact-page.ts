@@ -14,7 +14,6 @@ import { SnackBarService } from '../../core/services/snack-bar.service';
   standalone: true,
   imports: [CommonModule, FormsModule, LucideAngularModule, CustomButton, RevealDirective],
   templateUrl: './contact-page.html',
-  styleUrl: './contact-page.css',
   // animations: [fadeUpAnimation],
 })
 export class ContactPage {

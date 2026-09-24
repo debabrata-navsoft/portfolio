@@ -8,13 +8,13 @@ import { SnackBarService } from '../../../../core/services/snack-bar.service';
 import { LoaderService } from '../../../../core/services/loader.service';
 import { Error } from '../../../../shared/components/error/error';
 import { ArticleForm } from '../../../../models/article.model';
+import { generateSlug } from '../../../../utils/slug.utils';
 
 @Component({
   selector: 'app-admin-article-form',
   standalone: true,
   imports: [LucideAngularModule, Error],
   templateUrl: './admin-article-form.html',
-  styleUrl: './admin-article-form.css',
 })
 export class AdminArticleForm implements OnInit {
   private router = inject(Router);
@@ -119,20 +119,11 @@ export class AdminArticleForm implements OnInit {
     }));
   }
 
-  generateSlug(title: string): string {
-    return title
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-');
-  }
-
   updateTitle(title: string) {
     this.articles.update((form) => ({
       ...form,
       title,
-      slug: this.generateSlug(title),
+      slug: generateSlug(title),
     }));
   }
 

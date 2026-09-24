@@ -65,9 +65,7 @@ Every resource is exactly three files with matching names; **follow this when ad
 | comments | `/api/comments` | [comment.route.js](backend/routes/comment.route.js) | [comment.controller.js](backend/controllers/comment.controller.js) | [comment.model.js](backend/models/comment.model.js) |
 | notifications | `/api/notifications` | [notification.route.js](backend/routes/notification.route.js) | [notification.controller.js](backend/controllers/notification.controller.js) | [notification.model.js](backend/models/notification.model.js) |
 
-[backend/routes/upload.route.js](backend/routes/upload.route.js) and
-[upload.controller.js](backend/controllers/upload.controller.js) are **fully commented out and
-unmounted** — uploads happen inline on each resource route. Ignore them.
+There is no separate upload resource — uploads happen inline on each resource route.
 
 ### Schema fields (all have `timestamps: true`)
 
@@ -112,10 +110,9 @@ use `.single("image")`.
 
 - Plain `async (req, res)` with a top-level `try/catch`; each returns JSON and its own status.
   There is **no shared error-handling middleware** — don't `throw`, respond directly.
-- Projects/articles: read by **`slug`**, update/delete by **`_id`**. Slugs are generated and
-  de-duplicated by local `generateSlug` / `createUniqueSlug` helpers at the top of
-  [project.controller.js](backend/controllers/project.controller.js) and
-  [article.controller.js](backend/controllers/article.controller.js).
+- Projects/articles: read by **`slug`**, update/delete by **`_id`**. Project slugs are generated and
+  de-duplicated by `createUniqueSlug(Model, title, excludeId?)` in
+  [backend/utils/slug.js](backend/utils/slug.js); articles take the slug the admin form sends.
 - Singletons (profile, about) use `findOne()` / `deleteMany()`+`create` rather than ids.
 - Contact form: `createContact` is public and fires
   [sendContactMail](backend/utils/emails/sendMail.js) (nodemailer, templates in
@@ -206,7 +203,8 @@ and answer with an envelope, **not a bare array**:
 ```
 
 - Shared param helpers: [backend/utils/queryFilters.js](backend/utils/queryFilters.js)
-  (`parseList`, `anyOfRegex`, `buildDateRange`, `parsePagination`, `totalPages`, `isTrue`).
+  (`parseList`, `anyOfRegex`, `buildDateRange`, `parsePagination`, `totalPages`, `isTrue`,
+  `parseSort`, and `distinctFacet(Model, field, scope, unwind?)` which builds every facet).
   List params accept `a,b` or repeated keys; string matches are case-insensitive regexes with
   the input escaped; date bounds are UTC (`buildDateRange` uses `setUTCHours`, so `…To` covers
   the whole UTC day regardless of server timezone).
@@ -291,6 +289,10 @@ pick list before a template can use it.**
   It resolves a `Promise<boolean>`, so the calling method becomes `async`. The one
   [`<app-confirm-dialog />`](frontend/src/app/shared/components/confirm-dialog/) in `app.html`
   renders it for public and admin pages alike; Enter confirms, Esc / backdrop cancels.
+- [app/utils/](frontend/src/app/utils/) — **every framework-free helper lives here**, one
+  `<topic>.utils.ts` per concern: `filter.utils`, `code-highlight.utils`, `slug.utils`
+  (`generateSlug`, used by the article and project forms), `jwt.utils` (`decodeToken` /
+  `isTokenExpired`). Put new pure helpers here rather than as private component methods.
 - [admin.service.ts](frontend/src/app/core/services/admin.service.ts) is the exception — it also
   owns the `adminToken` in `localStorage` (`saveToken/getToken/isLoggedIn`) and
   `scheduleAutoLogout()` driven by the JWT `exp`.
@@ -317,8 +319,8 @@ pick list before a template can use it.**
   uses it today (Profile Image / About / Skills / Experience / Education).
 - [interceptors/auth-interceptor.ts](frontend/src/app/core/interceptors/auth-interceptor.ts) —
   attaches the bearer token, and on 401 clears it and routes to `/admin/login`.
-- [guards/admin-guard.ts](frontend/src/app/core/guards/admin-guard.ts) — decodes the JWT payload
-  client-side (`atob`) to check `exp`; redirects expired/missing tokens to `/admin/login` and
+- [guards/admin-guard.ts](frontend/src/app/core/guards/admin-guard.ts) — checks the JWT `exp`
+  client-side via `isTokenExpired` ([utils/jwt.utils.ts](frontend/src/app/utils/jwt.utils.ts)); redirects expired/missing tokens to `/admin/login` and
   logged-in users away from the login page. Returns `true` on the server.
 
 ### Models & static data
@@ -345,7 +347,7 @@ pick list before a template can use it.**
   widgets together), except the admin tree under [app/admin/](frontend/src/app/admin/) and the
   routed pages under [app/pages/](frontend/src/app/pages/).
 - **Public sections** [app/shared/components/](frontend/src/app/shared/components/): `hero`,
-  `about`, `slider-view` (static marquee, no logic — currently commented out of the home page),
+  `about`,
   `skills`, `education-experience`, `home-services`, `home-projects` (the only embla-carousel
   consumer), `home-articles`, `navbar`, `footer` (+ `footer/contact-footer`, `footer/faq`),
   `error`, `loaders/*`. [home.page.ts](frontend/src/app/pages/home.page/home.page.ts) is just a
@@ -430,7 +432,11 @@ pick list before a template can use it.**
     **draft** copy and emits `draftChange` on every change (so the page can preview the count),
     committing only on `applied`. Inputs `open/groups/selection/totalResults`, outputs
     `closed/draftChange/applied/cleared`.
-  - [filters/filter.utils.ts](frontend/src/app/shared/filters/filter.utils.ts) — the selection
+  - [filters/server-list-page.ts](frontend/src/app/shared/filters/server-list-page.ts) — the
+    abstract base both list pages extend. It owns the search / drawer / paging signals and the
+    debounced `switchMap` streams; a page only supplies `filterGroups`, `emptyFacets()`,
+    `fetch(query)` and `filterQuery(selection)`, and its template reads `items()`.
+  - [utils/filter.utils.ts](frontend/src/app/utils/filter.utils.ts) — the selection
     helpers shared by both list pages: `emptyFilterSelection` / `cloneFilterSelection`,
     `countActiveFilters`, `buildFilterChips` / `removeFilterChip`, `facetToOption`,
     `selectedValues` / `dateBound` (selection → query params), `toHttpParams` and
@@ -441,7 +447,7 @@ pick list before a template can use it.**
   existing `<b>`/`<strong>`), used by `markdown-preview`, the project/article detail pages and the
   public `hero` / `about` sections.
   ```` ```lang ```` fences become code blocks coloured by **highlight.js** via
-  [code-highlight.ts](frontend/src/app/pipes/code-highlight.ts): only the grammars registered
+  [code-highlight.utils.ts](frontend/src/app/utils/code-highlight.utils.ts): only the grammars registered
   there are bundled (JS/TS, Python, Java, C/C++/C#, HTML/XML, CSS/SCSS, JSON, SQL, bash, PHP, Go,
   Rust, Kotlin, Swift, Ruby, Dart, YAML, Markdown, Dockerfile), plus aliases such as `react`,
   `jsx`, `angular`, `node`, `c++`, `c#`, `py`. An unknown or missing language is auto-detected.
@@ -599,8 +605,9 @@ launch it once so it downloads SDK platform 36. `mobile:apk` writes
 - `ng build` uses `environment.prod.ts`, so the app talks to the Render API over HTTPS. Pointing
   it at a LAN `http://` address for debugging also needs `allowMixedContent: true` in
   `capacitor.config.ts` (Android blocks cleartext by default).
-- Ionic is registered via `provideIonicAngular()` in
-  [app.config.ts](frontend/src/app/app.config.ts) for its platform services only. **Its global
+- `provideIonicAngular()` is **commented out** in
+  [app.config.ts](frontend/src/app/app.config.ts); re-enable it only if you need Ionic's platform
+  services. **Its global
   stylesheets are deliberately not imported** — they would restyle the Tailwind UI — so an
   `ion-*` component will render unstyled until you add the matching CSS.
 - **Safe areas / edge-to-edge.** `targetSdk 36` means Android 15+ forces edge-to-edge, so the
@@ -639,13 +646,13 @@ launch it once so it downloads SDK platform 36. `mobile:apk` writes
   after the fact (and `reset-stats` zeroes the counters).
 - `data-table` renders no result counter — unlike the public `list-toolbar` there is no
   "Total N found" line, so the `label` input it used to carry was dead and has been removed.
-- `slider-view` is imported but commented out of `home.page.ts`'s `imports`, so it never renders.
+- The public project detail page returns early in `ngOnInit` behind `isPlatformBrowser`, so it
+  ships an empty shell from SSR — the exact anti-pattern §3 warns against.
 - The public skills section was rebuilt as a plain text list grouped by category, so it shows
   neither `imageUrl` nor `percentage`. The admin form still marks proficiency % as **required**,
   so that data is collected and never surfaced — wire it up or drop the field.
 - Two agent maps describe this repo — this file and [ANTIGRAVITY.md](ANTIGRAVITY.md). They drift
   independently; update both if you change something structural.
-- Large blocks of commented-out legacy code sit at the bottom of many files (`app.config.ts`,
-  `auth-interceptor.ts`, `admin-guard.ts`, all the profile/upload files). Treat them as dead;
-  don't mine them for behaviour.
+- Commented-out legacy code and empty stylesheets were swept out of the repo — don't add them
+  back; git history has the old versions. A component with no styles has no `styleUrl`.
 - `.spec.ts` files are untouched CLI scaffolds and several will fail if run.

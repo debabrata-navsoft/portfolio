@@ -8,7 +8,6 @@ import { RevealDirective } from '../../directives/reveal.directive';
   standalone: true,
   imports: [GradientText, LucideAngularModule, RevealDirective],
   templateUrl: './home-services.html',
-  styleUrl: './home-services.css',
 })
 export class HomeServices {
   services = signal([

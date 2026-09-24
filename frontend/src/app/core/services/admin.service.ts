@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 
 import { environment } from '../../../environments/environment';
 import { LoginResponse } from '../../models/admin.model';
+import { decodeToken } from '../../utils/jwt.utils';
 
 @Injectable({
   providedIn: 'root',
@@ -54,16 +55,6 @@ export class AdminService {
     return !!this.getToken();
   }
 
-  private decodeToken(token: string): any | null {
-    try {
-      const payload = token.split('.')[1];
-      const decoded = atob(payload);
-      return JSON.parse(decoded);
-    } catch {
-      return null;
-    }
-  }
-
   // Call this once when the app boots (if a token exists) and every time a new token is saved.
   scheduleAutoLogout(token: string | null) {
     this.clearAutoLogoutTimer();
@@ -72,7 +63,7 @@ export class AdminService {
       return;
     }
 
-    const decoded = this.decodeToken(token);
+    const decoded = decodeToken(token);
     if (!decoded?.exp) {
       return;
     }

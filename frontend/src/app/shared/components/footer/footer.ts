@@ -10,6 +10,5 @@ import { ContactFooter } from './contact-footer/contact-footer';
   standalone: true,
   imports: [GradientText, FAQ, ContactFooter],
   templateUrl: './footer.html',
-  styleUrl: './footer.css',
 })
 export class Footer {}

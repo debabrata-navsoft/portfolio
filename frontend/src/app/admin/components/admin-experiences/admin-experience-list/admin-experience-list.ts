@@ -114,15 +114,4 @@ export class AdminExperienceList implements OnInit {
 
     this.editingExperience.set(null);
   }
-
-  // openForm() {
-  //   this.showForm.set(true);
-  // }
-
-  // closeForm(newExperience?: ExperienceResponse) {
-  //   this.showForm.set(false);
-  //   if (newExperience) {
-  //     this.experiences.update((experiences) => [...experiences, newExperience]);
-  //   }
-  // }
 }

@@ -3,15 +3,14 @@ import {
   Component,
   computed,
   DestroyRef,
-  DOCUMENT,
   inject,
   NgZone,
   OnInit,
   PLATFORM_ID,
   signal,
 } from '@angular/core';
-import { CommonModule, DatePipe, isPlatformBrowser, NgClass, UpperCasePipe } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { CommonModule, DatePipe, isPlatformBrowser, UpperCasePipe } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { EMPTY, switchMap } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
 
@@ -43,7 +42,6 @@ import { ImageModal } from '../../../shared/components/image-modal/image-modal';
     ImageModal,
   ],
   templateUrl: './project-details.page.html',
-  styleUrl: './project-details.page.css',
   animations: [fadeUpAnimation],
 })
 export class ProjectDetailsPage implements OnInit {

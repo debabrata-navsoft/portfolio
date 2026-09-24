@@ -16,7 +16,6 @@ import { ConfirmDialog } from './shared/components/confirm-dialog/confirm-dialog
   standalone: true,
   imports: [RouterOutlet, Navbar, Footer, NgClass, ApiLoader, StartupLoader, ConfirmDialog],
   templateUrl: './app.html',
-  styleUrl: './app.css',
 })
 export class App {
   private router = inject(Router);

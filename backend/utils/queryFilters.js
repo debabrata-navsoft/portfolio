@@ -55,6 +55,29 @@ export const totalPages = (total, limit) => {
 
 export const isTrue = (value) => value === true || value === "true" || value === "1";
 
+// Distinct values of `field` with counts, so the client can render the filter drawer
+// without holding the whole collection in memory. `scope` keeps hidden docs (drafts,
+// inactive projects) out of a visitor's counts; `unwind` is for array fields.
+export const distinctFacet = async (Model, field, scope, unwind = false) => {
+  const trimmed = { $trim: { input: `$${field}` } };
+
+  const rows = await Model.aggregate([
+    { $match: scope },
+    ...(unwind ? [{ $unwind: `$${field}` }] : []),
+    { $match: { [field]: { $nin: [null, ""] } } },
+    {
+      $group: {
+        _id: { $toLower: trimmed },
+        label: { $first: trimmed },
+        count: { $sum: 1 },
+      },
+    },
+    { $sort: { _id: 1 } },
+  ]);
+
+  return rows.map((row) => ({ value: row._id, label: row.label, count: row.count }));
+};
+
 // Parses sort parameters supporting ?sortBy=createdAt&sortOrder=asc/desc or ?sort=oldest/newest/asc/desc
 export const parseSort = (query, defaultField = "createdAt", defaultOrder = "desc") => {
   if (!query) return { [defaultField]: defaultOrder === "asc" ? 1 : -1 };

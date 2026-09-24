@@ -46,7 +46,6 @@ const VIEWED_KEY = 'viewedArticles';
     ArticleComments,
   ],
   templateUrl: './article-details-page.html',
-  styleUrl: './article-details-page.css',
   animations: [fadeUpAnimation],
 })
 export class ArticleDetailsPage implements OnInit {

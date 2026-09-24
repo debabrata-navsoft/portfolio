@@ -2,12 +2,10 @@ import {
   Component,
   computed,
   DestroyRef,
-  EventEmitter,
   inject,
   input,
   OnInit,
   output,
-  Output,
   signal,
 } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
