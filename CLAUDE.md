@@ -440,6 +440,12 @@ pick list before a template can use it.**
   mini-markdown admins type into sanitized HTML (`**bold**`, `*italic*`, `` `code` ``, plus
   existing `<b>`/`<strong>`), used by `markdown-preview`, the project/article detail pages and the
   public `hero` / `about` sections.
+  ```` ```lang ```` fences become code blocks coloured by **highlight.js** via
+  [code-highlight.ts](frontend/src/app/pipes/code-highlight.ts): only the grammars registered
+  there are bundled (JS/TS, Python, Java, C/C++/C#, HTML/XML, CSS/SCSS, JSON, SQL, bash, PHP, Go,
+  Rust, Kotlin, Swift, Ruby, Dart, YAML, Markdown, Dockerfile), plus aliases such as `react`,
+  `jsx`, `angular`, `node`, `c++`, `c#`, `py`. An unknown or missing language is auto-detected.
+  The colours are the `.code-block .hljs-*` rules in `styles.css`.
 - **Admin** [app/admin/](frontend/src/app/admin/): `auth/admin-login`,
   `layout/admin-layout` + `components/admin-header`;
   `pages/dashboard-admin`; `pages/profile-admin` which composes `components/admin-profile`,

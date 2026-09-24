@@ -623,39 +623,92 @@ app-admin-login {
   color: #abb2bf;
 }
 
-/* Syntax Highlighting */
-.code-block .hl-comment {
+/* Syntax highlighting — highlight.js token classes (see app/pipes/code-highlight.ts),
+   One Dark palette. Anything unlisted keeps the base colour set on `.code-block code`. */
+.code-block .hljs-comment,
+.code-block .hljs-quote {
   color: #e5a87b;
   font-style: italic;
 }
 
-.code-block .hl-keyword {
+.code-block .hljs-keyword,
+.code-block .hljs-selector-tag,
+.code-block .hljs-literal,
+.code-block .hljs-doctag {
   color: #c678dd;
   font-weight: 500;
 }
 
-.code-block .hl-directive {
-  color: #38bdf8;
-}
-
-.code-block .hl-function {
-  color: #61afef;
-}
-
-.code-block .hl-type {
-  color: #e5c07b;
-}
-
-.code-block .hl-string {
+.code-block .hljs-string,
+.code-block .hljs-regexp,
+.code-block .hljs-addition,
+.code-block .hljs-char.escape_ {
   color: #98c379;
 }
 
-.code-block .hl-number {
+.code-block .hljs-number {
   color: #d19a66;
 }
 
-.code-block .hl-decorator {
+.code-block .hljs-title.function_,
+.code-block .hljs-title,
+.code-block .hljs-section {
+  color: #61afef;
+}
+
+.code-block .hljs-title.class_,
+.code-block .hljs-title.class_.inherited__,
+.code-block .hljs-type,
+.code-block .hljs-selector-class,
+.code-block .hljs-selector-id {
+  color: #e5c07b;
+}
+
+.code-block .hljs-built_in,
+.code-block .hljs-symbol,
+.code-block .hljs-bullet,
+.code-block .hljs-link {
+  color: #56b6c2;
+}
+
+/* Decorators (@Component), annotations, #include / #define, shebangs */
+.code-block .hljs-meta,
+.code-block .hljs-meta .hljs-keyword {
   color: #38bdf8;
+}
+
+.code-block .hljs-meta .hljs-string {
+  color: #98c379;
+}
+
+/* HTML / JSX / Angular template tags and their attributes; object keys and CSS properties */
+.code-block .hljs-tag,
+.code-block .hljs-name,
+.code-block .hljs-variable,
+.code-block .hljs-template-variable,
+.code-block .hljs-deletion {
+  color: #e06c75;
+}
+
+.code-block .hljs-attr,
+.code-block .hljs-attribute,
+.code-block .hljs-property,
+.code-block .hljs-selector-attr,
+.code-block .hljs-selector-pseudo {
+  color: #d19a66;
+}
+
+.code-block .hljs-params,
+.code-block .hljs-subst {
+  color: #abb2bf;
+}
+
+.code-block .hljs-emphasis {
+  font-style: italic;
+}
+
+.code-block .hljs-strong {
+  font-weight: 700;
 }
 
 /* Wrap instead of scrolling on phones: a nested scroll container is what WebKit

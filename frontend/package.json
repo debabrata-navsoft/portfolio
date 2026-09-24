@@ -38,6 +38,7 @@
     "embla-carousel": "^8.6.0",
     "embla-carousel-autoplay": "^8.6.0",
     "express": "^5.1.0",
+    "highlight.js": "^11.12.0",
     "lucide-angular": "^1.0.0",
     "postcss": "^8.5.16",
     "rxjs": "~7.8.0",
