@@ -25,11 +25,6 @@ import typescript from 'highlight.js/lib/languages/typescript';
 import xml from 'highlight.js/lib/languages/xml';
 import yaml from 'highlight.js/lib/languages/yaml';
 
-/*
- * Syntax colouring for ``` fenced blocks. Only these grammars are bundled (the full
- * highlight.js set is ~1 MB); add one here to support another language. Colours are the
- * `.hljs-*` rules under `.code-block` in styles.css. Pure string work, so it runs during SSR.
- */
 const LANGUAGES = {
   bash, c, cpp, csharp, css, dart, dockerfile, go, java, javascript, json, kotlin, markdown,
   php, plaintext, python, ruby, rust, scss, shell, sql, swift, typescript, xml, yaml,
@@ -37,7 +32,6 @@ const LANGUAGES = {
 
 for (const [name, grammar] of Object.entries(LANGUAGES)) hljs.registerLanguage(name, grammar);
 
-// Names people actually type after ``` → the grammar that colours them.
 hljs.registerAliases(['js', 'jsx', 'mjs', 'cjs', 'node', 'nodejs', 'react', 'express'], {
   languageName: 'javascript',
 });
@@ -51,10 +45,6 @@ hljs.registerAliases(['kt'], { languageName: 'kotlin' });
 hljs.registerAliases(['yml'], { languageName: 'yaml' });
 hljs.registerAliases(['text', 'txt'], { languageName: 'plaintext' });
 
-/**
- * Coloured, HTML-escaped markup for `code`. A known language (or alias) is used directly;
- * an unknown or missing one is auto-detected among the bundled grammars.
- */
 export const highlightCode = (code: string, lang: string): string => {
   const language = lang.trim().toLowerCase();
 

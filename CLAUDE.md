@@ -528,10 +528,11 @@ pick list before a template can use it.**
   generates, while Angular still puts it on the host — so positioning utilities
   (`absolute left-3 …`) are applied **twice**. Wrap the icon in a positioned `<span>` instead of
   styling the icon (see the search boxes in `list-toolbar` / `filter-drawer`).
-- The two list pages are the one place that departs from "subscribe in `ngOnInit`": search,
-  filters and paging feed rxjs `Subject`s piped through `debounceTime` + `switchMap` in the
-  constructor (so a superseded request is dropped), with the subscriptions torn down in the
-  usual `destroyRef.onDestroy`. Keep that shape if you add another server-queried list.
+- The two list pages drive search, filters and paging through rxjs `Subject`s piped through
+  `debounceTime` + `switchMap` (so a superseded request is dropped). The pipelines are set up in
+  `ngOnInit`, which fires the first `reload()` only **after** subscribing — the `Subject`s don't
+  replay, so an earlier emission would be lost. Teardown is the usual `destroyRef.onDestroy`.
+  Keep that shape if you add another server-queried list.
 - Angular Material is now down to two things: the snack bar and the `mat-paginator` inside
   `data-table`. `mat-form-field` is deliberately **not** used anywhere, because Tailwind's
   preflight breaks the MDC notched outline. For dates use `<app-date-picker>` — the Material

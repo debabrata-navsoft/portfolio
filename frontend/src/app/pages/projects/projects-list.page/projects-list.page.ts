@@ -97,7 +97,7 @@ export class ProjectsListPage implements OnInit {
   private searchInput$ = new Subject<void>();
   private previewReload$ = new Subject<void>();
 
-  constructor() {
+  ngOnInit(): void {
     // Main list request. switchMap drops the response of a superseded query.
     const listSub = this.reload$
       .pipe(
@@ -152,9 +152,7 @@ export class ProjectsListPage implements OnInit {
       searchSub.unsubscribe();
       previewSub.unsubscribe();
     });
-  }
 
-  ngOnInit(): void {
     this.reload();
   }
 
