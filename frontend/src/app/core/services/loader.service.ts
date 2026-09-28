@@ -10,9 +10,6 @@ export class LoaderService {
   startupLoading = signal(false);
   apiLoading = signal(false);
 
-  // Number of page requests still in flight. Components call trackRequest()
-  // before subscribing and completeRequest() in both next and error, so the
-  // startup loader can stay up until the (slow, cold-starting) API answers.
   private pendingRequests = signal(0);
 
   contentLoading = computed(() => this.pendingRequests() > 0);
@@ -49,8 +46,7 @@ export class LoaderService {
     this.pendingRequests.set(0);
   }
 
-  // Page-level failure. The home sections each fetch their own data, so without a
-  // shared flag a dead API renders one error card per section.
+  // Content error tracking
   contentError = signal(false);
 
   reportContentError() {

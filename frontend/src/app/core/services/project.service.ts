@@ -24,11 +24,6 @@ export class ProjectService {
     return this.http.post<ProjectSaveResponse>(this.apiUrl, formData);
   }
 
-  /** Every project, for callers that don't search / filter / paginate. */
-  /**
-   * Public callers pass `activeOnly` so inactive projects stay hidden even from the signed-in
-   * admin (the API hides them from everyone else regardless).
-   */
   private activeParams = (activeOnly: boolean) => (activeOnly ? { active: 'true' } : undefined);
 
   getProjects(activeOnly = false): Observable<ProjectResponse[]> {
@@ -37,7 +32,6 @@ export class ProjectService {
       .pipe(map((res) => this.toListResponse(res).items));
   }
 
-  /** Server-side search, filter, count and pagination + the filter facets. */
   queryProjects(query: ProjectQuery): Observable<ProjectListResponse> {
     return this.http
       .get<unknown>(this.apiUrl, { params: toHttpParams({ ...query }) })

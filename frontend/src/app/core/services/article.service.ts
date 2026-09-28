@@ -27,10 +27,6 @@ export class ArticleService {
     return this.http.post<ArticleSaveResponse>(this.apiUrl, formData);
   }
 
-  /**
-   * Public callers pass `publishedOnly` so drafts stay hidden even from the signed-in admin
-   * (the API hides them from everyone else regardless).
-   */
   private publishedParams = (publishedOnly: boolean) =>
     publishedOnly ? { published: 'true' } : undefined;
 

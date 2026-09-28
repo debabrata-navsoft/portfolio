@@ -28,10 +28,6 @@ export class SocketService {
     });
   }
 
-  /**
-   * Proves the admin token so this connection joins the server's admin room (notifications).
-   * Re-sent on every reconnect, since a new connection starts outside the room.
-   */
   joinAdmin(token: string): void {
     if (!this.isBrowser) return;
 
