@@ -37,17 +37,12 @@ const protectAdmin = async (req, res, next) => {
   }
 };
 
-/**
- * Soft version of protectAdmin for public routes: resolves to the admin when the request
- * carries a valid token, otherwise null — it never rejects the request.
- */
 export const adminFromRequest = (req) => {
   const authHeader = req.headers.authorization;
 
   return authHeader?.startsWith("Bearer ") ? adminFromToken(authHeader.split(" ")[1]) : null;
 };
 
-/** Same check for a bare token — the socket `admin:join` handshake uses it. */
 export const adminFromToken = async (token) => {
   if (typeof token !== "string" || !token) return null;
 
@@ -59,12 +54,6 @@ export const adminFromToken = async (token) => {
   }
 };
 
-/**
- * Mongo filter for which docs a public read may return — drafts / inactive items are admin-only.
- * `?<param>=true` wins even for the admin (the public pages send it, so SSR — which has no
- * token — and the browser agree) and is checked first so those calls skip the token lookup.
- * The admin may also ask for `?<param>=false` to get only the hidden ones.
- */
 export const visibilityScope = async (req, param, visible, hidden) => {
   const flag = req.query[param];
 

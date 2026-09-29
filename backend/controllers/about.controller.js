@@ -11,12 +11,6 @@ const parseArray = (value) => {
   }
 };
 
-/**
- * Rebuilds the gallery from the slots the admin kept (`existingImages`) with this
- * request's uploads dropped into the slots they replace (`imageSlots`). Clients that
- * send no slot map keep the stored images when they upload nothing, so a text-only
- * save can't wipe the gallery.
- */
 const mergeImages = (body, files, stored = []) => {
   const kept = parseArray(body.existingImages) || (files.length ? [] : stored);
   const slots = parseArray(body.imageSlots) || [];
