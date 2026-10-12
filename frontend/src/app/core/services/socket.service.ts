@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { inject, Injectable, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 
@@ -12,6 +12,7 @@ const SOCKET_URL = environment.apiUrl.replace(/\/api\/?$/, '');
 })
 export class SocketService {
   private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private zone = inject(NgZone);
   private socket?: Socket;
   private adminToken: string | null = null;
 
@@ -20,7 +21,7 @@ export class SocketService {
       if (!this.isBrowser) return;
 
       const socket = this.connect();
-      const handler = (payload: T) => subscriber.next(payload);
+      const handler = (payload: T) => this.zone.run(() => subscriber.next(payload));
 
       socket.on(event, handler);
 
@@ -44,7 +45,10 @@ export class SocketService {
 
   private connect(): Socket {
     if (!this.socket) {
-      this.socket = io(SOCKET_URL, { transports: ['websocket', 'polling'] });
+      // Outside the zone, or the socket's timers keep the app from ever becoming stable.
+      this.socket = this.zone.runOutsideAngular(() =>
+        io(SOCKET_URL, { transports: ['websocket', 'polling'] }),
+      );
       this.socket.on('connect', () => {
         if (this.adminToken) this.socket!.emit('admin:join', this.adminToken);
       });

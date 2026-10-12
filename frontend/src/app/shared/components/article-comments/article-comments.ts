@@ -235,7 +235,9 @@ export class ArticleComments implements OnInit {
     if (!silent) this.loading.set(true);
 
     this.track(
-      this.commentService.getComments(this.article()).pipe(finalize(() => this.loading.set(false))),
+      this.commentService
+        .getComments(this.article(), silent)
+        .pipe(finalize(() => this.loading.set(false))),
       (res) => {
         this.comments.set(res.items || []);
         this.total.set(res.total || 0);

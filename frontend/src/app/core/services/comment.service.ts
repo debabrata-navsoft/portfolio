@@ -17,9 +17,10 @@ export class CommentService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/comments`;
 
-  getComments(article?: string): Observable<CommentListResponse> {
+  // `fresh` skips the SSR transfer cache, which would replay the server-rendered thread.
+  getComments(article?: string, fresh = false): Observable<CommentListResponse> {
     const params = article ? new HttpParams().set('article', article) : undefined;
-    return this.http.get<CommentListResponse>(this.apiUrl, { params });
+    return this.http.get<CommentListResponse>(this.apiUrl, { params, transferCache: !fresh });
   }
 
   createComment(comment: CommentForm): Observable<CommentSaveResponse> {
