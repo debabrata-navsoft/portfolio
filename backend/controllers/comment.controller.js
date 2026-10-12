@@ -4,7 +4,7 @@ import Comment from "../models/comment.model.js";
 import Article from "../models/article.model.js";
 import { adminFromRequest } from "../middleware/auth.middleware.js";
 import { emitCommentsChanged } from "../config/socket.js";
-import { notify } from "./notification.controller.js";
+import { notify, unnotifySources } from "./notification.controller.js";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -133,6 +133,7 @@ export const createComment = async (req, res) => {
         title: `${comment.name} ${parentId ? "replied" : "commented"} on "${article.title}"`,
         message: comment.message,
         link: `/admin/articles/${article.slug}`,
+        source: comment._id,
       });
     }
 
@@ -185,9 +186,11 @@ export const deleteComment = async (req, res) => {
       return notFound(res, "Comment");
     }
 
-    await Comment.deleteMany({ $or: [{ _id: id }, { parent: id }] });
+    const ids = await Comment.find({ $or: [{ _id: id }, { parent: id }] }).distinct("_id");
+    await Comment.deleteMany({ _id: { $in: ids } });
 
     emitCommentsChanged(comment.article);
+    unnotifySources(ids);
 
     res.json({ message: "Comment deleted successfully" });
   } catch (error) {

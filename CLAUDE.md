@@ -86,7 +86,7 @@ unmounted** — uploads happen inline on each resource route. Ignore them.
   `name, email, message, isAuthor`
 - **Contact** `firstName, lastName, email, subject, message, isRead`
 - **FAQ** `question, answer, isActive, order`
-- **Notification** `type` (`like`/`comment`/`contact`), `title, message, link` (admin route to open), `isRead`
+- **Notification** `type` (`like`/`comment`/`contact`), `title, message, link` (admin route to open), `source` (the comment that raised it), `isRead`
 
 ### Auth
 
@@ -173,7 +173,7 @@ Readers have no accounts, so everything here is anonymous and public:
   [notification.controller.js](backend/controllers/notification.controller.js) is called by
   `toggleArticleLike` (an unlike calls `unnotify`, which deletes that article's newest like
   notification and pushes `notification:removed` so the bell drops it live), `createComment` (skipped for author comments)
-  and `createContact`. It never throws, so a failed notification can't fail the visitor's request.
+  and `createContact`. Deleting a comment calls `unnotifySources(ids)` for it and its replies, which drops their notifications (matched on `source`) and pushes `notification:removed` for each. It never throws, so a failed notification can't fail the visitor's request.
 - It saves the doc and pushes `notification:new` with `emitToAdmin` — to the socket.io
   **`admins` room only**, never a broadcast, because the payload carries visitors' names and
   messages. A socket joins by emitting `admin:join` with its JWT (checked by `adminFromToken`);

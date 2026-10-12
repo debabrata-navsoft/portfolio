@@ -22,6 +22,11 @@ const notificationSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    // The comment that raised it, so deleting the comment removes the notification too
+    source: {
+      type: mongoose.Schema.Types.ObjectId,
+      index: true,
+    },
     isRead: {
       type: Boolean,
       default: false,

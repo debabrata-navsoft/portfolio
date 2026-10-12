@@ -8,13 +8,14 @@ const LIST_LIMIT = 30;
  * Called by the like / comment / contact handlers. Never throws — a failed notification
  * must not fail the visitor's request that triggered it.
  */
-export const notify = async ({ type, title, message = "", link = "" }) => {
+export const notify = async ({ type, title, message = "", link = "", source = null }) => {
   try {
     const notification = await Notification.create({
       type,
       title,
       message: message.slice(0, 160),
       link,
+      source,
     });
 
     emitToAdmin("notification:new", notification);
@@ -36,6 +37,19 @@ export const unnotify = async ({ type, link }) => {
     );
 
     if (notification) emitToAdmin("notification:removed", notification);
+  } catch (error) {
+    console.log("Notification removal failed:", error.message);
+  }
+};
+
+/** Removes every notification raised by the given docs (e.g. deleted comments). Never throws. */
+export const unnotifySources = async (sources) => {
+  try {
+    const filter = { source: { $in: sources } };
+    const notifications = await Notification.find(filter, "_id isRead");
+
+    await Notification.deleteMany(filter);
+    notifications.forEach((n) => emitToAdmin("notification:removed", n));
   } catch (error) {
     console.log("Notification removal failed:", error.message);
   }
