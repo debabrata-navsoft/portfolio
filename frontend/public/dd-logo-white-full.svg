@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 120" width="440" height="120">
+  <defs>
+    <mask id="cut">
+      <rect width="120" height="120" fill="#fff"/>
+      <line x1="26" y1="112" x2="94" y2="8" stroke="#000" stroke-width="11" stroke-linecap="round"/>
+    </mask>
+  </defs>
+  <g mask="url(#cut)">
+    <path fill="#FFFFFF" fill-rule="evenodd"
+      d="M22 14 H60 C86.5 14 106 34.5 106 60 S86.5 106 60 106 H22 Z
+         M42 34 V86 H60 C74.9 86 86 74.9 86 60 S74.9 34 60 34 Z"/>
+  </g>
+  <text x="128" y="66" font-family="Roboto, Inter, 'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="40" letter-spacing="-1" fill="#FFFFFF">Debabrata Das</text>
+  <text x="130" y="94" font-family="Roboto, Inter, 'Helvetica Neue', Arial, sans-serif" font-weight="500" font-size="15" letter-spacing="3" fill="#9CA3AF">FRONTEND DEVELOPER</text>
+</svg>

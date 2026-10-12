@@ -15,18 +15,23 @@
       <!-- Logo -->
       <a
         (click)="goHome()"
-        class="mr-auto text-2xl font-extrabold italic whitespace-nowrap cursor-pointer no-underline max-[992px]:text-[1.4rem] max-[768px]:text-[1.25rem] max-[768px]:mr-0"
+        class="mr-auto flex shrink-0 cursor-pointer items-center no-underline max-[768px]:mr-0"
+        aria-label="Debabrata Das — home"
       >
-        <span
-          class="bg-gradient-to-r from-black dark:from-white via-gray-500 dark:via-gray-300 to-purple-500 bg-clip-text text-transparent [-webkit-background-clip:text]"
-        >
-          &lt;Debabrata
-        </span>
-        <span
-          class="bg-gradient-to-r from-purple-500 via-red-500 to-orange-400 bg-clip-text text-transparent [-webkit-background-clip:text]"
-        >
-          Das /&gt;
-        </span>
+        <img
+          src="dd-logo-black-full.svg"
+          alt="Debabrata Das — Frontend Developer"
+          width="440"
+          height="120"
+          class="h-12 w-auto dark:hidden max-[768px]:h-10"
+        />
+        <img
+          src="dd-logo-white-full.svg"
+          alt="Debabrata Das — Frontend Developer"
+          width="440"
+          height="120"
+          class="hidden h-12 w-auto dark:block max-[768px]:h-10"
+        />
       </a>
 
       <!-- Desktop Nav Links -->
