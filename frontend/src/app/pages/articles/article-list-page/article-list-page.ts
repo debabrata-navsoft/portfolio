@@ -25,11 +25,13 @@ import {
   removeFilterChip,
   selectedValues,
 } from '../../../shared/filters/filter.utils';
+import { CdnImagePipe } from '../../../pipes/cdn-image.pipe';
 
 @Component({
   selector: 'app-article-list-page',
   standalone: true,
   imports: [
+    CdnImagePipe,
     Error,
     TimeAgoPipe,
     GradientText,

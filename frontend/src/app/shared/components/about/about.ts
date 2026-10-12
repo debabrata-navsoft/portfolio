@@ -6,11 +6,12 @@ import { LucideAngularModule } from 'lucide-angular';
 import { GradientText } from '../gradient-text/gradient-text';
 import { RevealDirective } from '../../directives/reveal.directive';
 import { FormatTextPipe } from '../../../pipes/format-text.pipe';
+import { CdnImagePipe } from '../../../pipes/cdn-image.pipe';
 
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [LucideAngularModule, GradientText, RevealDirective, FormatTextPipe],
+  imports: [CdnImagePipe, LucideAngularModule, GradientText, RevealDirective, FormatTextPipe],
   templateUrl: './about.html',
   styleUrl: './about.css',
 })

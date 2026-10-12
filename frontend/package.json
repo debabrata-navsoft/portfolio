@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:frontend": "node dist/frontend/server/server.mjs"
+    "serve:ssr:frontend": "node dist/frontend/server/server.mjs",
+    "preview": "ng build && NG_ALLOWED_HOSTS=localhost node dist/frontend/server/server.mjs"
   },
   "prettier": {
     "printWidth": 100,

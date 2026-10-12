@@ -17,6 +17,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { ArticleService } from '../../../core/services/article.service';
 import { LoaderService } from '../../../core/services/loader.service';
 import { SnackBarService } from '../../../core/services/snack-bar.service';
+import { SeoService } from '../../../core/services/seo.service';
 import { ImageModal } from '../../../shared/components/image-modal/image-modal';
 import { ArticleResponse } from '../../../models/article.model';
 import { Error } from '../../../shared/components/error/error';
@@ -27,6 +28,7 @@ import { GradientText } from '../../../shared/components/gradient-text/gradient-
 import { fadeUpAnimation } from '../../../shared/animation/page.animations';
 import { RevealDirective } from '../../../shared/directives/reveal.directive';
 import { ArticleComments } from '../../../shared/components/article-comments/article-comments';
+import { CdnImagePipe, CdnSrcsetPipe } from '../../../pipes/cdn-image.pipe';
 
 const LIKED_KEY = 'likedArticles';
 const VIEWED_KEY = 'viewedArticles';
@@ -35,6 +37,8 @@ const VIEWED_KEY = 'viewedArticles';
   selector: 'app-article-details-page',
   standalone: true,
   imports: [
+    CdnImagePipe,
+    CdnSrcsetPipe,
     Error,
     TimeAgoPipe,
     FormatTextPipe,
@@ -54,6 +58,7 @@ export class ArticleDetailsPage implements OnInit {
   private articleService = inject(ArticleService);
   private loaderService = inject(LoaderService);
   private snackBarService = inject(SnackBarService);
+  private seo = inject(SeoService);
   private destroyRef = inject(DestroyRef);
   private ngZone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
@@ -87,6 +92,7 @@ export class ArticleDetailsPage implements OnInit {
         next: (res) => {
           this.inZone(() => {
             this.articles.set(res);
+            this.seo.set(res.title, res.excerpt);
             this.views.set(res.views || 0);
             this.likes.set(res.likes || 0);
     
@@ -117,6 +123,7 @@ export class ArticleDetailsPage implements OnInit {
 
     this.destroyRef.onDestroy(() => {
       articleSub.unsubscribe();
+      this.seo.reset();
     });
   }
 

@@ -44,7 +44,7 @@
             class="h-60 w-full md:h-80 overflow-hidden bg-neutral-500 dark:border dark:border-gray-900 xl:h-110"
           >
             <img
-              [src]="project.projectCardImage"
+              [src]="project.projectCardImage | cdnImage: 800"
               [alt]="project.title"
               class="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-110"
             />

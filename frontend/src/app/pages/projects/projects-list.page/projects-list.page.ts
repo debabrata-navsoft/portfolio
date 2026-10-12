@@ -26,11 +26,13 @@ import {
   removeFilterChip,
   selectedValues,
 } from '../../../shared/filters/filter.utils';
+import { CdnImagePipe } from '../../../pipes/cdn-image.pipe';
 
 @Component({
   selector: 'app-projects-list-page',
   standalone: true,
   imports: [
+    CdnImagePipe,
     NgClass,
     UpperCasePipe,
     Error,

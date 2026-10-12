@@ -18,6 +18,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { ProjectService } from '../../../core/services/project.service';
 import { ProjectResponse } from '../../../models/project.model';
 import { SnackBarService } from '../../../core/services/snack-bar.service';
+import { SeoService } from '../../../core/services/seo.service';
 import { LoaderService } from '../../../core/services/loader.service';
 import { Error } from '../../../shared/components/error/error';
 import { GradientText } from '../../../shared/components/gradient-text/gradient-text';
@@ -26,11 +27,14 @@ import { RevealDirective } from '../../../shared/directives/reveal.directive';
 import { TimeAgoPipe } from '../../../pipes/time-ago.pipe';
 import { FormatTextPipe } from '../../../pipes/format-text.pipe';
 import { ImageModal } from '../../../shared/components/image-modal/image-modal';
+import { CdnImagePipe, CdnSrcsetPipe } from '../../../pipes/cdn-image.pipe';
 
 @Component({
   selector: 'app-project-details.page',
   standalone: true,
   imports: [
+    CdnImagePipe,
+    CdnSrcsetPipe,
     CommonModule,
     UpperCasePipe,
     LucideAngularModule,
@@ -52,6 +56,7 @@ export class ProjectDetailsPage implements OnInit {
   private projectService = inject(ProjectService);
   private loaderService = inject(LoaderService);
   private snackBarService = inject(SnackBarService);
+  private seo = inject(SeoService);
   private destroyRef = inject(DestroyRef);
   private platformId = inject(PLATFORM_ID);
   private ngZone = inject(NgZone);
@@ -94,6 +99,7 @@ export class ProjectDetailsPage implements OnInit {
         next: (res) => {
           this.ngZone.run(() => {
             this.project.set(res);
+            this.seo.set(res.title, res.overview);
             this.loaderService.hideApi();
             this.cdr.detectChanges();
           });
@@ -120,6 +126,7 @@ export class ProjectDetailsPage implements OnInit {
     this.destroyRef.onDestroy(() => {
       projectSub.unsubscribe();
       projectsSub.unsubscribe();
+      this.seo.reset();
     });
   }
 

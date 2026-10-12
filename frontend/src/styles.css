@@ -301,12 +301,12 @@ body {
 
 .snackbar-success .mdc-snackbar__surface {
   background-color: white !important;
-  color: #4caf50 !important;
+  color: #15803d !important;
 }
 
 .snackbar-error .mdc-snackbar__surface {
   background-color: white !important;
-  color: #f44336 !important;
+  color: #dc2626 !important;
 }
 
 .snackbar-success .mat-mdc-snack-bar-action,

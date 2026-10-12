@@ -60,12 +60,19 @@
           class="cursor-zoom-in overflow-hidden bg-neutral-500"
           (click)="isImageModalOpen.set(true)"
         >
-          <img [src]="project()!.image" [alt]="project()!.title" class="w-full object-cover" />
+          <img
+            [src]="project()!.image | cdnImage"
+            [attr.srcset]="project()!.image | cdnSrcset"
+            sizes="(min-width: 1280px) 1280px, 100vw"
+            [alt]="project()!.title"
+            fetchpriority="high"
+            class="w-full object-cover"
+          />
         </div>
 
         <app-image-modal
           [(isOpen)]="isImageModalOpen"
-          [src]="project()!.image"
+          [src]="project()!.image | cdnImage: 2000"
           [alt]="project()!.title"
         />
 

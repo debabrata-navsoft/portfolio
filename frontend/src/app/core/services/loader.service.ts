@@ -19,6 +19,10 @@ export class LoaderService {
 
     const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
 
+    // Home only: on a deep link (an article, a project) the splash would hide content that is
+    // already server-rendered, and it would be measured as the page's largest paint.
+    if (window.location.pathname !== '/') return;
+
     if (navigation.type === 'reload' || navigation.type === 'navigate') {
       this.startupLoading.set(true);
     }

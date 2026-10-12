@@ -283,8 +283,9 @@ pick list before a template can use it.**
   skills`).
   Uniform shape: `inject(HttpClient)`, `private apiUrl = ${environment.apiUrl}/<resource>`, thin
   methods returning `Observable<T>` typed by `app/models/`. **Add API calls here, never in
-  components.** The non-HTTP services alongside them are `loader`, `snack-bar`, `admin-tab` and
-  `confirm-dialog`.
+  components.** The non-HTTP services alongside them are `loader`, `snack-bar`, `admin-tab`,
+  `confirm-dialog` and `seo` (`set(title, description)` on the article/project detail pages,
+  `reset()` on destroy back to the `index.html` defaults — runs during SSR, so crawlers see it).
 - [confirm-dialog.service.ts](frontend/src/app/core/services/confirm-dialog.service.ts) —
   **use it instead of the browser `confirm()`** (none are left):
   `if (!(await this.confirmDialog.confirm({ title?, message, confirmText? }))) return;`.
@@ -357,7 +358,8 @@ pick list before a template can use it.**
   `custom-button`, `custom-nav` (back/next nav), `gradient-text`, `list-toolbar`, `data-table`,
   `date-picker`, `markdown-toolbar`, `markdown-preview`, `article-comments`. Plus
   [shared/directives/reveal.directive.ts](frontend/src/app/shared/directives/reveal.directive.ts)
-  (IntersectionObserver scroll-reveal) and
+  (IntersectionObserver scroll-reveal — an element already on screen at load with no splash over it
+  is left visible, since hiding the server-rendered content would be a layout shift) and
   [shared/animation/page.animations.ts](frontend/src/app/shared/animation/page.animations.ts).
 - **[markdown-toolbar](frontend/src/app/shared/components/markdown-toolbar/) /
   [markdown-preview](frontend/src/app/shared/components/markdown-preview/)** — the mini-markdown
@@ -435,7 +437,10 @@ pick list before a template can use it.**
     `countActiveFilters`, `buildFilterChips` / `removeFilterChip`, `facetToOption`,
     `selectedValues` / `dateBound` (selection → query params), `toHttpParams` and
     `normalizeListResponse`.
-- **Pipes** [app/pipes/](frontend/src/app/pipes/): `truncate`, `time-ago`, `SafeHtml`, and
+- **Pipes** [app/pipes/](frontend/src/app/pipes/): `truncate`, `time-ago`, `SafeHtml`,
+  [cdn-image.pipe.ts](frontend/src/app/pipes/cdn-image.pipe.ts) (`cdnImage: width` → Cloudinary
+  `f_auto,q_auto,w_<n>` copy; `cdnSrcset` + a `sizes` attr for the detail-page hero images — use
+  them on any new public `<img>` of an uploaded image), and
   [format-text.pipe.ts](frontend/src/app/pipes/format-text.pipe.ts) (`formatText`) — turns the
   mini-markdown admins type into sanitized HTML (`**bold**`, `*italic*`, `` `code` ``, plus
   existing `<b>`/`<strong>`), used by `markdown-preview`, the project/article detail pages and the
@@ -558,8 +563,9 @@ is gated on real data rather than a fixed timer:
   visitor.
 
 The six home sections that register are `hero`, `about`, `skills`, `education-experience`,
-`home-projects` and `home-articles` (`home-services` is static and registers nothing). Pages other than home register nothing, so the counter is 0
-and they exit at the 2s minimum as before. Behaviour is covered by
+`home-projects` and `home-articles` (`home-services` is static and registers nothing). The splash is **home-only**:
+`initStartupLoader()` skips it when the first URL isn't `/`, because on a deep link it would hide
+server-rendered content and Lighthouse would measure it as the page's LCP. Behaviour is covered by
 [startup-loader.timing.spec.ts](frontend/src/app/shared/components/loaders/startup-loader/startup-loader.timing.spec.ts)
 (`ng test --include='**/startup-loader.timing.spec.ts'`) — the one spec in the repo that is not
 a scaffold.

@@ -29,7 +29,7 @@
           <!-- Image -->
           <div class="h-60 w-full overflow-hidden md:h-80 md:w-175 xl:h-95 xl:w-175">
             <img
-              [src]="article.image"
+              [src]="article.image | cdnImage: 800"
               [alt]="article.title"
               class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
             />

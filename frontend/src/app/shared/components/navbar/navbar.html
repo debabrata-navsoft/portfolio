@@ -14,7 +14,8 @@
     >
       <!-- Logo -->
       <a
-        (click)="goHome()"
+        href="/"
+        (click)="$event.preventDefault(); goHome()"
         class="mr-auto flex shrink-0 cursor-pointer items-center no-underline max-[768px]:mr-0"
         aria-label="Debabrata Das — home"
       >
@@ -64,6 +65,7 @@
       <div>
         <button
           (click)="toggleTheme()"
+          [attr.aria-label]="isDark ? 'Switch to light theme' : 'Switch to dark theme'"
           class="hidden md:flex items-center justify-center ml-auto border border-gray-400 dark:border-gray-800 rounded-full p-2 w-[38px] h-[38px] cursor-pointer bg-transparent text-[var(--text-color)]"
         >
           <lucide-icon
@@ -79,6 +81,7 @@
       <div class="flex items-center gap-3.5 ml-auto md:hidden">
         <button
           (click)="toggleTheme()"
+          [attr.aria-label]="isDark ? 'Switch to light theme' : 'Switch to dark theme'"
           class="flex items-center justify-center border border-gray-500 dark:border-gray-800 rounded-full p-1.5 cursor-pointer bg-transparent text-[var(--text-color)]"
         >
           <lucide-icon [name]="isDark ? 'moon' : 'sun'" [size]="14"></lucide-icon>
@@ -86,6 +89,8 @@
 
         <button
           (click)="toggleMenu()"
+          [attr.aria-label]="isOpen ? 'Close menu' : 'Open menu'"
+          [attr.aria-expanded]="isOpen"
           class="bg-transparent border-none text-[var(--text-color)] text-2xl cursor-pointer leading-none"
         >
           <lucide-icon [name]="isOpen ? 'x' : 'menu'" [size]="20"></lucide-icon>

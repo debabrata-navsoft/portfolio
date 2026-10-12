@@ -10,11 +10,13 @@ import { GradientText } from '../gradient-text/gradient-text';
 import { CustomNav } from '../custom-nav/custom-nav';
 import { RevealDirective } from '../../directives/reveal.directive';
 import { FormatTextPipe } from '../../../pipes/format-text.pipe';
+import { CdnImagePipe } from '../../../pipes/cdn-image.pipe';
 
 @Component({
   selector: 'app-hero',
   standalone: true,
   imports: [
+    CdnImagePipe,
     LucideAngularModule,
     CustomButton,
     GradientText,

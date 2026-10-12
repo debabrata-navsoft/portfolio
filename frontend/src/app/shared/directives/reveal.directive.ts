@@ -56,6 +56,11 @@ export class RevealDirective implements AfterViewInit, OnDestroy {
 
     const host = this.el.nativeElement;
 
+    // Already on screen with no splash over it: it was server-rendered visible, so hiding it to
+    // replay the animation would count as a layout shift and hold back the largest paint.
+    const onScreen = host.getBoundingClientRect().top < window.innerHeight;
+    if (onScreen && !this.loaderService.startupLoading()) return;
+
     this.renderer.setStyle(host, 'transition', 'none');
     this.renderer.addClass(host, 'reveal');
     this.renderer.addClass(host, `reveal-${this.revealAnimation()}`);

@@ -21,11 +21,13 @@ import { CustomButton } from '../custom-button/custom-button';
 import { GradientText } from '../gradient-text/gradient-text';
 import { CustomNav } from '../custom-nav/custom-nav';
 import { RevealDirective } from '../../directives/reveal.directive';
+import { CdnImagePipe } from '../../../pipes/cdn-image.pipe';
 
 @Component({
   selector: 'app-home-projects',
   standalone: true,
   imports: [
+    CdnImagePipe,
     CustomButton,
     GradientText,
     UpperCasePipe,

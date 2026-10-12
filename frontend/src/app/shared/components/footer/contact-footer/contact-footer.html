@@ -59,8 +59,8 @@
     >
       @for (item of footerMenu; track item.id) {
         <a
-          href="javascript:void(0)"
-          (click)="handleNavigation(item)"
+          [href]="item.link"
+          (click)="$event.preventDefault(); handleNavigation(item)"
           class="group relative inline-block w-fit text-xl text-white transition-colors duration-300 hover:text-primary"
         >
           {{ item.title }}
@@ -89,7 +89,7 @@
   </div>
 
   <!-- Bottom -->
-  <p class="mt-20 pb-4 text-center text-base text-gray-500">
+  <p class="mt-20 pb-4 text-center text-base text-gray-400">
     © {{ currentYear }}
 
     <app-gradient-text tagName="span" text="<Debabrata Das />" /> Rights Reserved. Built using
